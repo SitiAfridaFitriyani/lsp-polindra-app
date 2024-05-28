@@ -36,8 +36,16 @@ function snackBarAlert(message, alertBgColor) {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 statusCode: {
-                    422: function() {
-                        snackBarAlert('Error form validation', '#e7515a');
+                    422: function(response) {
+                        let errors = response.responseJSON.message;
+                        let errorMessages = [];
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errors[field].forEach(function(error) {
+                                    snackBarAlert(error, '#e7515a');
+                                });
+                            }
+                        }
                     },
                     500: function() {
                         snackBarAlert('Internal server error', '#e7515a');

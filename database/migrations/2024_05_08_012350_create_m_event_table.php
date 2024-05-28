@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->string('nama_event');
-            $table->string('tuk',200);
+            $table->enum('tuk', ['Sewaktu','Tempat Kerja','Mandiri']);
             $table->timestamp('event_mulai');
             $table->timestamp('event_selesai');
             $table->string('keterangan');

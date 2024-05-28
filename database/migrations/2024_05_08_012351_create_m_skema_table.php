@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('m_skema', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->string('kode_skema');
+            $table->string('kode_skema')->unique();
             $table->string('judul_skema');
-            $table->string('no_skema');
+            $table->string('no_skema')->unique();
             $table->enum('jenis_standar',['KKNI','Okupasi','Klaster']);
             $table->foreignId('event_id')->constrained('m_event')->cascadeOnDelete();
             $table->timestamps();

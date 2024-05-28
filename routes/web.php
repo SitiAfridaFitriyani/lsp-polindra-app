@@ -18,18 +18,32 @@ use Illuminate\Support\Facades\Route;
 // Root
 Route::get('/',fn() => to_route('dashboard'));
 Route::view('/dashboard','dashboard.index')->name('dashboard');
-// Perangkat Assesmen
-Route::resource('event',EventController::class);
-Route::get('datatable-event', [EventController::class, 'datatable'])->name('event.datatable');
-Route::get('event-skema-list/{uuid}',[EventController::class,'list_skema'])->name('event.list-skema');
+// Event
+Route::resource('event', EventController::class)->except(['create', 'show']);
+Route::prefix('event')->group(function () {
+    Route::get('datatable', [EventController::class, 'datatable'])->name('event.datatable');
+    Route::get('list',[EventController::class,'list'])->name('event.list');
+});
+// Skema
+Route::resource('skema', SkemaController::class)->except(['create', 'show']);
+Route::prefix('skema')->group(function () {
+    Route::get('datatable', [SkemaController::class, 'datatable'])->name('skema.datatable');
+    Route::get('list',[SkemaController::class,'list'])->name('skema.list');
+    Route::get('list/{uuid}', [SkemaController::class, 'listByUUID'])->name('skema.listByUuid');
+});
+// Unit Komptensi
+Route::resource('unit-kompetensi',UnitKompetensiController::class)->names('unitKompetensi')->except(['create', 'show']);;
+Route::prefix('unit-kompetensi')->group(function () {
+    Route::get('datatable', [UnitKompetensiController::class, 'datatable'])->name('unit-kompetensi.datatable');
+    Route::get('list',[UnitKompetensiController::class,'list'])->name('unit-kompetensi.list');
+    Route::get('list/{uuid}', [UnitKompetensiController::class, 'listByUUID'])->name('unit-kompetensi.listByUuid');
 
-Route::resource('skema',SkemaController::class);
-Route::get('datatable-skema', [SkemaController::class, 'datatable'])->name('skema.datatable');
-Route::get('skema-unitKompetensi-list/{uuid}',[SkemaController::class,'list_unitKompetensi'])->name('skema.list-unitKompetensi');
-
-Route::resource('unit-kompetensi',UnitKompetensiController::class)->names('unitKompetensi');
+});
+// Elemen
 Route::resource('elemen',ElemenController::class);
+// Kriteria Unjuk Kerja
 Route::resource('kriteria-unjuk-kerja',KriteriaUnjukKerjaController::class)->names('kriteriaUnjukKerja');
+// Berkas Permohonan
 Route::resource('berkas-permohonan',BerkasPemohonController::class)->names('berkasPermohonan');
 Route::resource('ujian-tulis',TestTulisController::class)->names('ujianTulis');
 Route::resource('ujian-praktek',TestPraktekController::class)->names('ujianPraktek');

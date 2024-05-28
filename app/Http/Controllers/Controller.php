@@ -21,7 +21,8 @@ class Controller extends BaseController
             'email' => 'Masukkan format email yang benar',
             'numeric' => 'Format harus berupa angka',
             'in' => 'Data harus salah satu dari :values',
-            'date' => 'Data harus berupa tanggal'
+            'date' => 'Data harus berupa tanggal',
+            'integer' => 'Data harus berupa angka'
         );
     }
 }

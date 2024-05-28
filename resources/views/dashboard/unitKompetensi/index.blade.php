@@ -1,5 +1,5 @@
 @extends('layouts.app.main')
-@section('title','Skema')
+@section('title','Unit Kompetensi')
 @section('content')
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
@@ -12,7 +12,7 @@
                         </a>
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             <a class="dropdown-item" href="{{ route('event.index') }}">Event</a>
-                            <a class="dropdown-item" href="{{ route('unitKompetensi.index') }}">Unit Kompetensi</a>
+                            <a class="dropdown-item" href="{{ route('skema.index') }}">Skema</a>
                             <a class="dropdown-item" href="{{ route('elemen.index') }}">Elemen</a>
                             <a class="dropdown-item" href="{{ route('kriteriaUnjukKerja.index') }}">Kriteria Unjuk Kerja</a>
                             <a class="dropdown-item" href="{{ route('berkasPermohonan.index') }}">Berkas Permohonan</a>
@@ -20,7 +20,7 @@
                             <a class="dropdown-item" href="{{ route('ujianPraktek.index') }}">Ujian Praktek</a>
                         </div>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Skema</li>
+                    <li class="breadcrumb-item active" aria-current="page">Unit Kompetensi</li>
                 </ol>
             </nav>
         </div>
@@ -37,30 +37,29 @@
                     <a href="javascript:void(0);" class="dropdown-item">Export Excel</a>
                 </div>
             </div>
-            @include('dashboard.skema.create')
+            @include('dashboard.unitKompetensi.create')
             <div class="statbox widget box box-shadow">
                 <div class="widget-content widget-content-area">
                     <table id="table-skema" class="table style-3 table-hover" data-route="{{ route('skema.datatable') }}">
                         <thead>
                             <tr>
-                                <th>Kode Skema</th>
-                                <th>No Skema</th>
-                                <th>Judul Skema</th>
+                                <th>Kode Unit</th>
+                                <th>Judul Unit</th>
                                 <th>Jenis Standar</th>
-                                <th>Event</th>
+                                <th>Skema</th>
                                 <th class="text-center dt-no-sorting">Action</th>
                             </tr>
                         </thead>
                     </table>
-                    @include('dashboard.skema.listUnitKompetensi')
+                    @include('dashboard.unitKompetensi.listElemen')
                 </div>
             </div>
         </div>
     </div>
     @push('datatable')
-        @include('dashboard.skema.component')
-        @include('dashboard.skema.datatable')
-        @include('dashboard.skema.modalListUnitKompetensi')
-        @include('dashboard.skema.edit')
+        @include('dashboard.unitKompetensi.component')
+        @include('dashboard.unitKompetensi.datatable')
+        @include('dashboard.unitKompetensi.modalElemen')
+        @include('dashboard.unitKompetensi.edit')
     @endpush
 @endsection

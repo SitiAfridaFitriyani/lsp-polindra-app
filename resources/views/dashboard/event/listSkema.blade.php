@@ -22,6 +22,7 @@
                             </thead>
                             <tbody></tbody>
                         </table>
+                        <p id="empty-dataTable">Tidak ada data</p>
                     </div>
                 </p>
             </div>

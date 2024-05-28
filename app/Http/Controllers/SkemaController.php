@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Skema;
-use App\Http\Requests\StoreSkemaRequest;
-use App\Http\Requests\UpdateSkemaRequest;
-use App\Models\UnitKompetensi;
-
+use App\Models\{Event, Skema};
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 class SkemaController extends Controller
 {
     /**
@@ -18,43 +16,81 @@ class SkemaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSkemaRequest $request)
+    public function store(Request $request)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'no_skema' => ['required', 'string', 'max:255', 'unique:m_skema,no_skema'],
+            'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
+            'kode_skema' => ['required','unique:m_skema,kode_skema'],
+            'judul_skema' => ['required', 'string', 'max:255'],
+            'event_id' => ['required']
+        ], $this->messageValidation());
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Skema $skema)
-    {
-        //
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+        }
+        $validated = $validator->validated();
+        $event = Event::where('uuid', $validated['event_id'])->first();
+        if(empty($event)) {
+            return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
+        }
+        $validated['event_id'] = $event['id'];
+        $data =  Skema::create($validated);
+        if ($data) {
+            return response()->json(['status' => 'success', 'message' => 'Data skema berhasil ditambahkan'], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Skema $skema)
+    public function edit($uuid)
     {
-        //
+        $skema = Skema::where('uuid', $uuid)->first();
+        if($skema) {
+            return response()->json(['status' => 'success', 'data' => $skema], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSkemaRequest $request, Skema $skema)
+    public function update(Request $request, $uuid)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'no_skema' => ['required', 'string', 'max:255', 'unique:m_skema,no_skema,'. $uuid . ',uuid'],
+            'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
+            'kode_skema' => ['required','unique:m_skema,kode_skema,'. $uuid . ',uuid'],
+            'judul_skema' => ['required', 'string', 'max:255'],
+            'event_id' => ['required']
+        ], $this->messageValidation());
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+        }
+        $validated = $validator->validated();
+        $event = Event::where('uuid', $validated['event_id'])->first();
+        if(empty($event)) {
+            return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
+        }
+        $validated['event_id'] = $event['id'];
+
+        $data = Skema::where('uuid', $uuid)->first();
+        if(empty($data)) {
+            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
+        }
+        $result =  $data->update($validated);
+        if ($result) {
+            return response()->json(['status' => 'success', 'message' => 'Data skema berhasil diubah'], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
+        }
     }
 
     /**
@@ -62,25 +98,34 @@ class SkemaController extends Controller
      */
     public function destroy($uuid)
     {
-        Skema::where('uuid', $uuid)->delete();
-        return response()->json(['status' => 'success','message' => 'Skema berhasil dihapus'], 200);
-
+        $skema = Skema::where('uuid', $uuid);
+        if($skema->delete()) {
+            return response()->json(['status' => 'success','message' => 'Data skema berhasil dihapus'], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
+        }
     }
 
     public function datatable()
+    {
+        $data = Skema::with('event')->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function list()
     {
         $data = Skema::latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
-    public function list_unitKompetensi($uuid)
+    public function listByUUID($uuid)
     {
-        $skmeId = Skema::where('uuid',$uuid)->pluck('id');
-        if(isset($skmeId)) {
-            $result = UnitKompetensi::where('skema_id', $skmeId)->get();
-            return response()->json(['status' => 'success', 'data' => $result], 200);
+        $eventId = Event::where('uuid', $uuid)->pluck('id');
+        if(isset($eventId)) {
+            $result = Skema::where('event_id', $eventId)->get();
+            return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);
         } else {
-            return response()->json(['status' => 'success', 'message' => 'Data skema tidak ditemukan'], 404);
+            return response()->json(['status' => 'success', 'message' => 'Data event tidak ditemukan'], 404);
         }
     }
 }

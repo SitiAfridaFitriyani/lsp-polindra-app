@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-
 class Skema extends Model
 {
     use HasFactory;
@@ -18,5 +17,10 @@ class Skema extends Model
         static::creating(function ($model) {
             $model->uuid = Str::uuid();
         });
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class,'event_id'); // Many To One
     }
 }
