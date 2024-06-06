@@ -38,6 +38,7 @@
         const targetModal = elemen.getAttribute('data-target');
         $(`${targetModal}`).modal('show');
         $('#skema-modal-title').text('Tambah Data Skema');
+        $('#btn-form').text('Simpan');
         $('.needs-validation').attr('action','{{ route("skema.store") }}');
     }
 

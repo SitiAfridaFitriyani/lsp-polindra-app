@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('uuid')->unique();
             $table->string('kode_unit');
             $table->string('judul_unit');
-            $table->enum('jenis_standar',['SKKNI']);
+            $table->enum('jenis_standar',['KKNI','Okupasi','Klaster']);
             $table->foreignId('skema_id')->constrained('m_skema')->cascadeOnDelete();
             $table->timestamps();
         });

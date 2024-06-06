@@ -15,6 +15,7 @@
         const targetModal = elemen.getAttribute('data-target');
         $(`${targetModal}`).modal('show');
         $('#event-modal-title').text('Tambah Data Event');
+        $('#btn-form').text('Simpan');
         $('.needs-validation').attr('action','{{ route("event.store") }}');
         flatpickr(document.getElementById('event_mulai'), {
             enableTime: true,

@@ -1,8 +1,8 @@
-<div class="modal fade" id="modal-list-unitKompetensi" tabindex="-1" aria-labelledby="modal-title-unitKompetensi" aria-hidden="true">
+<div class="modal fade" id="modal-list-elemen" tabindex="-1" aria-labelledby="modal-title-elemen" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title-unitKompetensi">Daftar Unit Kompetensi [Nama Skema]</h5>
+                <h5 class="modal-title" id="modal-title-elemen">Daftar Elemen [Nama Unit Kompetensi]</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
@@ -10,12 +10,10 @@
             <div class="modal-body">
                 <p class="modal-text">
                     <div class="table-responsive">
-                        <table id="table-list-unitKompetensi" class="table table-bordered mb-4">
+                        <table id="table-list-elemen" class="table table-bordered mb-4">
                             <thead>
                                 <tr>
-                                    <th>Kode Unit</th>
-                                    <th>Judul Unit</th>
-                                    <th>Jenis Standar</th>
+                                    <th>Nama Elemen</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>

@@ -23,3 +23,8 @@
 <link href="{{ asset('admin/plugins/flatpickr/custom-flatpickr.css') }}" rel="stylesheet" type="text/css">
 {{-- Snackbar --}}
 <link href="{{ asset('admin/plugins/notification/snackbar/snackbar.min.css') }}" rel="stylesheet" type="text/css" />
+@if(request()->routeIs('login') || request()->routeIs('password.request'))
+    <link href="{{ asset('admin/assets/css/authentication/form-1.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/switches.css') }}">
+@endif

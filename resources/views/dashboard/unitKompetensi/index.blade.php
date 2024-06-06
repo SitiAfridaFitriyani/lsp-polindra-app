@@ -26,7 +26,7 @@
         </div>
         <div class="col-lg-12">
             <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-skema" onclick="modalFormCreate(this)">
+                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-unitKompetensi" onclick="modalFormCreate(this)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 <button class="btn btn-transparent mb-2 mr-2 border dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -40,7 +40,7 @@
             @include('dashboard.unitKompetensi.create')
             <div class="statbox widget box box-shadow">
                 <div class="widget-content widget-content-area">
-                    <table id="table-skema" class="table style-3 table-hover" data-route="{{ route('skema.datatable') }}">
+                    <table id="table-unitKompetensi" class="table style-3 table-hover" data-route="{{ route('unitKompetensi.datatable') }}">
                         <thead>
                             <tr>
                                 <th>Kode Unit</th>

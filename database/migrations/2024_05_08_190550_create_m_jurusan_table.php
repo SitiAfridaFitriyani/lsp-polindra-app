@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('m_jurusan', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->string('nama_jurusan');
+            $table->string('nama_jurusan')->unique();
             $table->string('keterangan');
             $table->timestamps();
         });

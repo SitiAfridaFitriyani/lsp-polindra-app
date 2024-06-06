@@ -1,24 +1,22 @@
 <script>
-    function handleListUnitKompetensi(elemen) {
+    function handleListElemen(elemen) {
         const modalbs = elemen.getAttribute('data-modal');
         const dataRoute = elemen.getAttribute('data-route');
-        const skemaName = elemen.getAttribute('data-skemaName');
+        const unitKompetensiName = elemen.getAttribute('data-unitKompetensiName');
         $.ajax({
             url: dataRoute,
             type: 'GET',
             success: function(response) {
                 const data = response.data;
-                $('#table-list-unitKompetensi tbody').empty();
-                $('#modal-title-unitKompetensi').text('Daftar Unit Kompetensi [' + skemaName + ']');
+                $('#table-list-elemen tbody').empty();
+                $('#modal-title-elemen').text('Daftar Elemen [' + unitKompetensiName + ']');
                 $('#' + modalbs).modal('show');
 
                 if(data.length > 0) {
                     $('#empty-dataTable').addClass('d-none');
                     data.forEach(function(item) {
                         var row = $('<tr>');
-                        row.append($('<td>').text(item.kode_unit));
-                        row.append($('<td>').text(item.judul_unit));
-                        row.append($('<td>').text(item.jenis_standar));
+                        row.append($('<td>').text(item.nama_elemen));
                         row.append($('<td class="text-center">').html(
                             `<ul class="table-controls list-unstyled">
                                 <li>
@@ -28,7 +26,7 @@
                                 </li>
                             </ul>`
                         ));
-                        $('#table-list-unitKompetensi tbody').append(row);
+                        $('#table-list-elemen tbody').append(row);
                     });
                 } else {
                     $('#empty-dataTable').removeClass('d-none').addClass('text-center');

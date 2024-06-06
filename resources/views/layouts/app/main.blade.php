@@ -8,22 +8,40 @@
     <title>LSP Polindra :: @yield('title')</title>
     @include('layouts.app.style')
 </head>
-<body class="sidebar-noneoverflow">
-    <div id="load_screen"> <div class="loader"> <div class="loader-content">
-        <div class="spinner-grow align-self-center"></div>
-    </div></div></div>
-    @include('layouts.app.header')
-    <div class="main-container" id="container">
-        <div class="overlay"></div>
-        <div class="search-overlay"></div>
-        @include('layouts.app.sidebar')
-        <div id="content" class="main-content">
-            <div class="layout-px-spacing">
-                @yield('content')
+<body @class(['sidebar-noneoverflow' => !request()->routeIs('login') && !request()->routeIs('password.request'), 'form' => request()->routeIs('login') && request()->routeIs('password.request')])>
+    @if(!request()->routeIs('login') && !request()->routeIs('password.request'))
+        <div id="load_screen"> <div class="loader"> <div class="loader-content">
+            <div class="spinner-grow align-self-center"></div>
+        </div></div></div>
+        @include('layouts.app.header')
+        <div class="main-container" id="container">
+            <div class="overlay"></div>
+            <div class="search-overlay"></div>
+            @include('layouts.app.sidebar')
+            <div id="content" class="main-content">
+                <div class="layout-px-spacing">
+                    @yield('content')
+                </div>
+                @include('layouts.app.footer')
             </div>
-            @include('layouts.app.footer')
+        </div>
+    @else
+    <div class="form-container">
+        <div class="form-form">
+            <div class="form-form-wrap">
+                <div class="form-container">
+                    <div class="form-content">
+                        @yield('authentication')
+                        <p class="terms-conditions">© 2020 All Rights Reserved. <a href="javascript:void(0)">LSP Polindra</a> is a product of Designreset. <a href="javascript:void(0);">Cookie Preferences</a>, <a href="javascript:void(0);">Privacy</a>, and <a href="javascript:void(0);">Terms</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-image">
+            <div class="l-image"></div>
         </div>
     </div>
+    @endif
     @include('layouts.app.script')
     @stack('datatable')
     @include('layouts.app.component')

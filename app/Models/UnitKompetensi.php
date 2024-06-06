@@ -21,6 +21,11 @@ class UnitKompetensi extends Model
 
     public function skema()
     {
-        return $this->belongsTo(Skema::class,'skema_id'); // Many To One
+        return $this->belongsTo(Skema::class,'skema_id');
+    }
+
+    public function elemen()
+    {
+        return $this->hasMany(Elemen::class, 'unit_kompetensi_id');
     }
 }

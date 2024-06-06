@@ -1,6 +1,7 @@
 <script>
     function handleEdit(elemen) {
         $('#event-modal-title').text('Edit Data Event');
+        $('#btn-form').text('Update');
         const editRoute = elemen.getAttribute('data-route');
         const uuid = elemen.getAttribute('data-uuid');
         const updateRoute = '{{ route("event.update", [":uuid"]) }}';

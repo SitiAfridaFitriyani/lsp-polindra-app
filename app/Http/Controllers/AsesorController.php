@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asesor;
+use App\Models\{Asesor, Kelas, KelompokAsesor};
 use App\Http\Requests\StoreAsesorRequest;
 use App\Http\Requests\UpdateAsesorRequest;
 
@@ -62,5 +62,33 @@ class AsesorController extends Controller
     public function destroy(Asesor $asesor)
     {
         //
+    }
+
+    public function datatable()
+    {
+        $data = Asesor::with(['kelompokAsesor','user'])->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function list()
+    {
+        $data = Asesor::with(['kelompokAsesor','user'])->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function listByUUID($uuid)
+    {
+        $kelasId = Kelas::with('kelompokAsesor')
+            ->where('uuid',$uuid)
+            ->pluck('id');
+        if(isset($kelasId)) {
+            $result = KelompokAsesor::with(['asesor','kelas'])
+            ->where('kelas_id', $kelasId)
+            ->latest()
+            ->get();
+            return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);
+        } else {
+            return response()->json(['status' => 'success', 'message' => 'Data kelas tidak ditemukan'], 404);
+        }
     }
 }

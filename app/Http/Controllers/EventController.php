@@ -32,7 +32,7 @@ class EventController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
-        $validated = $validator->validated();
+        $validated = $validator->validate();
         $data =  Event::create($validated);
         if ($data) {
             return response()->json(['status' => 'success', 'message' => 'Data event berhasil ditambahkan'], 200);
@@ -71,7 +71,7 @@ class EventController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
-        $validated = $validator->validated();
+        $validated = $validator->validate();
         $data = Event::where('uuid', $uuid)->first();
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
@@ -90,10 +90,13 @@ class EventController extends Controller
     public function destroy($uuid)
     {
         $event = Event::where('uuid', $uuid);
-        if($event->delete()) {
-            return response()->json(['status' => 'success', 'message' => 'Data Event berhasil dihapus'], 200);
-        } else {
+        if(empty($event->first())) {
             return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
+        }
+        if($event->delete()) {
+            return response()->json(['status' => 'success', 'message' => 'Data event berhasil dihapus'], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Data event gagal dihapus'], 500);
         }
 
     }

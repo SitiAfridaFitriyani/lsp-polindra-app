@@ -25,13 +25,13 @@ class UnitKompetensiController extends Controller
             'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
             'kode_unit' => ['required','unique:m_unit_kompetensi,kode_unit'],
             'judul_unit' => ['required', 'string', 'max:255'],
-            'skema_id' => ['required']
+            'skema_id' => ['required', 'exists:m_skema,uuid']
         ], $this->messageValidation());
 
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
-        $validated = $validator->validated();
+        $validated = $validator->validate();
         $skema = Skema::where('uuid', $validated['skema_id'])->first();
         if(empty($skema)) {
             return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
@@ -50,8 +50,10 @@ class UnitKompetensiController extends Controller
      */
     public function edit($uuid)
     {
-        $uk = UnitKompetensi::where('uuid', $uuid)->first();
-        if($uk) {
+        $uk = UnitKompetensi::with(['skema','elemen'])
+            ->where('uuid', $uuid)
+            ->first();
+        if(!empty($uk)) {
             return response()->json(['status' => 'success', 'data' => $uk], 200);
         } else {
             return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
@@ -63,7 +65,33 @@ class UnitKompetensiController extends Controller
      */
     public function update(Request $request, $uuid)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
+            'kode_unit' => ['required','unique:m_unit_kompetensi,kode_unit,'. $uuid . ',uuid'],
+            'judul_unit' => ['required', 'string', 'max:255'],
+            'skema_id' => ['required', 'exists:m_skema,uuid']
+        ], $this->messageValidation());
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+        }
+        $validated = $validator->validate();
+        $skema = Skema::where('uuid', $validated['skema_id'])->first();
+        if(empty($skema)) {
+            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
+        }
+        $validated['skema_id'] = $skema['id'];
+
+        $data = UnitKompetensi::with(['skema','elemen'])->where('uuid', $uuid)->first();
+        if(empty($data)) {
+            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
+        }
+        $result =  $data->update($validated);
+        if ($result) {
+            return response()->json(['status' => 'success', 'message' => 'Data unit kompetensi berhasil diubah'], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
+        }
     }
 
     /**
@@ -71,17 +99,20 @@ class UnitKompetensiController extends Controller
      */
     public function destroy($uuid)
     {
-        $uk = UnitKompetensi::where('uuid', $uuid);
+        $uk = UnitKompetensi::with(['skema','elemen'])->where('uuid', $uuid);
+        if(empty($uk->first())) {
+            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
+        }
         if($uk->delete()) {
             return response()->json(['status' => 'success','message' => 'Data unit kompetensi berhasil dihapus'], 200);
         } else {
-            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi gagal dihapus'], 500);
         }
     }
 
     public function datatable()
     {
-        $data = UnitKompetensi::with('skema')->latest()->get();
+        $data = UnitKompetensi::with(['skema','elemen'])->latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
@@ -95,7 +126,7 @@ class UnitKompetensiController extends Controller
     {
         $skmeId = Skema::where('uuid',$uuid)->pluck('id');
         if(isset($skmeId)) {
-            $result = UnitKompetensi::where('skema_id', $skmeId)->get();
+            $result = UnitKompetensi::with(['skema','elemen'])->where('skema_id', $skmeId)->latest()->get();
             return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);
         } else {
             return response()->json(['status' => 'success', 'message' => 'Data skema tidak ditemukan'], 404);

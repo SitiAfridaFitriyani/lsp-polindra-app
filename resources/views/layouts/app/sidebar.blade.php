@@ -4,8 +4,8 @@
             <figure class="user-cover-image"></figure>
             <div class="user-info">
                 <img src="{{ asset('admin/assets/img/nopict.png') }}" alt="avatar">
-                <h6 class="">Sonia Shaw</h6>
-                <p class="">Project Leader</p>
+                <h6 class="">{{ Auth::user()->name }}</h6>
+                <p class="">{{ Auth::user()->role }}</p>
             </div>
         </div>
         <div class="shadow-bottom"></div>

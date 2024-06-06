@@ -1,6 +1,7 @@
 <script>
     function handleEdit(elemen) {
         $('#skema-modal-title').text('Edit Data Skema');
+        $('#btn-form').text('Update');
         const editRoute = elemen.getAttribute('data-route');
         const uuid = elemen.getAttribute('data-uuid');
         const updateRoute = '{{ route("skema.update", [":uuid"]) }}';

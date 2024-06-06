@@ -16,11 +16,12 @@ return new class extends Migration
             $table->string('uuid')->unique();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('username')->unique();
-            $table->enum('role',['Asesor','Asesi','Admin']);
-            $table->text('address');
-            $table->string('phone',20)->unique();
-            $table->string('photo');
+            $table->string('username')->nullable()->unique();
+            $table->enum('role',['Asesor','Asesi','Admin'])->default('Asesi');
+            $table->text('address')->nullable();
+            $table->string('phone',20)->nullable()->unique();
+            $table->string('photo')->nullable();
+            $table->enum('jenis_kelamin',['Laki-laki','Perempuan'])->nullable();
             $table->enum('status',['active','nonactive'])->default('active');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

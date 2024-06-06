@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt-3 text-center" type="submit">Simpan</button>
+                            <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
                         </form>
                     </div>
                 </p>
