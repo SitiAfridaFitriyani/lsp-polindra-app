@@ -23,4 +23,9 @@ class Skema extends Model
     {
         return $this->belongsTo(Event::class,'event_id'); // Many To One
     }
+
+    public function berkasPermohonan()
+    {
+        return $this->hasMany(BerkasPemohon::class,'skema_id');
+    }
 }

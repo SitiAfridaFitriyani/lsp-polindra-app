@@ -72,17 +72,19 @@ class ElemenController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
         $validated = $validator->validate();
-        $unitKompetensi = UnitKompetensi::where('uuid', $validated['unit_kompetensi_id'])->first();
-        if(empty($unitKompetensi)) {
-            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
-        }
-        $validated['unit_kompetensi_id'] = (int) $unitKompetensi['id'];
 
         $data = Elemen::where('uuid', $uuid)
             ->first();
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data elemen tidak ditemukan'], 404);
         }
+
+        $unitKompetensi = UnitKompetensi::where('uuid', $validated['unit_kompetensi_id'])->first();
+        if(empty($unitKompetensi)) {
+            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
+        }
+        $validated['unit_kompetensi_id'] = (int) $unitKompetensi['id'];
+
         $result =  $data->update($validated);
         if ($result) {
             return response()->json(['status' => 'success', 'message' => 'Data elemen berhasil diubah'], 200);

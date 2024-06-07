@@ -75,16 +75,18 @@ class SkemaController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
         $validated = $validator->validate();
+
+        $data = Skema::where('uuid', $uuid)->first();
+        if(empty($data)) {
+            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
+        }
+
         $event = Event::where('uuid', $validated['event_id'])->first();
         if(empty($event)) {
             return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
         }
         $validated['event_id'] = $event['id'];
 
-        $data = Skema::where('uuid', $uuid)->first();
-        if(empty($data)) {
-            return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
-        }
         $result =  $data->update($validated);
         if ($result) {
             return response()->json(['status' => 'success', 'message' => 'Data skema berhasil diubah'], 200);
@@ -111,13 +113,17 @@ class SkemaController extends Controller
 
     public function datatable()
     {
-        $data = Skema::with('event')->latest()->get();
+        $data = Skema::with(['event','berkasPermohonan'])
+        ->latest()
+        ->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
     public function list()
     {
-        $data = Skema::latest()->get();
+        $data = Skema::with(['event','berkasPermohonan'])
+        ->latest()
+        ->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
@@ -125,7 +131,9 @@ class SkemaController extends Controller
     {
         $eventId = Event::where('uuid', $uuid)->pluck('id');
         if(isset($eventId)) {
-            $result = Skema::where('event_id', $eventId)->get();
+            $result = Skema::with(['event','berkasPermohonan'])
+            ->where('event_id', $eventId)
+            ->get();
             return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);
         } else {
             return response()->json(['status' => 'success', 'message' => 'Data event tidak ditemukan'], 404);

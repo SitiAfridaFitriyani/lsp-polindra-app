@@ -57,9 +57,14 @@ Route::middleware('auth')->group(function () {
         Route::get('list/{uuid}', [KriteriaUnjukKerjaController::class, 'listByUUID'])->name('kriteriaUnjukKerja.listByUuid');
     });
     // Berkas Permohonan
-    Route::resource('berkas-permohonan',BerkasPemohonController::class)->names('berkasPermohonan');
+    Route::resource('berkas-permohonan',BerkasPemohonController::class)->names('berkasPemohon')->except(['create', 'show']);
+    Route::prefix('berkas-permohonan')->group(function () {
+        Route::get('datatable', [BerkasPemohonController::class, 'datatable'])->name('berkasPemohon.datatable');
+        Route::get('list',[BerkasPemohonController::class,'list'])->name('berkasPemohon.list');
+        Route::get('list/{uuid}', [BerkasPemohonController::class, 'listByUUID'])->name('berkasPemohon.listByUuid');
+    });
     // Ujian Tulis
-    Route::resource('ujian-tulis',TestTulisController::class)->names('ujianTulis');
+    Route::resource('ujian-tulis',TestTulisController::class)->names('ujianTulis')->except(['create', 'show']);
     Route::prefix('ujian-tulis')->group(function () {
         Route::get('datatable', [TestTulisController::class, 'datatable'])->name('ujianTulis.datatable');
         Route::get('list',[TestTulisController::class,'list'])->name('ujianTulis.list');

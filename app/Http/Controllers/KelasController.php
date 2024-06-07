@@ -75,17 +75,19 @@ class KelasController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
         $validated = $validator->validate();
-        $jurusan = Jurusan::where('uuid', $validated['jurusan_id'])->first();
-        if(empty($jurusan)) {
-            return response()->json(['status' => 'error', 'message' => 'Data jurusan tidak ditemukan'], 404);
-        }
-        $validated['jurusan_id'] = (int) $jurusan['id'];
 
         $data = Kelas::where('uuid', $uuid)
             ->first();
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data kelas tidak ditemukan'], 404);
         }
+
+        $jurusan = Jurusan::where('uuid', $validated['jurusan_id'])->first();
+        if(empty($jurusan)) {
+            return response()->json(['status' => 'error', 'message' => 'Data jurusan tidak ditemukan'], 404);
+        }
+        $validated['jurusan_id'] = (int) $jurusan['id'];
+
         $result =  $data->update($validated);
         if ($result) {
             return response()->json(['status' => 'success', 'message' => 'Data kelas berhasil diubah'], 200);

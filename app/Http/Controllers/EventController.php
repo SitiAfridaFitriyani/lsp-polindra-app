@@ -26,7 +26,7 @@ class EventController extends Controller
             'tuk' => ['required','in:Sewaktu,Tempat Kerja,Mandiri'],
             'event_mulai' => ['required','date'],
             'event_selesai' => ['required','date'],
-            'keterangan' => ['required', 'string', 'max:255','min:5']
+            'keterangan' => ['required', 'string', 'max:255']
         ], $this->messageValidation());
 
         if ($validator->fails()) {
@@ -65,7 +65,7 @@ class EventController extends Controller
             'tuk' => ['required','in:Sewaktu,Tempat Kerja,Mandiri'],
             'event_mulai' => ['required','date'],
             'event_selesai' => ['required','date'],
-            'keterangan' => ['required', 'string', 'max:255','min:5']
+            'keterangan' => ['required', 'string', 'max:255']
         ], $this->messageValidation());
 
         if ($validator->fails()) {

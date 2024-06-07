@@ -1,5 +1,5 @@
 @extends('layouts.app.main')
-@section('title','Kriteria Unjuk Kerja')
+@section('title','Berkas Pemohon')
 @section('content')
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
@@ -15,18 +15,18 @@
                             <a class="dropdown-item" href="{{ route('skema.index') }}">Skema</a>
                             <a class="dropdown-item" href="{{ route('unitKompetensi.index') }}">Unit Kompetensi</a>
                             <a class="dropdown-item" href="{{ route('elemen.index') }}">Elemen</a>
-                            <a class="dropdown-item" href="{{ route('berkasPemohon.index') }}">Berkas Permohonan</a>
+                            <a class="dropdown-item" href="{{ route('kriteriaUnjukKerja.index') }}">Kriteria Unjuk Kerja</a>
                             <a class="dropdown-item" href="{{ route('ujianTulis.index') }}">Ujian Tulis</a>
                             <a class="dropdown-item" href="{{ route('ujianPraktek.index') }}">Ujian Praktek</a>
                         </div>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Kriteria Unjuk Kerja</li>
+                    <li class="breadcrumb-item active" aria-current="page">Berkas Pemohon</li>
                 </ol>
             </nav>
         </div>
         <div class="col-lg-12">
             <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-kriteriaUnjukKerja" onclick="modalFormCreate(this)">
+                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-berkasPemohon" onclick="modalFormCreate(this)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 <button class="btn btn-transparent mb-2 mr-2 border dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -37,27 +37,25 @@
                     <a href="javascript:void(0);" class="dropdown-item">Export Excel</a>
                 </div>
             </div>
-            @include('dashboard.kriteriaUnjukKerja.create')
+            @include('dashboard.berkasPemohon.create')
             <div class="statbox widget box box-shadow">
                 <div class="widget-content widget-content-area">
-                    <table id="table-kriteriaUnjukKerja" class="table style-3 table-hover" data-route="{{ route('kriteriaUnjukKerja.datatable') }}">
+                    <table id="table-berkasPemohon" class="table style-3 table-hover" data-route="{{ route('berkasPemohon.datatable') }}">
                         <thead>
                             <tr>
-                                <th>Nama Kriteria</th>
-                                <th>Elemen</th>
+                                <th>Nama Berkas</th>
+                                <th>Skema</th>
                                 <th class="text-center dt-no-sorting">Action</th>
                             </tr>
                         </thead>
                     </table>
-                    @include('dashboard.kriteriaUnjukKerja.modalTestTulis')
                 </div>
             </div>
         </div>
     </div>
     @push('datatable')
-        @include('dashboard.kriteriaUnjukKerja.component')
-        @include('dashboard.kriteriaUnjukKerja.datatable')
-        @include('dashboard.kriteriaUnjukKerja.listTestTulis')
-        @include('dashboard.kriteriaUnjukKerja.edit')
+        @include('dashboard.berkasPemohon.component')
+        @include('dashboard.berkasPemohon.datatable')
+        @include('dashboard.berkasPemohon.edit')
     @endpush
 @endsection

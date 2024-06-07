@@ -22,7 +22,7 @@ class Jurusan extends Model
 
     public function kelas()
     {
-        return $this->hasMany(Kelas::class,'kelas_id');
+        return $this->hasMany(Kelas::class,'jurusan_id');
     }
 
 }

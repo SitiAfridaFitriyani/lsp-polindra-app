@@ -71,17 +71,19 @@ class KriteriaUnjukKerjaController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
         $validated = $validator->validate();
-        $elemen = Elemen::where('uuid', $validated['elemen_id'])->first();
-        if(empty($elemen)) {
-            return response()->json(['status' => 'error', 'message' => 'Data elemen tidak ditemukan'], 404);
-        }
-        $validated['elemen_id'] = (int) $elemen['id'];
 
         $data = KriteriaUnjukKerja::where('uuid', $uuid)
             ->first();
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data kriteria unjuk kerja tidak ditemukan'], 404);
         }
+
+        $elemen = Elemen::where('uuid', $validated['elemen_id'])->first();
+        if(empty($elemen)) {
+            return response()->json(['status' => 'error', 'message' => 'Data elemen tidak ditemukan'], 404);
+        }
+        $validated['elemen_id'] = (int) $elemen['id'];
+
         $result =  $data->update($validated);
         if ($result) {
             return response()->json(['status' => 'success', 'message' => 'Data kriteria unjuk kerja berhasil diubah'], 200);

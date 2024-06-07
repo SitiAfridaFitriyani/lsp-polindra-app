@@ -15,7 +15,7 @@
                             <a class="dropdown-item" href="{{ route('skema.index') }}">Skema</a>
                             <a class="dropdown-item" href="{{ route('unitKompetensi.index') }}">Unit Kompetensi</a>
                             <a class="dropdown-item" href="{{ route('kriteriaUnjukKerja.index') }}">Kriteria Unjuk Kerja</a>
-                            <a class="dropdown-item" href="{{ route('berkasPermohonan.index') }}">Berkas Permohonan</a>
+                            <a class="dropdown-item" href="{{ route('berkasPemohon.index') }}">Berkas Permohonan</a>
                             <a class="dropdown-item" href="{{ route('ujianTulis.index') }}">Ujian Tulis</a>
                             <a class="dropdown-item" href="{{ route('ujianPraktek.index') }}">Ujian Praktek</a>
                         </div>

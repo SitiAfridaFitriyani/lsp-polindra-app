@@ -43,7 +43,8 @@ class JurusanController extends Controller
      */
     public function edit($uuid)
     {
-        $jurusan = Jurusan::where('uuid', $uuid)
+        $jurusan = Jurusan::with('kelas')
+        ->where('uuid', $uuid)
         ->first();
         if(!empty($jurusan)) {
             return response()->json(['status' => 'success', 'data' => $jurusan], 200);
@@ -98,13 +99,13 @@ class JurusanController extends Controller
 
     public function datatable()
     {
-        $data = Jurusan::latest()->get();
+        $data = Jurusan::with('kelas')->latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
     public function list()
     {
-        $data = Jurusan::latest()->get();
+        $data = Jurusan::latest('kelas')->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

@@ -76,16 +76,18 @@ class UnitKompetensiController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
         $validated = $validator->validate();
+
+        $data = UnitKompetensi::with(['skema','elemen'])->where('uuid', $uuid)->first();
+        if(empty($data)) {
+            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
+        }
+
         $skema = Skema::where('uuid', $validated['skema_id'])->first();
         if(empty($skema)) {
             return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
         }
         $validated['skema_id'] = $skema['id'];
 
-        $data = UnitKompetensi::with(['skema','elemen'])->where('uuid', $uuid)->first();
-        if(empty($data)) {
-            return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
-        }
         $result =  $data->update($validated);
         if ($result) {
             return response()->json(['status' => 'success', 'message' => 'Data unit kompetensi berhasil diubah'], 200);
