@@ -1,14 +1,13 @@
 // Basic
 
-var quill = new Quill('#editor-container', {
+var quill = new Quill('#aplication_description', {
   modules: {
     toolbar: [
       [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline'],
-      ['image', 'code-block']
+      ['bold', 'italic', 'underline']
     ]
   },
-  placeholder: 'Compose an epic...',
+  placeholder: 'Deskripsi website...',
   theme: 'snow'  // or 'bubble'
 });
 
@@ -22,10 +21,10 @@ var quill = new Quill('#editor-container', {
     placeholder: 'Compose an epic...',
     theme: 'snow'
   });
-  
+
   // Enable all tooltips
   $('[data-toggle="tooltip"]').tooltip();
-  
+
   // Can control programmatically too
   $('.ql-italic').mouseover();
   setTimeout(function() {

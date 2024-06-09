@@ -5,10 +5,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#jurusan-modal-title').text('Tambah Data Jurusan');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("jurusan.store") }}');
+        form.attr('action','{{ route("jurusan.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-jurusan').on('hidden.bs.modal', function () {

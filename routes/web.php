@@ -9,7 +9,10 @@ use App\Http\Controllers\{
     JurusanController,
     KelasController,
     KriteriaUnjukKerjaController,
+    PengaturanConctroller,
+    PersetujuanKerahasiaanController,
     ProfileController,
+    RekamanAssesmenController,
     SkemaController,
     TestPraktekController,
     TestTulisController,
@@ -97,8 +100,23 @@ Route::middleware('auth')->group(function () {
     Route::prefix('asesi')->group(function () {
         Route::get('datatable', [AsesiController::class, 'datatable'])->name('asesi.datatable');
         Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
-        Route::get('list/{uuid}', [AsesiController::class, 'listByUUID'])->name('asesi.listByUuid');
     });
+    // Persetujuan Assesmen
+    Route::resource('persetujuan-assesmen',PersetujuanKerahasiaanController::class)->names('persetujuanAssesmen')->except(['create', 'show']);
+    Route::prefix('persetujuan-assesmen')->group(function () {
+        Route::get('datatable', [PersetujuanKerahasiaanController::class, 'datatable'])->name('persetujuanAssesmen.datatable');
+        Route::get('list',[PersetujuanKerahasiaanController::class,'list'])->name('persetujuanAssesmen.list');
+        Route::get('list-by-asesor/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesorUUID'])->name('persetujuanAssesmen.listByAsesorUuid');
+        Route::get('list-by-asesi/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesiUUID'])->name('persetujuanAssesmen.listByAsesiUuid');
+    });
+    // Pengaturan
+    Route::prefix('pengaturan')->group(function () {
+        Route::get('',[PengaturanConctroller::class,'index'])->name('pengaturan');
+        Route::post('',[PengaturanConctroller::class,'store'])->name('pengaturan.store');
+        Route::get('datatable', [PengaturanConctroller::class, 'datatable'])->name('pengaturan.datatable');
+        Route::delete('delete-image/{type}',[PengaturanConctroller::class,'deleteImage'])->name('pengaturan.image-delete');
+    });
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

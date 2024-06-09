@@ -1,4 +1,11 @@
-<link rel="icon" type="image/x-icon" href="{{ asset('admin/assets/img/favicon.ico') }}"/>
+@php
+    $pengaturan = App\Models\Pengaturan::value('application_icon');
+    $image = asset('admin/assets/img/nopict.png');
+    if($pengaturan != null) {
+        $image = asset('storage/'.$pengaturan);
+    }
+@endphp
+<link rel="icon" type="image/x-icon" href="{{ $image }}"/>
 <link href="{{ asset('admin/assets/css/loader.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset('admin/assets/js/loader.js') }}"></script>
 <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700&display=swap" rel="stylesheet">
@@ -23,6 +30,7 @@
 <link href="{{ asset('admin/plugins/flatpickr/custom-flatpickr.css') }}" rel="stylesheet" type="text/css">
 {{-- Snackbar --}}
 <link href="{{ asset('admin/plugins/notification/snackbar/snackbar.min.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="{{ asset('admin/plugins/editors/quill/quill.snow.css') }}">
 @if(request()->routeIs('login') || request()->routeIs('password.request'))
     <link href="{{ asset('admin/assets/css/authentication/form-1.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">

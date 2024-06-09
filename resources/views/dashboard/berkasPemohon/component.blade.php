@@ -30,10 +30,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#berkasPemohon-modal-title').text('Tambah Data Berkas Pemohon');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("berkasPemohon.store") }}');
+        form.attr('action','{{ route("berkasPemohon.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-berkasPemohon').on('hidden.bs.modal', function () {

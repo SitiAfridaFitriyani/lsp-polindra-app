@@ -9,7 +9,7 @@
             success: function(response) {
                 const data = response.data;
                 $('#table-list-asesor tbody').empty();
-                $('#modal-title-kriteriaUnjukKerja').text('Daftar Ujian Tulis [' + kelasName + ']');
+                $('#modal-title-asesor').text('Daftar Asesor [' + kelasName + ']');
                 $('#' + modalbs).modal('show');
 
                 if(data.length > 0) {

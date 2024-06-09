@@ -36,10 +36,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#unitKompetensi-modal-title').text('Tambah Data Unit Kompetensi');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("unitKompetensi.store") }}');
+        form.attr('action','{{ route("unitKompetensi.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-unitKompetensi').on('hidden.bs.modal', function () {

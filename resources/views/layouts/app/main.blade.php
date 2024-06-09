@@ -5,7 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>LSP Polindra :: @yield('title')</title>
+    @php
+        $pengaturan = App\Models\Pengaturan::value('application_prefix_title');
+        $prefixTitle = 'LSP Polindra';
+        if($pengaturan != null) {
+            $prefixTitle = $pengaturan;
+        }
+    @endphp
+    <title>{{ $pengaturan }} @yield('title')</title>
     @include('layouts.app.style')
 </head>
 <body @class(['sidebar-noneoverflow' => !request()->routeIs('login') && !request()->routeIs('password.request'), 'form' => request()->routeIs('login') && request()->routeIs('password.request')])>

@@ -50,7 +50,7 @@
                                 <div class="col-12 mb-4">
                                     <label for="jenis_standar">Jenis Standar <span class="text-danger">*</span></label>
                                     <select class="form-control select-standar @error('jenis_standar') is-invalid @enderror" name="jenis_standar" id="jenis_standar" required>
-                                        <option value="" selected disabled>Please select</option>
+                                        <option hidden selected disabled>Please select</option>
                                         <option value="KKNI">KKNI</option>
                                         <option value="Okupasi">Okupasi</option>
                                         <option value="Klaster">Klaster</option>

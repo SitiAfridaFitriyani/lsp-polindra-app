@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RekamanAssesmen;
 use App\Http\Requests\StoreRekamanAssesmenRequest;
 use App\Http\Requests\UpdateRekamanAssesmenRequest;
+use App\Models\Asesor;
 
 class RekamanAssesmenController extends Controller
 {
@@ -62,5 +63,33 @@ class RekamanAssesmenController extends Controller
     public function destroy(RekamanAssesmen $rekamanAssesmen)
     {
         //
+    }
+
+    public function datatable()
+    {
+        $data = RekamanAssesmen::with(['asesor','asesi','skema'])->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function list()
+    {
+        $data = RekamanAssesmen::with(['asesor','asesi','skema'])->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function listByUUID($uuid)
+    {
+        $asesorId = Asesor::with('user')
+            ->where('uuid',$uuid)
+            ->pluck('id');
+        if(isset($asesorId)) {
+            $result = RekamanAssesmen::with(['asesor','asesi','skema'])
+            ->where('asesor_id', $asesorId)
+            ->latest()
+            ->get();
+            return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);
+        } else {
+            return response()->json(['status' => 'success', 'message' => 'Data asesor tidak ditemukan'], 404);
+        }
     }
 }

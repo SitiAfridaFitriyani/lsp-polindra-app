@@ -29,9 +29,9 @@ class SkemaController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
         $event = Event::where('uuid', $validated['event_id'])->first();
         if(empty($event)) {
             return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
@@ -72,9 +72,9 @@ class SkemaController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = Skema::where('uuid', $uuid)->first();
         if(empty($data)) {

@@ -33,7 +33,8 @@
 <script src="{{ asset('admin/plugins/notification/snackbar/snackbar.min.js') }}"></script>
 <script src="{{ asset('admin/assets/js/components/notification/custom-snackbar.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
+<script src="{{ asset('admin/plugins/editors/quill/quill.js') }}"></script>
+<script src="{{ asset('admin/plugins/editors/quill/custom-quill.js') }}"></script>
 @if(request()->routeIs('login') || request()->routeIs('password.request'))
     <script src="{{ asset('admin/assets/js/authentication/form-1.js') }}"></script>
 @endif

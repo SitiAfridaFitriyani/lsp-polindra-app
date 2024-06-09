@@ -30,10 +30,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#kelas-modal-title').text('Tambah Data Kelas');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("kelas.store") }}');
+        form.attr('action','{{ route("kelas.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-kelas').on('hidden.bs.modal', function () {

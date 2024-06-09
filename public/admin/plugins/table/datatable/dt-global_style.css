@@ -108,10 +108,14 @@ table.dataTable {
   background-color: #fafafa !important; }
 
 .table > tbody > tr:last-child > td .dropdown:not(.custom-dropdown-icon):not(.custom-dropdown) .dropdown-menu, .table > tbody > tr:nth-last-child(2) > td .dropdown:not(.custom-dropdown-icon):not(.custom-dropdown) .dropdown-menu {
-  top: -94px !important; }
+    top: -30px !important;
+    right: -172px !important;
+}
 
 .table > tbody > tr:last-child > td .dropdown:not(.custom-dropdown-icon):not(.custom-dropdown) .dropdown-menu.show, .table > tbody > tr:nth-last-child(2) > td .dropdown:not(.custom-dropdown-icon):not(.custom-dropdown) .dropdown-menu.show {
-  top: -108px !important; }
+  top: 10px !important;
+  position: sticky !important;
+}
 
 .table > tbody > tr > td {
   font-size: 13px;
@@ -120,7 +124,8 @@ table.dataTable {
   padding: 10px 21px 10px 21px;
   color: #515365;
   letter-spacing: normal;
-  white-space: nowrap; }
+  white-space: nowrap;
+}
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: transparent !important; }

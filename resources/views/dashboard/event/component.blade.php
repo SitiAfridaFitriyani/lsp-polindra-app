@@ -13,10 +13,14 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#event-modal-title').text('Tambah Data Event');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("event.store") }}');
+        form.attr('action','{{ route("event.store") }}');
+        form.attr('data-method','POST');
+
         flatpickr(document.getElementById('event_mulai'), {
             enableTime: true,
             dateFormat: "Y-m-d H:i",

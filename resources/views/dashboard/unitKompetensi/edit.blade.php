@@ -7,6 +7,8 @@
         const updateRoute = '{{ route("unitKompetensi.update", [":uuid"]) }}';
         const form = $('.needs-validation');
         form.attr('action', updateRoute.replace(':uuid', uuid));
+        form.attr('data-method','PUT');
+
         if ($('#_method').length === 0) {
             form.append('<input type="hidden" name="_method" id="_method" value="PUT">');
         }

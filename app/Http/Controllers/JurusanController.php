@@ -26,9 +26,9 @@ class JurusanController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data =  Jurusan::create($validated);
         if ($data) {
@@ -64,9 +64,9 @@ class JurusanController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = Jurusan::where('uuid', $uuid)
             ->first();
@@ -105,7 +105,7 @@ class JurusanController extends Controller
 
     public function list()
     {
-        $data = Jurusan::latest('kelas')->get();
+        $data = Jurusan::with('kelas')->latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

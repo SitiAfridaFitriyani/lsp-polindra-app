@@ -36,10 +36,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#skema-modal-title').text('Tambah Data Skema');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("skema.store") }}');
+        form.attr('action','{{ route("skema.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-skema').on('hidden.bs.modal', function () {

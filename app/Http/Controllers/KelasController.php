@@ -28,9 +28,9 @@ class KelasController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
         $jurusan = Jurusan::where('uuid', $validated['jurusan_id'])->first();
         if(empty($jurusan)) {
             return response()->json(['status' => 'error', 'message' => 'Data jurusan tidak ditemukan'], 404);
@@ -72,9 +72,9 @@ class KelasController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = Kelas::where('uuid', $uuid)
             ->first();

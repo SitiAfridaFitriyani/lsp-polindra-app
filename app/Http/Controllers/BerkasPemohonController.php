@@ -27,9 +27,9 @@ class BerkasPemohonController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
         $skema = Skema::where('uuid', $validated['skema_id'])->first();
         if(empty($skema)) {
             return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
@@ -70,9 +70,9 @@ class BerkasPemohonController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = BerkasPemohon::where('uuid', $uuid)->first();
         if(empty($data)) {

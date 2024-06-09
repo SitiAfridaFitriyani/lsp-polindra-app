@@ -30,10 +30,13 @@
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
+        const form = $('.needs-validation');
+
         $(`${targetModal}`).modal('show');
         $('#kriteriaUnjukKerja-modal-title').text('Tambah Data Kriteria Unjuk Kerja');
         $('#btn-form').text('Simpan');
-        $('.needs-validation').attr('action','{{ route("kriteriaUnjukKerja.store") }}');
+        form.attr('action','{{ route("kriteriaUnjukKerja.store") }}');
+        form.attr('data-method','POST');
     }
 
     $('#modal-kriteriaUnjukKerja').on('hidden.bs.modal', function () {

@@ -27,9 +27,9 @@ class ElemenController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
         $unitKompetensi = UnitKompetensi::where('uuid', $validated['unit_kompetensi_id'])->first();
         if(empty($unitKompetensi)) {
             return response()->json(['status' => 'error', 'message' => 'Data unit kompetensi tidak ditemukan'], 404);
@@ -69,9 +69,9 @@ class ElemenController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = Elemen::where('uuid', $uuid)
             ->first();

@@ -23,22 +23,26 @@ function snackBarAlert(message, alertBgColor) {
             event.preventDefault();
             form.classList.add('was-validated');
             const url = form.getAttribute('action');
-            const formData = $(form).serialize();
+            const formData = new FormData(form);
             const keyModal = $(event.target).closest('.modal').data('key-modal');
+            const isUpdate = form.getAttribute('data-method') === 'PUT';
+            const buttonTextLoading = isUpdate ? 'Updating...' : 'Saving...';
+            const buttonTextDone = isUpdate ? 'Update' : 'Simpan';
 
-            submitButton.textContent = 'Loading...';
+            submitButton.textContent = buttonTextLoading;
             submitButton.disabled = true;
             $.ajax({
                 type: 'POST',
                 url: url,
                 data: formData,
+                processData: false,
+                contentType: false,
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 statusCode: {
                     422: function(response) {
-                        let errors = response.responseJSON.message;
-                        let errorMessages = [];
+                        let errors = response.responseJSON.errors;
                         for (let field in errors) {
                             if (errors.hasOwnProperty(field)) {
                                 errors[field].forEach(function(error) {
@@ -53,15 +57,21 @@ function snackBarAlert(message, alertBgColor) {
                 },
                 success: function(response) {
                     snackBarAlert(response.message, '#1abc9c');
-                    form.reset();
+                    submitButton.textContent = buttonTextDone;
+                    submitButton.disabled = false;
+                    if(!url.includes('pengaturan')) {
+                        form.reset();
+                    }
                     getData();
                     $('#' + keyModal).modal('hide');
                 },
                 error: function(xhr, status, error) {
+                    submitButton.textContent = buttonTextDone;
+                    submitButton.disabled = false;
                     snackBarAlert('Internal server error', '#e7515a');
                 },
                 complete: function() {
-                    submitButton.textContent = 'Simpan';
+                    submitButton.textContent = buttonTextDone;
                     submitButton.disabled = false;
                 }
             });

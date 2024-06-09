@@ -26,9 +26,9 @@ class KriteriaUnjukKerjaController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
         $elemen = Elemen::where('uuid', $validated['elemen_id'])->first();
         if(empty($elemen)) {
             return response()->json(['status' => 'error', 'message' => 'Data elemen tidak ditemukan'], 404);
@@ -68,9 +68,9 @@ class KriteriaUnjukKerjaController extends Controller
         ], $this->messageValidation());
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
-        $validated = $validator->validate();
+        $validated = $validator->validated();
 
         $data = KriteriaUnjukKerja::where('uuid', $uuid)
             ->first();

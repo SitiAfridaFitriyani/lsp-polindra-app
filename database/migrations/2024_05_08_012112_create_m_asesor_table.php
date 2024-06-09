@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('m_asesor', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->string('nip',50);
-            $table->string('surat_tugas');
+            $table->string('nip',50)->unique();
+            $table->string('surat_tugas')->nullable();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
