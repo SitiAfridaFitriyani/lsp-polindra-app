@@ -38,16 +38,6 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    <label for="event_id">Event <span class="text-danger">*</span></label>
-                                    <select class="form-control select-event @error('event_id') is-invalid @enderror" name="event_id" id="event_id" required>
-                                    </select>
-                                    <div class="invalid-feedback" style="margin-top: -20px">
-                                        Kolom event tidak boleh kosong
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col-12 mb-4">
                                     <label for="jenis_standar">Jenis Standar <span class="text-danger">*</span></label>
                                     <select class="form-control select-standar @error('jenis_standar') is-invalid @enderror" name="jenis_standar" id="jenis_standar" required>
                                         <option hidden selected disabled>Please select</option>
@@ -59,6 +49,14 @@
                                         Kolom jenis standar tidak boleh kosong
                                     </div>
                                 </div>
+                                {{-- <div class="col-md-6 mb-4">
+                                    <label for="event_id">Event <span class="text-danger">*</span></label>
+                                    <select class="form-control select-event @error('event_id') is-invalid @enderror" name="event_id" id="event_id" required>
+                                    </select>
+                                    <div class="invalid-feedback" style="margin-top: -20px">
+                                        Kolom event tidak boleh kosong
+                                    </div>
+                                </div> --}}
                             </div>
                             <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
                         </form>

@@ -178,80 +178,110 @@
         </div>
     </div>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        getData()
-    });
-    function getData() {
-        $.ajax({
-            url: "{{ route('pengaturan.datatable') }}",
-            type: 'GET',
-            success: function(response) {
-                const data = response.data;
-                const urlLogo = `{{ asset('storage/${data.application_logo}') }}`;
-                const urlIcon = `{{ asset('storage/${data.application_icon}') }}`;
-                const urlNoPict = `{{ asset('admin/assets/img/nopict.png') }}`;
-
-                $('#application_name').val(data.application_name);
-                $('#application_short_name').val(data.application_short_name);
-                $('#application_email').val(data.application_email);
-                $('#application_contact').val(data.application_contact);
-                $('#instagram_account').val(data.instagram_account);
-                $('#facebook_account').val(data.facebook_account);
-                $('#whatsapp_account').val(data.whatsapp_account);
-                $('#twitter_account').val(data.twitter_account);
-                $('#youtube_account').val(data.youtube_account);
-                $('#linkedin_account').val(data.linkedin_account);
-                $('#application_footer').val(data.application_footer);
-                $('#application_prefix_title').val(data.application_prefix_title);
-                $('#application_description').val(data.application_description);
-                if(data.application_logo) {
-                    $('#delete-icon-logo').removeClass('d-none');
-                    $('#file-available-logo').html(`<img src="${urlLogo}" class="rounded-circle" style="width:70px; height:70px"/>`);
-                } else {
-                    $('#delete-icon-logo').addClass('d-none');
-                    $('#file-available-logo').html(`<img src="${urlNoPict}" class="rounded-circle" style="width:70px; height:70px"/>`);
-                }
-                if(data.application_icon) {
-                    $('#delete-icon-favicon').removeClass('d-none');
-                    $('#file-available-favicon').html(`<img src="${urlIcon}" class="rounded-circle" style="width:70px; height:70px"/>`);
-                } else {
-                    $('#delete-icon-favicon').addClass('d-none');
-                    $('#file-available-favicon').html(`<img src="${urlNoPict}" class="rounded-circle" style="width:70px; height:70px"/>`);
-                }
-            },
-            error: function(xhr, status, error) {
-                snackBarAlert('Data gagal dimuat', '#e7515a');
-            }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            getData()
         });
-    }
+        function getData() {
+            $.ajax({
+                url: "{{ route('pengaturan.datatable') }}",
+                type: 'GET',
+                success: function(response) {
+                    const data = response.data;
+                    const urlLogo = `{{ asset('storage/${data.application_logo}') }}`;
+                    const urlIcon = `{{ asset('storage/${data.application_icon}') }}`;
+                    const urlNoPict = `{{ asset('admin/assets/img/nopict.png') }}`;
 
-    function deleteImage(type) {
-        const deleteRoute = '{{ route("pengaturan.image-delete", [":type"]) }}';
-        const deleteRouteRendered = deleteRoute.replace(':type', type);
+                    $('#application_name').val(data.application_name);
+                    $('#application_short_name').val(data.application_short_name);
+                    $('#application_email').val(data.application_email);
+                    $('#application_contact').val(data.application_contact);
+                    $('#instagram_account').val(data.instagram_account);
+                    $('#facebook_account').val(data.facebook_account);
+                    $('#whatsapp_account').val(data.whatsapp_account);
+                    $('#twitter_account').val(data.twitter_account);
+                    $('#youtube_account').val(data.youtube_account);
+                    $('#linkedin_account').val(data.linkedin_account);
+                    $('#application_footer').val(data.application_footer);
+                    $('#application_prefix_title').val(data.application_prefix_title);
+                    $('#application_description').val(data.application_description);
+                    if(data.application_logo) {
+                        $('#delete-icon-logo').removeClass('d-none');
+                        $('#file-available-logo').html(`<img src="${urlLogo}" class="rounded-circle" style="width:70px; height:70px"/>`);
+                    } else {
+                        $('#delete-icon-logo').addClass('d-none');
+                        $('#file-available-logo').html(`<img src="${urlNoPict}" class="rounded-circle" style="width:70px; height:70px"/>`);
+                    }
+                    if(data.application_icon) {
+                        $('#delete-icon-favicon').removeClass('d-none');
+                        $('#file-available-favicon').html(`<img src="${urlIcon}" class="rounded-circle" style="width:70px; height:70px"/>`);
+                    } else {
+                        $('#delete-icon-favicon').addClass('d-none');
+                        $('#file-available-favicon').html(`<img src="${urlNoPict}" class="rounded-circle" style="width:70px; height:70px"/>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    snackBarAlert('Data gagal dimuat', '#e7515a');
+                }
+            });
+        }
 
-        $.ajax({
-            url: deleteRouteRendered,
-            type: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                swal(
-                    'Terhapus!',
-                    'Image berhasil dihapus',
-                    'success'
+        function deleteImage(type) {
+            const deleteRoute = '{{ route("pengaturan.image-delete", [":type"]) }}';
+            const deleteRouteRendered = deleteRoute.replace(':type', type);
+
+            $.ajax({
+                url: deleteRouteRendered,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    swal(
+                        'Terhapus!',
+                        'Image berhasil dihapus',
+                        'success'
+                        )
+                    getData();
+                },
+                error: function(xhr, status, error) {
+                    swal(
+                    'Gagal Terhapus!',
+                    'Data terpilih gagal terhapus',
+                    'error'
                     )
-                getData();
-            },
-            error: function(xhr, status, error) {
-                swal(
-                'Gagal Terhapus!',
-                'Data terpilih gagal terhapus',
-                'error'
-                )
-            }
-        });
-    }
-</script>
+                }
+            });
+        }
+    </script>
+    @push('ckEditor')
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#application_description'), {
+                    toolbar: {
+                        items: [
+                            'exportPDF','exportWord', '|',
+                            'findAndReplace', 'selectAll', '|',
+                            'heading', '|',
+                            'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                            'bulletedList', 'numberedList', 'todoList', '|',
+                            'outdent', 'indent', '|',
+                            'undo', 'redo',
+                            '-',
+                            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                            'alignment', '|',
+                            'link', 'blockQuote', 'insertTable', 'codeBlock', 'htmlEmbed', '|',
+                            'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                            'textPartLanguage', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    placeholder: 'Ketikkan deskripsi website...',
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        </script>
+    @endpush
 @endsection

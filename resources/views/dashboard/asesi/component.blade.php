@@ -2,6 +2,32 @@
     document.addEventListener('DOMContentLoaded', function() {
         getData()
     });
+
+    const kelasModalPath = $('#modal-asesi > .modal-dialog > .modal-content');
+
+    $(".select-kelas").select2({
+        dropdownParent: kelasModalPath,
+        tags: true,
+        placeholder: "Pilih Kelas",
+        allowClear: true,
+        ajax: {
+        url: '{{ route('kelas.list') }}',
+        dataType: 'json',
+        delay: 250,
+        processResults: function (data) {
+                return {
+                    results: data.data.map(function (item) {
+                        return {
+                            id: item.uuid,
+                            text: item.nama_kelas
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
     function modalFormCreate(elemen)
     {
         const targetModal = elemen.getAttribute('data-target');
@@ -19,6 +45,7 @@
 
     $('#modal-asesi').on('hidden.bs.modal', function () {
         $('#form-asesi').trigger('reset');
+        $('#kelas_id').val(null).trigger('change');
         $('#_method').remove();
     });
 </script>

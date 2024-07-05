@@ -47,7 +47,6 @@
                                 <th>No Skema</th>
                                 <th>Judul Skema</th>
                                 <th>Jenis Standar</th>
-                                <th>Event</th>
                                 <th class="text-center dt-no-sorting">Action</th>
                             </tr>
                         </thead>

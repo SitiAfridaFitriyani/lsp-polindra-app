@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{KriteriaUnjukKerja,Elemen};
+use App\Models\{KriteriaUnjukKerja,Elemen, UnitKompetensi};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 class KriteriaUnjukKerjaController extends Controller
@@ -48,8 +48,8 @@ class KriteriaUnjukKerjaController extends Controller
     public function edit($uuid)
     {
         $kriteriaUnjukKerja = KriteriaUnjukKerja::with(['testTulis','elemen'])
-        ->where('uuid', $uuid)
-        ->first();
+            ->where('uuid', $uuid)
+            ->first();
         if(!empty($kriteriaUnjukKerja)) {
             return response()->json(['status' => 'success', 'data' => $kriteriaUnjukKerja], 200);
         } else {
@@ -122,8 +122,7 @@ class KriteriaUnjukKerjaController extends Controller
 
     public function listByUUID($uuid)
     {
-        $elemenId = Elemen::with(['unitKompetensi','kriteriaUnjukKerja','checklistObservasi'])
-            ->where('uuid',$uuid)
+        $elemenId = Elemen::where('uuid',$uuid)
             ->pluck('id');
         if(isset($elemenId)) {
             $result = KriteriaUnjukKerja::with(['testTulis','elemen'])
@@ -134,5 +133,17 @@ class KriteriaUnjukKerjaController extends Controller
         } else {
             return response()->json(['status' => 'success', 'message' => 'Data elemen tidak ditemukan'], 404);
         }
+    }
+
+    public function listByUnitKompetensi($uuid)
+    {
+        $unitKomptensiId = UnitKompetensi::where('uuid', $uuid)->pluck('id');
+        if(empty($unitKomptensiId)) {
+            return response()->json(['status' => 'success', 'message' => 'Data unit kompetensi tidak ditemukan'], 500);
+        }
+        $elemen = Elemen::with('kriteriaUnjukKerja')->firstWhere('unit_kompetensi_id', $unitKomptensiId);
+        $unjukKerja = !empty($elemen->kriteriaUnjukKerja) ? $elemen->kriteriaUnjukKerja : [];
+
+        return response()->json(['status' => 'success', 'data' => $unjukKerja, 'totalRecord' => count($unjukKerja)], 200);
     }
 }

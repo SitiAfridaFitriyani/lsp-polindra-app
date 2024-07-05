@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('m_test_tulis', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->enum('pilihan_jawaban',['A/B/C','A/B/C/D','A/B/C/D/E']);
             $table->longText('pertanyaan');
             $table->string('kunci_jawaban');
             $table->json('jawaban');

@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\{User,Asesi};
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAsesiRequest extends FormRequest
 {
@@ -22,12 +25,15 @@ class UpdateAsesiRequest extends FormRequest
      */
     public function rules(): array
     {
+        $asesiUuid = $this->input('asesi_uuid');
+        $asesiData = Asesi::firstWhere('uuid',$asesiUuid);
         return [
-            'nim' => ['required','min:8','numeric'],
-            'email' => ['required', 'email', 'min:3', 'max:50'],
+            'nim' => ['required','numeric',Rule::unique(Asesi::class)->ignore($asesiData['id'])],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($asesiData['user_id'])],
             'name' => ['required','min:3','string'],
-            'phone'=>['nullable','regex:/(08)[0-9]{9}/'],
-            'username' => ['required','string'],
+            'kelas_id' => ['required', 'exists:m_kelas,uuid'],
+            'phone'=>['nullable','regex:/(08)[0-9]{9}/', Rule::unique(User::class,'phone')->ignore($asesiData['user_id'])],
+            'username' => ['required','string', Rule::unique(User::class,'username')->ignore($asesiData['user_id'])],
             'photo' => [
                 'nullable',
                 File::types(['jpg', 'jpeg','png'])

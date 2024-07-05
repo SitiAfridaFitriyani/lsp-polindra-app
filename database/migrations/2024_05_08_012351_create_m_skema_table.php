@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('judul_skema');
             $table->string('no_skema')->unique();
             $table->enum('jenis_standar',['KKNI','Okupasi','Klaster']);
-            $table->foreignId('event_id')->constrained('m_event')->cascadeOnDelete();
             $table->timestamps();
         });
     }

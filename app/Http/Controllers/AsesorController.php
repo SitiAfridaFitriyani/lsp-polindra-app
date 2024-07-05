@@ -94,18 +94,10 @@ class AsesorController extends Controller
     public function update(UpdateAsesorRequest $request, $uuid)
     {
         $validated = $request->validated();
-        $request->validate([
-            'nip' => 'unique:m_asesor,nip,'.$uuid.',uuid',
-        ],$this->messageValidation());
         $data = Asesor::with('user')->firstWhere('uuid',$uuid);
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data asesor tidak ditemukan'], 404);
         }
-        $request->validate([
-            'username' => 'unique:users,username,'.(int) $data['user_id'].',id',
-            'phone' => 'nullable|unique:users,phone,'.(int) $data['user_id'].',id',
-            'email' => 'unique:users,email,'.(int) $data['user_id'].',id',
-        ],$this->messageValidation());
 
         try {
             DB::beginTransaction();

@@ -24,7 +24,7 @@ class StoreAsesorRequest extends FormRequest
     {
         return [
             'nip' => ['required','min:8','numeric', Rule::unique('m_asesor')],
-            'email' => ['required', 'email', 'min:3', 'max:50', Rule::unique('users')],
+            'email' => ['required', 'lowercase','email', 'min:3', 'max:50', Rule::unique('users')],
             'name' => ['required','min:3','string'],
             'phone'=>['nullable','regex:/(08)[0-9]{9}/',Rule::unique('users')],
             'photo' => [

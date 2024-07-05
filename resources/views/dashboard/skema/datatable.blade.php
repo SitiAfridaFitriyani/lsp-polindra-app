@@ -44,12 +44,12 @@
                             }
                         },
                         { data: 'jenis_standar' },
-                        {
-                            data: 'event',
-                            render: function(data) {
-                                return data ? data.nama_event : 'N/A';
-                            }
-                        },
+                        // {
+                        //     data: 'event',
+                        //     render: function(data) {
+                        //         return data ? data.nama_event : 'N/A';
+                        //     }
+                        // },
                         {
                             data: 'uuid',
                             render: function(data) {

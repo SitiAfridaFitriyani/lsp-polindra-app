@@ -11,18 +11,37 @@ function snackBarAlert(message, alertBgColor) {
 
 (function() {
     'use strict';
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let isChecked = false;
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+            return isChecked;
+    }
     window.addEventListener('load', function() {
     var forms = document.getElementsByClassName('needs-validation');
     Array.prototype.filter.call(forms, function(form) {
         form.addEventListener('submit', function(event) {
             var submitButton = form.querySelector('button[type="submit"]');
+            const url = form.getAttribute('action');
+            const currentUrl = new URL(window.location.href);
+
+            if(!validateForm() && currentUrl.pathname.includes('persetujuan-assesmen')) {
+                event.preventDefault();
+                snackBarAlert('Centang minimal 1 checkbox berkas', '#e7515a');
+                event.stopPropagation();
+                return false;
+            }
             if (form.checkValidity() === false) {
                 event.preventDefault();
                 event.stopPropagation();
             }
             event.preventDefault();
             form.classList.add('was-validated');
-            const url = form.getAttribute('action');
+
             const formData = new FormData(form);
             const keyModal = $(event.target).closest('.modal').data('key-modal');
             const isUpdate = form.getAttribute('data-method') === 'PUT';

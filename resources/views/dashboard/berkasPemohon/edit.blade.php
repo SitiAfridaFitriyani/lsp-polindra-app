@@ -18,9 +18,15 @@
             type: 'GET',
             success: function(response) {
                 const data = response.data;
+                const skema = $('#skema_id');
 
                 $('#nama_berkas').val(data.nama_berkas);
-                $('#skema_id').val(data.skema_id).trigger('change');
+                if (skema.find("option[value='" + data.skema.judul_skema + "']").length) {
+                    skema.val(data.skema.judul_skema).trigger('change');
+                } else {
+                    const newOption = new Option(data.skema.judul_skema, data.skema.uuid, true, true);
+                    skema.append(newOption).trigger('change');
+                }
             },
             error: function(xhr, status, error) {
                 snackBarAlert('Data gagal dimuat', '#e7515a');

@@ -5,14 +5,17 @@ use App\Http\Controllers\{
     AsesorController,
     BerkasPemohonController,
     ElemenController,
+    EventAsesiController,
     EventController,
+    FRAPL01Controller,
+    FRAPL02Controller,
+    FRAPLcontroller,
     JurusanController,
     KelasController,
     KriteriaUnjukKerjaController,
     PengaturanConctroller,
     PersetujuanKerahasiaanController,
     ProfileController,
-    RekamanAssesmenController,
     SkemaController,
     TestPraktekController,
     TestTulisController,
@@ -22,104 +25,133 @@ use Illuminate\Support\Facades\Route;
 
 // Root
 Route::get('/',fn() => to_route('dashboard'));
-Route::middleware('auth')->group(function () {
-    Route::view('/dashboard','dashboard.index')->name('dashboard');
-    // Event
-    Route::resource('event', EventController::class)->except(['create', 'show']);
-    Route::prefix('event')->group(function () {
-        Route::get('datatable', [EventController::class, 'datatable'])->name('event.datatable');
-        Route::get('list',[EventController::class,'list'])->name('event.list');
-    });
-    // Skema
-    Route::resource('skema', SkemaController::class)->except(['create', 'show']);
-    Route::prefix('skema')->group(function () {
-        Route::get('datatable', [SkemaController::class, 'datatable'])->name('skema.datatable');
-        Route::get('list',[SkemaController::class,'list'])->name('skema.list');
-        Route::get('list/{uuid}', [SkemaController::class, 'listByUUID'])->name('skema.listByUuid');
-    });
-    // Unit Komptensi
-    Route::resource('unit-kompetensi',UnitKompetensiController::class)->names('unitKompetensi')->except(['create', 'show']);
-    Route::prefix('unit-kompetensi')->group(function () {
-        Route::get('datatable', [UnitKompetensiController::class, 'datatable'])->name('unitKompetensi.datatable');
-        Route::get('list',[UnitKompetensiController::class,'list'])->name('unitKompetensi.list');
-        Route::get('list/{uuid}', [UnitKompetensiController::class, 'listByUUID'])->name('unitKompetensi.listByUuid');
 
+Route::middleware('auth')->group(function () {
+    // Admin
+    Route::middleware('can:admin')->group(function() {
+        // Event
+        Route::resource('event', EventController::class)->except(['create', 'show']);
+        Route::prefix('event')->group(function () {
+            Route::get('datatable', [EventController::class, 'datatable'])->name('event.datatable');
+            Route::get('list',[EventController::class,'list'])->name('event.list');
+        });
+        // Skema
+        Route::resource('skema', SkemaController::class)->except(['create', 'show']);
+        Route::prefix('skema')->group(function () {
+            Route::get('datatable', [SkemaController::class, 'datatable'])->name('skema.datatable');
+            Route::get('list',[SkemaController::class,'list'])->name('skema.list');
+            Route::get('list/{uuid}', [SkemaController::class, 'listByUUID'])->name('skema.listByUuid');
+        });
+        // Unit Komptensi
+        Route::resource('unit-kompetensi',UnitKompetensiController::class)->names('unitKompetensi')->except(['create', 'show']);
+        Route::prefix('unit-kompetensi')->group(function () {
+            Route::get('datatable', [UnitKompetensiController::class, 'datatable'])->name('unitKompetensi.datatable');
+            Route::get('list',[UnitKompetensiController::class,'list'])->name('unitKompetensi.list');
+            Route::get('list/{uuid}', [UnitKompetensiController::class, 'listByUUID'])->name('unitKompetensi.listByUuid');
+
+        });
+        // Elemen
+        Route::resource('elemen',ElemenController::class)->except(['create', 'show']);
+        Route::prefix('elemen')->group(function () {
+            Route::get('datatable', [ElemenController::class, 'datatable'])->name('elemen.datatable');
+            Route::get('list',[ElemenController::class,'list'])->name('elemen.list');
+            Route::get('list/{uuid}', [ElemenController::class, 'listByUUID'])->name('elemen.listByUuid');
+        });
+        // Kriteria Unjuk Kerja
+        Route::resource('kriteria-unjuk-kerja',KriteriaUnjukKerjaController::class)->names('kriteriaUnjukKerja')->except(['create', 'show']);
+        Route::prefix('kriteria-unjuk-kerja')->group(function () {
+            Route::get('datatable', [KriteriaUnjukKerjaController::class, 'datatable'])->name('kriteriaUnjukKerja.datatable');
+            Route::get('list',[KriteriaUnjukKerjaController::class,'list'])->name('kriteriaUnjukKerja.list');
+            Route::get('list/{uuid}', [KriteriaUnjukKerjaController::class, 'listByUUID'])->name('kriteriaUnjukKerja.listByUuid');
+            Route::get('list-by-unit-kompetensi/{uuid}',[KriteriaUnjukKerjaController::class,'listByUnitKompetensi'])->name('kriteriaUnjukKerja.listByUnitKompetensi');
+        });
+        // Berkas Permohonan
+        Route::resource('berkas-permohonan',BerkasPemohonController::class)->names('berkasPemohon')->except(['create', 'show']);
+        Route::prefix('berkas-permohonan')->group(function () {
+            Route::get('datatable', [BerkasPemohonController::class, 'datatable'])->name('berkasPemohon.datatable');
+            Route::get('list',[BerkasPemohonController::class,'list'])->name('berkasPemohon.list');
+            Route::get('list/{uuid}', [BerkasPemohonController::class, 'listByUUID'])->name('berkasPemohon.listByUuid');
+        });
+        // Ujian Tulis
+        Route::resource('ujian-tulis',TestTulisController::class)->names('ujianTulis')->except(['create', 'show']);
+        Route::prefix('ujian-tulis')->group(function () {
+            Route::get('datatable', [TestTulisController::class, 'datatable'])->name('ujianTulis.datatable');
+            Route::get('list',[TestTulisController::class,'list'])->name('ujianTulis.list');
+            Route::get('list/{uuid}', [TestTulisController::class, 'listByUUID'])->name('ujianTulis.listByUuid');
+        });
+        // Ujian Praktek
+        Route::resource('ujian-praktek',TestPraktekController::class)->names('ujianPraktek');
+        // Jurusan
+        Route::resource('jurusan',JurusanController::class)->except(['create', 'show']);
+        Route::prefix('jurusan')->group(function () {
+            Route::get('datatable', [JurusanController::class, 'datatable'])->name('jurusan.datatable');
+            Route::get('list',[JurusanController::class,'list'])->name('jurusan.list');
+        });
+        // Kelas
+        Route::resource('kelas',KelasController::class)->except(['create', 'show']);
+        Route::prefix('kelas')->group(function () {
+            Route::get('datatable', [KelasController::class, 'datatable'])->name('kelas.datatable');
+            Route::get('list',[KelasController::class,'list'])->name('kelas.list');
+            Route::get('list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
+        });
+        // Asesor
+        Route::resource('asesor',AsesorController::class)->except(['create', 'show']);
+        Route::prefix('asesor')->group(function () {
+            Route::get('datatable', [AsesorController::class, 'datatable'])->name('asesor.datatable');
+            Route::get('list',[AsesorController::class,'list'])->name('asesor.list');
+            Route::get('list/{uuid}', [AsesorController::class, 'listByUUID'])->name('asesor.listByUuid');
+        });
+        // Asesi
+        Route::resource('asesi',AsesiController::class)->except(['create', 'show']);
+        Route::prefix('asesi')->group(function () {
+            Route::get('datatable', [AsesiController::class, 'datatable'])->name('asesi.datatable');
+            Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
+        });
+        // Pengaturan
+        Route::prefix('pengaturan')->group(function () {
+            Route::get('',[PengaturanConctroller::class,'index'])->name('pengaturan');
+            Route::post('',[PengaturanConctroller::class,'store'])->name('pengaturan.store');
+            Route::get('datatable', [PengaturanConctroller::class, 'datatable'])->name('pengaturan.datatable');
+            Route::delete('delete-image/{type}',[PengaturanConctroller::class,'deleteImage'])->name('pengaturan.image-delete');
+        });
     });
-    // Elemen
-    Route::resource('elemen',ElemenController::class)->except(['create', 'show']);
-    Route::prefix('elemen')->group(function () {
-        Route::get('datatable', [ElemenController::class, 'datatable'])->name('elemen.datatable');
-        Route::get('list',[ElemenController::class,'list'])->name('elemen.list');
-        Route::get('list/{uuid}', [ElemenController::class, 'listByUUID'])->name('elemen.listByUuid');
-    });
-    // Kriteria Unjuk Kerja
-    Route::resource('kriteria-unjuk-kerja',KriteriaUnjukKerjaController::class)->names('kriteriaUnjukKerja')->except(['create', 'show']);
-    Route::prefix('kriteria-unjuk-kerja')->group(function () {
-        Route::get('datatable', [KriteriaUnjukKerjaController::class, 'datatable'])->name('kriteriaUnjukKerja.datatable');
-        Route::get('list',[KriteriaUnjukKerjaController::class,'list'])->name('kriteriaUnjukKerja.list');
-        Route::get('list/{uuid}', [KriteriaUnjukKerjaController::class, 'listByUUID'])->name('kriteriaUnjukKerja.listByUuid');
-    });
-    // Berkas Permohonan
-    Route::resource('berkas-permohonan',BerkasPemohonController::class)->names('berkasPemohon')->except(['create', 'show']);
-    Route::prefix('berkas-permohonan')->group(function () {
-        Route::get('datatable', [BerkasPemohonController::class, 'datatable'])->name('berkasPemohon.datatable');
-        Route::get('list',[BerkasPemohonController::class,'list'])->name('berkasPemohon.list');
-        Route::get('list/{uuid}', [BerkasPemohonController::class, 'listByUUID'])->name('berkasPemohon.listByUuid');
-    });
-    // Ujian Tulis
-    Route::resource('ujian-tulis',TestTulisController::class)->names('ujianTulis')->except(['create', 'show']);
-    Route::prefix('ujian-tulis')->group(function () {
-        Route::get('datatable', [TestTulisController::class, 'datatable'])->name('ujianTulis.datatable');
-        Route::get('list',[TestTulisController::class,'list'])->name('ujianTulis.list');
-        Route::get('list/{uuid}', [TestTulisController::class, 'listByUUID'])->name('ujianTulis.listByUuid');
-    });
-    // Ujian Praktek
-    Route::resource('ujian-praktek',TestPraktekController::class)->names('ujianPraktek');
-    // Jurusan
-    Route::resource('jurusan',JurusanController::class)->except(['create', 'show']);
-    Route::prefix('jurusan')->group(function () {
-        Route::get('datatable', [JurusanController::class, 'datatable'])->name('jurusan.datatable');
-        Route::get('list',[JurusanController::class,'list'])->name('jurusan.list');
-    });
-    // Kelas
-    Route::resource('kelas',KelasController::class)->except(['create', 'show']);
-    Route::prefix('kelas')->group(function () {
-        Route::get('datatable', [KelasController::class, 'datatable'])->name('kelas.datatable');
-        Route::get('list',[KelasController::class,'list'])->name('kelas.list');
-        Route::get('list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
-    });
-    // Asesor
-    Route::resource('asesor',AsesorController::class)->except(['create', 'show']);
-    Route::prefix('asesor')->group(function () {
-        Route::get('datatable', [AsesorController::class, 'datatable'])->name('asesor.datatable');
-        Route::get('list',[AsesorController::class,'list'])->name('asesor.list');
-        Route::get('list/{uuid}', [AsesorController::class, 'listByUUID'])->name('asesor.listByUuid');
-    });
+
+
+
     // Asesi
-    Route::resource('asesi',AsesiController::class)->except(['create', 'show']);
-    Route::prefix('asesi')->group(function () {
-        Route::get('datatable', [AsesiController::class, 'datatable'])->name('asesi.datatable');
-        Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
+    Route::middleware('can:asesi')->group(function() {
+        Route::prefix('event-asesi')->group(function () {
+            Route::get('{uuid}/datatable', [EventAsesiController::class, 'datatable'])->name('event-asesi.datatable');
+            Route::get('{uuid}/show',[EventAsesiController::class,'show'])->name('event-asesi.show');
+        });
     });
-    // Persetujuan Assesmen
-    Route::resource('persetujuan-assesmen',PersetujuanKerahasiaanController::class)->names('persetujuanAssesmen')->except(['create', 'show']);
-    Route::prefix('persetujuan-assesmen')->group(function () {
-        Route::get('datatable', [PersetujuanKerahasiaanController::class, 'datatable'])->name('persetujuanAssesmen.datatable');
-        Route::get('list',[PersetujuanKerahasiaanController::class,'list'])->name('persetujuanAssesmen.list');
-        Route::get('list-by-asesor/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesorUUID'])->name('persetujuanAssesmen.listByAsesorUuid');
-        Route::get('list-by-asesi/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesiUUID'])->name('persetujuanAssesmen.listByAsesiUuid');
+
+    // Asesor
+    Route::middleware('can:asesor')->group(function() {
+        //
     });
-    // Pengaturan
-    Route::prefix('pengaturan')->group(function () {
-        Route::get('',[PengaturanConctroller::class,'index'])->name('pengaturan');
-        Route::post('',[PengaturanConctroller::class,'store'])->name('pengaturan.store');
-        Route::get('datatable', [PengaturanConctroller::class, 'datatable'])->name('pengaturan.datatable');
-        Route::delete('delete-image/{type}',[PengaturanConctroller::class,'deleteImage'])->name('pengaturan.image-delete');
-    });
+    // All
+    Route::view('/dashboard','dashboard.index')->name('dashboard');
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Persetujuan Assesmen
+    Route::resource('persetujuan-assesmen',PersetujuanKerahasiaanController::class)->names('persetujuanAssesmen')->except(['create', 'show']);
+    Route::prefix('persetujuan-assesmen')->group(function () {
+        Route::get('datatable', [PersetujuanKerahasiaanController::class, 'datatable'])->name('persetujuanAssesmen.datatable');
+        Route::get('show-by-kelompokAsesor',[PersetujuanKerahasiaanController::class,'showByKelompokAsesor'])->name('persetujuanAssesmen.show-by-kelompokAsesor');
+        Route::get('list',[PersetujuanKerahasiaanController::class,'list'])->name('persetujuanAssesmen.list');
+        Route::get('list-by-asesor/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesorUUID'])->name('persetujuanAssesmen.listByAsesorUuid'); // Catatan Error
+        Route::get('list-by-asesi/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesiUUID'])->name('persetujuanAssesmen.listByAsesiUuid');
+    });
+
+    // FRAPL
+    Route::get('frapl-assesmen',FRAPLcontroller::class)->name('frapl.index');
+    // FRAPL01
+    Route::resource('frapl01-assesmen',FRAPL01Controller::class)->names('frapl01')->except(['create', 'show']);
+    // FRAPL02
+    Route::resource('frapl02-assesmen',FRAPL02Controller::class)->names('frapl02')->except(['create', 'show']);
 });
 
 require __DIR__.'/auth.php';

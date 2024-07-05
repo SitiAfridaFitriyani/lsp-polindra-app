@@ -51,6 +51,14 @@
                                         <p>Available File: <small id="file-available-photo"></small></p>
                                     </div>
                                 </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="kelas_id">Kelas <span class="text-danger">*</span></label>
+                                    <select class="form-control select-kelas @error('kelas_id') is-invalid @enderror" name="kelas_id" id="kelas_id" required>
+                                    </select>
+                                    <div class="invalid-feedback" style="margin-top: -20px">
+                                        Kolom kelas tidak boleh kosong
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-row" id="editForm-container">
                                 <div class="col-md-6 mb-4">

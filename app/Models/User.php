@@ -61,4 +61,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function asesi()
+    {
+        return $this->hasOne(Asesi::class,'user_id');
+    }
+
+    public function asesor()
+    {
+        return $this->hasOne(Asesor::class,'user_id');
+    }
 }

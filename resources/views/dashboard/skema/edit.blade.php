@@ -18,11 +18,16 @@
             type: 'GET',
             success: function(response) {
                 const data = response.data;
-
+                const event = $('#event_id');
                 $('#no_skema').val(data.no_skema);
                 $('#kode_skema').val(data.kode_skema);
                 $('#judul_skema').val(data.judul_skema);
-                $('#event_id').val(data.event_id).trigger('change');
+                // if (event.find("option[value='" + data.event.nama_event + "']").length) {
+                //     event.val(data.event.nama_event).trigger('change');
+                // } else {
+                //     const newOption = new Option(data.event.nama_event, data.event.uuid, true, true);
+                //     event.append(newOption).trigger('change');
+                // }
                 $('#jenis_standar').val(data.jenis_standar).trigger('change');
             },
             error: function(xhr, status, error) {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Asesi,User};
+use App\Models\{Asesi, Kelas, User};
 use Illuminate\Support\Facades\{DB,Storage};
 use App\Http\Requests\{StoreAsesiRequest, UpdateAsesiRequest};
 
@@ -31,6 +31,11 @@ class AsesiController extends Controller
 
             $photo = $request->file('photo');
             $gender = $request->input('jenis_kelamin');
+            $kelas = Kelas::firstWhere('uuid', $validated['kelas_id']);
+            if(empty($kelas)) {
+                return response()->json(['status' => 'error', 'message' => 'Data kelas tidak ditemukan'], 404);
+            }
+            $validated['kelas_id'] = $kelas['id'];
 
             if($photo && !empty($photo)) {
                 $validated['photo'] = $photo->store('profilePicture');
@@ -51,6 +56,7 @@ class AsesiController extends Controller
                 $asesi = Asesi::create([
                     'user_id' => (int) $user['id'],
                     'nim' => $validated['nim'],
+                    'kelas_id' => $validated['kelas_id']
                 ]);
                 if($asesi) {
                     DB::commit();
@@ -74,7 +80,7 @@ class AsesiController extends Controller
      */
     public function edit($uuid)
     {
-        $asesi = Asesi::with('user')
+        $asesi = Asesi::with(['user','kelas'])
         ->firstWhere('uuid', $uuid);
         if(!empty($asesi)) {
             return response()->json(['status' => 'success', 'data' => $asesi], 200);
@@ -89,18 +95,10 @@ class AsesiController extends Controller
     public function update(UpdateAsesiRequest $request, $uuid)
     {
         $validated = $request->validated();
-        $request->validate([
-            'nim' => 'unique:m_asesi,nim,'.$uuid.',uuid',
-        ],$this->messageValidation());
         $data = Asesi::with('user')->firstWhere('uuid',$uuid);
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data asesi tidak ditemukan'], 404);
         }
-        $request->validate([
-            'username' => 'unique:users,username,'.(int) $data['user_id'].',id',
-            'phone' => 'nullable|unique:users,phone,'.(int) $data['user_id'].',id',
-            'email' => 'unique:users,email,'.(int) $data['user_id'].',id',
-        ],$this->messageValidation());
 
         try {
             DB::beginTransaction();
@@ -121,8 +119,15 @@ class AsesiController extends Controller
 
             $user = User::whereId((int)$data['user_id'])->first();
 
+            $kelas = Kelas::firstWhere('uuid', $validated['kelas_id']);
+            if(empty($kelas)) {
+                return response()->json(['status' => 'error', 'message' => 'Data kelas tidak ditemukan'], 404);
+            }
+            $validated['kelas_id'] = $kelas['id'];
+
             $asesiUpdate = $data->update([
                 'nim' => $validated['nim'],
+                'kelas_id' => $validated['kelas_id']
             ]);
             $userUpdate = $user->update([
                 'name' => $validated['name'],

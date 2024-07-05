@@ -19,18 +19,13 @@ class PersetujuanKerahasiaan extends Model
         });
     }
 
-    public function asesor()
+    public function kelompokAsesor()
     {
-        return $this->belongsTo(Asesor::class,'asesor_id');
+        return $this->belongsTo(KelompokAsesor::class,'kelompok_asesor_id');
     }
 
     public function asesi()
     {
         return $this->belongsTo(Asesi::class,'asesi_id');
-    }
-
-    public function skema()
-    {
-        return $this->belongsTo(Skema::class,'skema_id');
     }
 }

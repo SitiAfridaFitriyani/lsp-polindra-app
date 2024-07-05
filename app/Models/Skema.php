@@ -21,11 +21,16 @@ class Skema extends Model
 
     public function event()
     {
-        return $this->belongsTo(Event::class,'event_id'); // Many To One
+        return $this->hasMany(KelompokAsesor::class,'skema_id');
     }
 
     public function berkasPermohonan()
     {
         return $this->hasMany(BerkasPemohon::class,'skema_id');
+    }
+
+    public function unitKompetensi()
+    {
+        return $this->hasMany(UnitKompetensi::class,'skema_id');
     }
 }

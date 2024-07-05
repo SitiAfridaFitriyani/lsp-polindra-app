@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rule;
+use App\Models\{User,Asesor};
 class UpdateAsesorRequest extends FormRequest
 {
     /**
@@ -21,12 +23,15 @@ class UpdateAsesorRequest extends FormRequest
      */
     public function rules(): array
     {
+        $asesorUuid = $this->input('asesor_uuid');
+        $asesorData = Asesor::firstWhere('uuid', $asesorUuid);
+
         return [
-            'nip' => ['required','min:8','numeric'],
-            'email' => ['required', 'email', 'min:3', 'max:50'],
+            'nip' => ['required','numeric', Rule::unique(Asesor::class,'nip')->ignore($asesorData['id'])],
+            'email' => ['required', 'lowercase','email', 'min:3', 'max:50', Rule::unique(User::class)->ignore($asesorData['user_id'])],
             'name' => ['required','min:3','string'],
-            'phone'=>['nullable','regex:/(08)[0-9]{9}/'],
-            'username' => ['required','string'],
+            'phone'=>['nullable','regex:/(08)[0-9]{9}/', Rule::unique(User::class)->ignore($asesorData['user_id'])],
+            'username' => ['required','string', Rule::unique(User::class)->ignore($asesorData['user_id'])],
             'photo' => [
                 'nullable',
                 File::types(['jpg', 'jpeg','png'])

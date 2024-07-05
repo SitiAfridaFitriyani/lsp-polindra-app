@@ -30,9 +30,23 @@
 <link href="{{ asset('admin/plugins/flatpickr/custom-flatpickr.css') }}" rel="stylesheet" type="text/css">
 {{-- Snackbar --}}
 <link href="{{ asset('admin/plugins/notification/snackbar/snackbar.min.css') }}" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="{{ asset('admin/plugins/editors/quill/quill.snow.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/widgets/modules-widgets.css') }}">
+{{-- Form Step Bar --}}
+<link href="{{ asset('admin/assets/css/scrollspyNav.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="{{ asset('admin/plugins/jquery-step/jquery.steps.css') }}">
+{{-- Checkbox Style --}}
+<link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
+<style>
+    #formValidate .wizard > .content {min-height: 25em;}
+    #example-vertical.wizard > .content {min-height: 24.5em;}
+</style>
 @if(request()->routeIs('login') || request()->routeIs('password.request'))
     <link href="{{ asset('admin/assets/css/authentication/form-1.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/switches.css') }}">
 @endif
+<style>
+    .ck-editor__editable[role="textbox"] {
+        min-height: 200px;
+    }
+</style>

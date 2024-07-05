@@ -10,6 +10,7 @@
         form.attr('data-method','PUT');
         if ($('#_method').length === 0) {
             form.append('<input type="hidden" name="_method" id="_method" value="PUT">');
+            form.append('<input type="hidden" name="asesi_uuid" value="'+uuid+'">');
         }
         $('#modal-asesi').modal('show');
         $.ajax({
@@ -18,6 +19,7 @@
             success: function(response) {
                 const data = response.data;
                 const urlPhoto = `{{ asset('storage/${data.user.photo}') }}`;
+                const kelas = $('#kelas_id');
 
                 $('#container-file-photo-show').removeClass('d-none');
                 $('#editForm-container').removeClass('d-none');
@@ -31,6 +33,14 @@
                 $('#phone').val(data.user.phone);
                 $('#jenis_kelamin').val(data.user.jenis_kelamin);
                 $('#address').val(data.user.address);
+
+                if (kelas.find("option[value='" + data.kelas.nama_kelas + "']").length) {
+                    kelas.val(data.kelas.nama_kelas).trigger('change');
+                } else {
+                    const newOption = new Option(data.kelas.nama_kelas, data.kelas.uuid, true, true);
+                    kelas.append(newOption).trigger('change');
+                }
+
                 if(data.user.photo) {
                     $('#file-available-photo').html(`<img src="${urlPhoto}" class="rounded-circle" style="width:60px; height:60px"/>`);
                 } else {

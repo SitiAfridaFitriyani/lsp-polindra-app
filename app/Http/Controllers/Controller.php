@@ -22,7 +22,8 @@ class Controller extends BaseController
             'numeric' => 'Format harus berupa angka',
             'in' => 'Data harus salah satu dari :values',
             'date' => 'Data harus berupa tanggal',
-            'integer' => 'Data harus berupa angka'
+            'integer' => 'Data harus berupa angka',
+            'mimes' => 'Format yang diperbolehkan :values'
         );
     }
 }

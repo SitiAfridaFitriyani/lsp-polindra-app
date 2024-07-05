@@ -17,9 +17,15 @@
             type: 'GET',
             success: function(response) {
                 const data = response.data;
+                const unitKompetensi = $('#unit_kompetensi_id');
 
                 $('#nama_elemen').val(data.nama_elemen);
-                $('#unit_kompetensi_id').val(data.unit_kompetensi_id).trigger('change');
+                if (unitKompetensi.find("option[value='" + data.unit_kompetensi.judul_unit + "']").length) {
+                    unitKompetensi.val(data.unit_kompetensi.judul_unit).trigger('change');
+                } else {
+                    const newOption = new Option(data.unit_kompetensi.judul_unit, data.unit_kompetensi.uuid, true, true);
+                    unitKompetensi.append(newOption).trigger('change');
+                }
             },
             error: function(xhr, status, error) {
                 snackBarAlert('Data gagal dimuat', '#e7515a');

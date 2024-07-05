@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                    <p><span class="text-danger">*</span> Wajib diisi</p>
+                <p><span class="text-danger">*</span> Wajib diisi</p>
                 <p class="modal-text">
                     <div class="widget-content widget-content-area">
                         <form class="needs-validation" id="form-elemen" novalidate method="POST" action="">

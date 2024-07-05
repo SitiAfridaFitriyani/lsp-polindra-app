@@ -18,11 +18,17 @@
             type: 'GET',
             success: function(response) {
                 const data = response.data;
+                const skema = $('#skema_id');
 
                 $('#kode_unit').val(data.kode_unit);
                 $('#judul_unit').val(data.judul_unit);
                 $('#jenis_standar').val(data.jenis_standar).trigger('change');
-                $('#skema_id').val(data.skema_id).trigger('change');
+                if (skema.find("option[value='" + data.skema.judul_skema + "']").length) {
+                    skema.val(data.skema.judul_skema).trigger('change');
+                } else {
+                    const newOption = new Option(data.skema.judul_skema, data.skema.uuid, true, true);
+                    skema.append(newOption).trigger('change');
+                }
             },
             error: function(xhr, status, error) {
                 snackBarAlert('Data gagal dimuat', '#e7515a');

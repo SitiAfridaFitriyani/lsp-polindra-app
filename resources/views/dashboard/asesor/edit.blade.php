@@ -10,6 +10,7 @@
         form.attr('data-method','PUT');
         if ($('#_method').length === 0) {
             form.append('<input type="hidden" name="_method" id="_method" value="PUT">');
+            form.append('<input type="hidden" name="asesor_uuid" value="'+uuid+'">');
         }
         $('#modal-asesor').modal('show');
         $.ajax({

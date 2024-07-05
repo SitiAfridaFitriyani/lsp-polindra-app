@@ -18,9 +18,15 @@
             type: 'GET',
             success: function(response) {
                 const data = response.data;
+                const elemen = $('#elemen_id');
 
                 $('#nama_kriteria_kerja').val(data.nama_kriteria_kerja);
-                $('#event_id').val(data.event_id).trigger('change');
+                if (elemen.find("option[value='" + data.elemen.nama_elemen + "']").length) {
+                    elemen.val(data.elemen.nama_elemen).trigger('change');
+                } else {
+                    const newOption = new Option(data.elemen.nama_elemen, data.elemenelemen, true, true);
+                    elemen.append(newOption).trigger('change');
+                }
             },
             error: function(xhr, status, error) {
                 snackBarAlert('Data gagal dimuat', '#e7515a');

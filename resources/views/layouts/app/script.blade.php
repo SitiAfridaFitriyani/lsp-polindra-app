@@ -33,8 +33,14 @@
 <script src="{{ asset('admin/plugins/notification/snackbar/snackbar.min.js') }}"></script>
 <script src="{{ asset('admin/assets/js/components/notification/custom-snackbar.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="{{ asset('admin/plugins/editors/quill/quill.js') }}"></script>
-<script src="{{ asset('admin/plugins/editors/quill/custom-quill.js') }}"></script>
+{{-- CkEditor 5 --}}
+<script src="{{ asset('admin/assets/js/ckeditor5-build-classic/ckeditor.js') }}"></script>
+{{-- Form Step Bar --}}
+<script src="{{ asset('admin/assets/js/scrollspyNav.js') }}"></script>
+<script src="{{ asset('admin/plugins/jquery-step/jquery.steps.min.js') }}"></script>
+<script src="{{ asset('admin/plugins/jquery-step/custom-jquery.steps.js') }}"></script>
+
 @if(request()->routeIs('login') || request()->routeIs('password.request'))
     <script src="{{ asset('admin/assets/js/authentication/form-1.js') }}"></script>
 @endif
+@stack('ckEditor')

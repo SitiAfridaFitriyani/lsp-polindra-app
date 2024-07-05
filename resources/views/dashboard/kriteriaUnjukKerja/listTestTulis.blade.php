@@ -9,14 +9,15 @@
             success: function(response) {
                 const data = response.data;
                 $('#table-list-testTulis tbody').empty();
-                $('#modal-title-kriteriaUnjukKerja').text('Daftar Ujian Tulis [' + kriteriaUnjukKerjaName + ']');
+                $('#modal-title-testTulis').text('Daftar Ujian Tulis [' + kriteriaUnjukKerjaName + ']');
                 $('#' + modalbs).modal('show');
 
                 if(data.length > 0) {
                     $('#empty-dataTable').addClass('d-none');
                     data.forEach(function(item) {
                         var row = $('<tr>');
-                        row.append($('<td>').text(item.pertanyaan));
+                        const plainText = $('<div>').html(item.pertanyaan).text();
+                        row.append($('<td>').text(plainText));
                         row.append($('<td class="text-center">').html(
                             `<ul class="table-controls list-unstyled">
                                 <li>

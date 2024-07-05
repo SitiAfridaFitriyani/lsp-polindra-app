@@ -2,7 +2,6 @@
     function getData() {
         const table = $('#table-kelas');
         const dataRoute = table.data('route');
-
         $.ajax({
             url: dataRoute,
             type: 'GET',

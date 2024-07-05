@@ -20,6 +20,16 @@ class KelompokAsesor extends Model
         });
     }
 
+    public function skema()
+    {
+        return $this->belongsTo(Skema::class,'skema_id');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class,'event_id');
+    }
+
     public function kelas()
     {
         return $this->belongsTo(Kelas::class,'kelas_id');

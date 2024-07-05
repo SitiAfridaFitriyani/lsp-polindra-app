@@ -24,8 +24,9 @@ class StoreAsesiRequest extends FormRequest
     {
         return [
             'nim' => ['required','min:8','numeric', Rule::unique('m_asesi')],
-            'email' => ['required', 'email', 'min:3', 'max:50', Rule::unique('users')],
+            'email' => ['required', 'lowercase','email', 'min:3', 'max:50', Rule::unique('users')],
             'name' => ['required','min:3','string'],
+            'kelas_id' => ['required', 'exists:m_kelas,uuid'],
             'phone'=>['nullable','regex:/(08)[0-9]{9}/',Rule::unique('users')],
             'photo' => [
                 'nullable',
