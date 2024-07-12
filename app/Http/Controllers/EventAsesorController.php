@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use App\Models\KelompokAsesor;
 use Illuminate\Support\Facades\Auth;
 
-class EventAsesiController extends Controller
+class EventAsesorController extends Controller
 {
     public function show($uuid)
     {
-        $kelas_id = Auth::user()->asesi['kelas_id'];
+        $asesor_id = Auth::user()->asesor['id'];
         $current_time = Carbon::now();
         $query = KelompokAsesor::query();
         $singleDataKelompokAsesor = (clone $query)->with('event')->firstWhere('uuid',$uuid)->event['nama_event'];
-        $kelompokAsesor = $query->where([['kelas_id', $kelas_id],['uuid','!=',$uuid]])
+        $kelompokAsesor = $query->where([['asesor_id', $asesor_id],['uuid', '!=', $uuid]])
             ->whereHas('event', function($query) use ($current_time) {
                 $query->where('event_mulai', '<=', $current_time)
                     ->where('event_selesai', '>=', $current_time);
@@ -25,16 +24,17 @@ class EventAsesiController extends Controller
                     ->where('event_selesai', '>=', $current_time);
             }])
             ->get();
-        return view('dashboard.eventAsesi.index',compact('kelompokAsesor','singleDataKelompokAsesor'));
+        return view('dashboard.eventAsesor.index',compact('kelompokAsesor','singleDataKelompokAsesor'));
     }
 
     public function datatable($uuid)
     {
-        $kelas_id = Auth::user()->asesi['kelas_id'];
-        $data = KelompokAsesor::with(['skema','event','kelas','asesor.user'])->where([
+        $asesor_id = Auth::user()->asesor['id'];
+        $kelompokAsesor = KelompokAsesor::with(['skema','event','kelas.asesi.user','asesor.user'])->where([
             ['uuid',$uuid],
-            ['kelas_id', $kelas_id]
-        ])->get();
+            ['asesor_id', $asesor_id]
+        ])->first();
+        $data = $kelompokAsesor->kelas->asesi;
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

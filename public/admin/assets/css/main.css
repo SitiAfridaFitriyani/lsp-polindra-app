@@ -198,7 +198,7 @@ span.red {
 
 /*  Disable forms     */
 .custom-control-input:disabled ~ .custom-control-label {
-  color: #d3d3d3; }
+  color: #3b3f5c; }
 
 /*      Form Control       */
 .form-control {
@@ -1625,8 +1625,8 @@ select.form-control.form-custom {
 
 input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
   cursor: not-allowed;
-  background-color: #f1f2f3 !important;
-  color: #bfc9d4; }
+  background-color: #fff !important;
+  color: #3b3f5c; }
 
 .help-block, .help-inline {
   color: #555555; }
@@ -1810,13 +1810,13 @@ table .badge-success, table .badge-primary, table .badge-warning, table .badge-d
   padding: 16px 12px;
   color: #fff; }
 
-/*  
+/*
     ==========================
-        Background Colors  
+        Background Colors
     ==========================
 */
-/*  
-    Default  
+/*
+    Default
 */
 .bg-primary {
   background-color: #4361ee !important;
@@ -1853,8 +1853,8 @@ table .badge-success, table .badge-primary, table .badge-warning, table .badge-d
   border-color: #3b3f5c;
   color: #fff; }
 
-/*  
-    Light Background  
+/*
+    Light Background
 */
 .bg-light-primary {
   background-color: #eaf1ff !important;
@@ -1891,7 +1891,7 @@ table .badge-success, table .badge-primary, table .badge-warning, table .badge-d
   border-color: #e3e4eb;
   color: #fff; }
 
-/*  
+/*
     Progress Bar
 */
 .progress {

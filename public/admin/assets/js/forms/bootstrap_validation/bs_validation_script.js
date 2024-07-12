@@ -11,7 +11,7 @@ function snackBarAlert(message, alertBgColor) {
 
 (function() {
     'use strict';
-    function validateForm() {
+    function validateCheckbox() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         let isChecked = false;
         checkboxes.forEach(checkbox => {
@@ -21,6 +21,99 @@ function snackBarAlert(message, alertBgColor) {
         });
             return isChecked;
     }
+
+    function validateRadioFRAPL01() {
+        const radioButtons = document.querySelectorAll('input[type="radio"][name="tujuan_assesmen"]');
+        let isSelected = false;
+        for (let i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                isSelected = true;
+                break;
+            }
+        }
+        return isSelected;
+    }
+
+    function validateRadioGroupFRAPL01() {
+        const radioGroups = document.querySelectorAll('input[type="radio"][name^="statusBerkasPemohon"]');
+        const fileInputs = document.querySelectorAll('input[type="file"][name^="berkasFilePemohon"]');
+        const checkedGroups = {};
+        const fileGroups = {};
+
+        // Check radio buttons
+        radioGroups.forEach(function(radio) {
+            const name = radio.name;
+            if (!checkedGroups[name]) {
+                checkedGroups[name] = false;
+            }
+            if (radio.checked) {
+                checkedGroups[name] = true;
+            }
+        });
+
+        // Check file inputs
+        fileInputs.forEach(function(fileInput) {
+            const name = fileInput.name;
+            fileGroups[name] = fileInput.files.length > 0;
+        });
+
+        // Validate radio buttons
+        for (const key in checkedGroups) {
+            if (!checkedGroups[key]) {
+                return false;
+            }
+        }
+
+        // Validate file inputs
+        for (const key in fileGroups) {
+            if (!fileGroups[key]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function validateRadioGroupFRAPL02() {
+        const radioGroups = document.querySelectorAll('input[type="radio"][name^="statusAssesmenMandiri"]');
+        const fileInputs = document.querySelectorAll('input[type="file"][name^="berkasFilePemohon"]');
+        const checkedGroups = {};
+        const fileGroups = {};
+
+        // Check radio buttons
+        radioGroups.forEach(function(radio) {
+            const name = radio.name;
+            if (!checkedGroups[name]) {
+                checkedGroups[name] = false;
+            }
+            if (radio.checked) {
+                checkedGroups[name] = true;
+            }
+        });
+
+        // Check file inputs
+        fileInputs.forEach(function(fileInput) {
+            const name = fileInput.name;
+            fileGroups[name] = fileInput.files.length > 0;
+        });
+
+        // Validate radio buttons
+        for (const key in checkedGroups) {
+            if (!checkedGroups[key]) {
+                return false;
+            }
+        }
+
+        // Validate file inputs
+        for (const key in fileGroups) {
+            if (!fileGroups[key]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     window.addEventListener('load', function() {
     var forms = document.getElementsByClassName('needs-validation');
     Array.prototype.filter.call(forms, function(form) {
@@ -29,12 +122,32 @@ function snackBarAlert(message, alertBgColor) {
             const url = form.getAttribute('action');
             const currentUrl = new URL(window.location.href);
 
-            if(!validateForm() && currentUrl.pathname.includes('persetujuan-assesmen')) {
+            if(!validateCheckbox() && currentUrl.pathname.includes('persetujuan-assesmen')) {
                 event.preventDefault();
-                snackBarAlert('Centang minimal 1 checkbox berkas', '#e7515a');
+                snackBarAlert('Centang minimal satu checkbox berkas', '#e7515a');
                 event.stopPropagation();
                 return false;
             }
+            if(!validateRadioFRAPL01() && currentUrl.pathname.includes('frapl01-assesmen')) {
+                event.preventDefault();
+                snackBarAlert('Pilih salah satu tujuan assesmen', '#e7515a');
+                event.stopPropagation();
+                return false;
+            }
+            if(!validateRadioGroupFRAPL01() && currentUrl.pathname.includes('frapl01-assesmen')) {
+                event.preventDefault();
+                snackBarAlert('Pilih persyaratan pemohon minimal satu dan upload setiap berkasnya', '#e7515a');
+                event.stopPropagation();
+                return false;
+            }
+
+            if(!validateRadioGroupFRAPL02() && currentUrl.pathname.includes('frapl02-assesmen')) {
+                event.preventDefault();
+                snackBarAlert('Pilih elemen minimal satu dan upload berkas di setiap elemennya', '#e7515a');
+                event.stopPropagation();
+                return false;
+            }
+
             if (form.checkValidity() === false) {
                 event.preventDefault();
                 event.stopPropagation();

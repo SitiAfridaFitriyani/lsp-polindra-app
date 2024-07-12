@@ -1,5 +1,5 @@
 @extends('layouts.app.main')
-@section('title','Persetujuan Kerahasiaan')
+@section('title','Test Praktek Assesmen')
 @section('content')
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
@@ -18,8 +18,8 @@
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('frapl.index',$kelompokAsesor['uuid']) }}">Daftar FRAPL Assesmen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">FRAPL-02. ASSESMEN MANDIRI</li>
+                    <li class="breadcrumb-item"><a href="{{ route('testAssesmen.index',$kelompokAsesor['uuid']) }}">Daftar Test Assesmen</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">TUGAS PRAKTEK</li>
                 </ol>
             </nav>
         </div>
@@ -70,88 +70,32 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="row mb-4">
-                        <h5 class="col-12 mb-3">ASSESMEN MANDIRI</h5>
-                    </div>
-                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl02.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
+                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('userTestPraktek.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
                         <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         <section style="height: 170vh; overflow-y: auto;">
-                            @php
-                                foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
-                                    $groupedUnitKompetensi[$unitKom['judul_unit']][] = $unitKom;
-                                }
-                            @endphp
-                            <table class="table table-borderless">
-                                <tbody>
-                                    @isset($groupedUnitKompetensi)
-                                        @forelse($groupedUnitKompetensi as $unitKom => $data)
-                                            <tr style="border: none !important;">
-                                                @php
-                                                    $kodeUnit = '';
-                                                    foreach($data as $val) {
-                                                        if($val['judul_unit'] === $unitKom) {
-                                                            $kodeUnit = $val['kode_unit'];
-                                                        }
-                                                    }
-                                                @endphp
-                                                <th>{{ 'Unit Kompetensi : [' . $kodeUnit . '] ' . $unitKom }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Daftar Elemen</th>
-                                            </tr>
-                                            @forelse($data as $val)
-                                                @forelse($val->elemen as $elemen)
-                                                    <tr>
-                                                        <td>
-                                                            <p class="text-wrap">{{ $elemen['nama_elemen'] }}</p>
-                                                        </td>
-                                                        <td>
-                                                            <div class="n-chk">
-                                                                <label class="new-control new-radio new-radio-text radio-classic-success">
-                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $elemen['id'] }}]" value="Kompeten">
-                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Kompeten (K)</span>
-                                                                </label>
-                                                            </div>
-                                                            <div class="n-chk">
-                                                                <label class="new-control new-radio new-radio-text radio-classic-danger">
-                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $elemen['id'] }}]" value="Belum Kompeten">
-                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Belum Kompeten (BK)</span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="custom-file mb-4">
-                                                                <input type="file" class="custom-file-input" id="berkasFilePemohon_{{ $elemen['id'] }}" name="berkasFilePemohon[{{ $elemen['id'] }}]" accept=".pdf">
-                                                                <label class="custom-file-label" for="berkasFilePemohon_{{ $elemen['id'] }}">Choose file</label>
-                                                            </div>
-                                                            <p><small>Available format: .PDF Max: 2MB <span id="uploadStatus_{{ $elemen['id'] }}" class="text-danger"> (Belum Upload)</span> </small></p>
-                                                            <p>File: <a href="" class="text-primary d-none" style="text-decoration: underline;" target="__blank" id="fileLink_{{ $elemen['id'] }}">Tampilkan file</a></p>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td class="text-danger">Daftar elemen tidak tersedia pada unit kompetensi ini</td>
-                                                    </tr>
-                                                @endforelse
-                                            @empty
-                                                <tr>
-                                                    <td class="text-danger">Daftar unit kompetensi tidak tersedia</td>
-                                                </tr>
-                                            @endforelse
-                                        @empty
-                                            <tr>
-                                                <td colspan="4">Data berkas Tidak Tersedia</td>
-                                            </tr>
-                                        @endforelse
-                                    @else
-                                        <tr>
-                                            <td colspan="4">Data unit kompetensi Tidak Tersedia</td>
-                                        </tr>
-                                    @endisset
-                                </tbody>
-                            </table>
+                            <p style="height: 60vh; overflow-y: auto;">
+                                {!! $kelompokAsesor->skema->testPraktek['isi_prosedur_kerja'] !!}
+                            </p>
+                            <div class="col-12 mb-2">
+                                <label for="jawaban">Jawaban <span class="text-danger">*</span></label>
+                                <div class="widget-content widget-content-area">
+                                    <textarea class="form-control @error('jawaban') is-invalid @enderror" id="jawaban" name="jawaban"></textarea>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Kolom jawaban tidak boleh kosong
+                                </div>
+                            </div>
+                            <div class="custom-file-container" data-upload-id="mySecondImage">
+                                <label>Upload (Allow Multiple) <a href="javascript:void(0)" class="custom-file-container__image-clear" title="Clear Image">x</a></label>
+                                <label class="custom-file-container__custom-file" >
+                                    <input type="file" class="custom-file-container__custom-file__custom-file-input" multiple name="file[]">
+                                    <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+                                    <span class="custom-file-container__custom-file__custom-file-control"></span>
+                                </label>
+                                <div class="custom-file-container__image-preview"></div>
+                            </div>
                             <table class="table table-borderless">
                                 <tbody>
                                     <tr style="border: none !important;">
@@ -190,5 +134,38 @@
             </div>
         </div>
     </div>
-    @include('dashboard.frapl.frapl02.scriptComponent')
+    @include('dashboard.testAssesmen.testPraktek.scriptComponent')
+    @push('ckEditor')
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#jawaban'), {
+                toolbar: {
+                    items: [
+                        'exportPDF','exportWord', '|',
+                        'findAndReplace', 'selectAll', '|',
+                        'heading', '|',
+                        'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                        'bulletedList', 'numberedList', 'todoList', '|',
+                        'outdent', 'indent', '|',
+                        'undo', 'redo',
+                        '-',
+                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                        'alignment', '|',
+                        'link', 'blockQuote', 'insertTable', 'codeBlock', 'htmlEmbed', '|',
+                        'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                        'textPartLanguage', '|',
+                        'sourceEditing'
+                    ],
+                    shouldNotGroupWhenFull: true
+                },
+                placeholder: 'Ketikkan jawabanmu disini...',
+            })
+            .then(editor => {
+                window.jawabanTestPraktek = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+@endpush
 @endsection

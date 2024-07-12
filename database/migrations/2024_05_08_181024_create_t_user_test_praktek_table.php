@@ -15,10 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->longText('jawaban');
-            $table->json('file');
+            $table->json('file')->nullable();
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
-            $table->foreignId('asesor_id')->constrained('m_asesor')->cascadeOnDelete();
+            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->foreignId('test_praktek_id')->constrained('m_test_praktek')->cascadeOnDelete();
+            $table->string('no_reg')->nullable();
+            $table->string('catatan')->nullable();
+            $table->string('ttd_asesor')->nullable();
+            $table->string('ttd_asesi');
+            $table->timestamp('tgl_ttd_asesor')->nullable();
+            $table->timestamp('tgl_ttd_asesi');
+            $table->enum('status_rekomendasi',['Pending','Assesment Dapat Dilanjutkan','Assesment Tidak Dapat Dilanjutkan'])->default('Pending');
+
             $table->timestamps();
         });
     }

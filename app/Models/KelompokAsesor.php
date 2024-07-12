@@ -39,4 +39,24 @@ class KelompokAsesor extends Model
     {
         return $this->belongsTo(Asesor::class,'asesor_id');
     }
+
+    public function frapl01()
+    {
+        return $this->hasMany(FRAPL01::class,'kelompok_asesor_id');
+    }
+
+    public function frapl02()
+    {
+        return $this->hasMany(FRAPL02::class,'kelompok_asesor_id');
+    }
+
+    public function userTestTulis()
+    {
+        return $this->hasMany(UserTestTulis::class,'kelompok_asesor_id');
+    }
+
+    public function userTestPraktek()
+    {
+        return $this->hasMany(UserTestPraktek::class,'kelompok_asesor_id');
+    }
 }

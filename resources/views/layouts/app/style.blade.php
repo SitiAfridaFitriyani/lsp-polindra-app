@@ -34,6 +34,8 @@
 {{-- Form Step Bar --}}
 <link href="{{ asset('admin/assets/css/scrollspyNav.css') }}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" type="text/css" href="{{ asset('admin/plugins/jquery-step/jquery.steps.css') }}">
+{{-- Upload File --}}
+<link href="{{ asset('admin/plugins/file-upload/file-upload-with-preview.min.css') }}" rel="stylesheet" type="text/css" />
 {{-- Checkbox Style --}}
 <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
 <style>

@@ -39,7 +39,11 @@
 <script src="{{ asset('admin/assets/js/scrollspyNav.js') }}"></script>
 <script src="{{ asset('admin/plugins/jquery-step/jquery.steps.min.js') }}"></script>
 <script src="{{ asset('admin/plugins/jquery-step/custom-jquery.steps.js') }}"></script>
-
+{{-- Upload File --}}
+<script src="{{ asset('admin/plugins/file-upload/file-upload-with-preview.min.js') }}"></script>
+<script>
+    var secondUpload = new FileUploadWithPreview('mySecondImage')
+</script>
 @if(request()->routeIs('login') || request()->routeIs('password.request'))
     <script src="{{ asset('admin/assets/js/authentication/form-1.js') }}"></script>
 @endif

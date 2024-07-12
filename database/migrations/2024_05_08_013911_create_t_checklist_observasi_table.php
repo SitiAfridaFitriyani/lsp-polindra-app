@@ -24,9 +24,8 @@ return new class extends Migration
             $table->timestamp('tgl_ttd_asesi');
             $table->foreignId('elemen_id')->constrained('m_elemen')->cascadeOnDelete();
             $table->foreignId('unit_kompetensi_id')->constrained('m_unit_kompetensi')->cascadeOnDelete();
-            $table->foreignId('skema_id')->constrained('m_skema')->cascadeOnDelete();
+            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
-            $table->foreignId('asesor_id')->constrained('m_asesor')->cascadeOnDelete();
             $table->timestamps();
         });
     }

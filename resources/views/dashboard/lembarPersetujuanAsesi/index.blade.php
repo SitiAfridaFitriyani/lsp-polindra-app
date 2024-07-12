@@ -7,9 +7,16 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a></li>
                     <li class="breadcrumb-item dropdown">
-                        <a class="dropdown-toggle" href="{{ route('event-asesi.show', $kelompokAsesor['uuid']) }}" role="button" id="pendingTask" aria-haspopup="true" aria-expanded="true">
+                        <a class="dropdown-toggle" href="javascript:void(0);" role="button" id="pendingTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             Event Saya
                         </a>
+                        <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
+                            @forelse($kelompokAsesorNotIn as $data)
+                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                            @empty
+                                <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
+                            @endforelse
+                        </div>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">Lembar Persetujuan Kerahasiaan</li>
                 </ol>
@@ -17,15 +24,17 @@
         </div>
         <div class="col-lg-12">
             <div class="statbox widget box box-shadow">
+                <div class="widget-header">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h4>
+                        </div>
+                    </div>
+                </div>
                 <div class="widget-content widget-content-area">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="background-color: #ebf3fe; border-radius: 5px;">
                         <table class="table table-borderless">
                             <tbody>
-                                <tr>
-                                    <th style="border: none !important;">
-                                        FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN
-                                    </th>
-                                </tr>
                                 <tr style="border: none !important;">
                                     <th>Skema Sertifikasi</th>
                                     <td>:</td>
@@ -145,175 +154,5 @@
             </div>
         </div>
     </div>
-    @can('asesi')
-        {{-- MODAL TTD ASESI --}}
-        <div class="modal fade" id="create-ttd-asesi" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Tanda Tangan Asesi</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body text-center">
-                            <canvas id="signatureCanvasAsesi" width="400" height="200" style="border: 1px solid black;"></canvas>
-                            <div class="modal-footer bg-transparent d-flex justify-content-center">
-                                <button onclick="clearCanvasAsesi()" id="clearCanvasAsesiButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- TTD ASESI SCRIPT --}}
-        <script>
-            var canvasAsesi = document.getElementById('signatureCanvasAsesi');
-            var ctxAsesi = canvasAsesi.getContext('2d');
-            var isDrawingAsesi = false;
-            var lastXAsesi = 0;
-            var lastYAsesi = 0;
-            var inputSignatureAsesi = document.getElementById('signatureAsesi');
-            canvasAsesi.addEventListener('mousedown', (e) => {
-                isDrawingAsesi = true;
-                [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
-            });
-            canvasAsesi.addEventListener('mousemove', draw);
-            canvasAsesi.addEventListener('mouseup', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
-            canvasAsesi.addEventListener('mouseout', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
-            function draw(e) {
-                if (!isDrawingAsesi) return;
-                ctxAsesi.beginPath();
-                ctxAsesi.moveTo(lastXAsesi, lastYAsesi);
-                ctxAsesi.lineTo(e.offsetX, e.offsetY);
-                ctxAsesi.stroke();
-                [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
-            }
-            function updateSignatureInputAsesi() {
-                inputSignatureAsesi.value = canvasAsesi.toDataURL();
-            }
-            function clearCanvasAsesi() {
-                inputSignatureAsesi.value = "";
-                ctxAsesi.clearRect(0, 0, canvasAsesi.width, canvasAsesi.height);
-            }
-        </script>
-    @endcan
-    @can('asesor')
-        {{-- MODAL TTD ASESOR --}}
-        <div class="modal fade" id="create-ttd-asesor" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Tanda Tangan Asesor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body text-center">
-                            <canvas id="signatureCanvasAsesor" width="400" height="200" style="border: 1px solid black;"></canvas>
-                            <div class="modal-footer bg-transparent d-flex justify-content-center">
-                                <button onclick="clearCanvasAsesor()" id="clearCanvasAsesorButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- TTD ASESOR SCRIPT --}}
-        <script>
-            var canvasAsesor = document.getElementById('signatureCanvasAsesor');
-            var ctxAsesor = canvasAsesor.getContext('2d');
-            var isDrawingAsesor = false;
-            var lastXAsesor = 0;
-            var lastYAsesor = 0;
-            var inputSignatureAsesor = document.getElementById('signatureAsesor');
-            canvasAsesor.addEventListener('mousedown', (e) => {
-                isDrawingAsesor = true;
-                [lastXAsesor, lastYAsesor] = [e.offsetX, e.offsetY];
-            });
-            canvasAsesor.addEventListener('mousemove', draw);
-            canvasAsesor.addEventListener('mouseup', () => {
-                isDrawingAsesor = false;
-                updateSignatureInputAsesor();
-            });
-            canvasAsesor.addEventListener('mouseout', () => {
-                isDrawingAsesor = false;
-                updateSignatureInputAsesor();
-            });
-            function draw(e) {
-                if (!isDrawingAsesor) return;
-                ctxAsesor.beginPath();
-                ctxAsesor.moveTo(lastXAsesor, lastYAsesor);
-                ctxAsesor.lineTo(e.offsetX, e.offsetY);
-                ctxAsesor.stroke();
-                [lastXAsesor, lastYAsesor] = [e.offsetX, e.offsetY];
-            }
-            function updateSignatureInputAsesor() {
-                inputSignatureAsesor.value = canvasAsesor.toDataURL();
-            }
-            function clearCanvasAsesor() {
-                inputSignatureAsesor.value = "";
-                ctxAsesor.clearRect(0, 0, canvasAsesor.width, canvasAsesor.height);
-            }
-        </script>
-    @endcan
-    {{-- GET DATA --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            getData();
-        });
-        function getData() {
-            $.ajax({
-                url: "{{ route('persetujuanAssesmen.show-by-kelompokAsesor') }}",
-                type: 'GET',
-                data: {kelompok_asesor: @json($kelompokAsesor['uuid'])},
-                success: function(response) {
-                    @can('asesi')
-                        document.getElementById('clearCanvasAsesiButton').click();
-                    @endcan
-                    @can('asesor')
-                        document.getElementById('clearCanvasAsesorButton').click();
-                    @endcan
-                    const data = response.data;
-                    const berkas = JSON.parse(data.berkas);
-                    const urlTtdAsesi = `{{ asset('storage/${data.ttd_asesi}') }}`;
-
-                    if(data.ttd_asesi) {
-                        $('#available-ttdAsesi').html(`<img style="width: 130px; height: 60px;" src="${urlTtdAsesi}" style="width:70px; height:70px"/>`);
-                    }
-
-                    berkas.forEach(item => {
-                        if (item === "TL : Verifikasi Portofolio") {
-                            document.getElementById('ckportofolio').checked = true;
-                        }
-                        if (item === "L : Observasi") {
-                            document.getElementById('ckoberservasi').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Tulis") {
-                            document.getElementById('cktestTulis').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Lisan") {
-                            document.getElementById('cktestLisan').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Wawancara") {
-                            document.getElementById('cktestWawancara').checked = true;
-                        }
-                    });
-                },
-                error: function(xhr, status, error) {
-                    snackBarAlert('Data gagal dimuat', '#e7515a');
-                }
-            });
-        }
-    </script>
+    @include('dashboard.lembarPersetujuanAsesi.scriptComponent')
 @endsection

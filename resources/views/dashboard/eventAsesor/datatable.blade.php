@@ -11,7 +11,9 @@
                 const listAsesorRoute = '{{ route("asesor.listByUuid", [":uuid"]) }}';
                 const fraplRoute = '{{ route("frapl.index", [":uuid"]) }}';
                 const persetujuanAssesmen = '{{ route("persetujuanAssesmen.index", [":uuid"]) }}';
-                const testAssesmen = '{{ route("testAssesmen.index", [":uuid"]) }}';
+                const kelompokAsesorId = @json(request()->segment(2));
+                const testAssesmenBaseURL = '{{ route("testAssesmen.index", ":uuid") }}';
+                const testAssesmenURL = `${testAssesmenBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
                 let kelasName = '';
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
@@ -39,7 +41,7 @@
                                 const listAsesorRouteRendered = listAsesorRoute.replace(':uuid', data);
                                 const fraplRouteRendered = fraplRoute.replace(':uuid', data);
                                 const persetujuanAssesmenRendered = persetujuanAssesmen.replace(':uuid', data);
-                                const daftarTestAssesmenRendered = testAssesmen.replace(':uuid', data);
+                                const daftarTestAssesmenRendered = testAssesmenURL.replace(':uuid', data);
 
                                 return `
                                     <div class="dropdown">
@@ -47,7 +49,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                         </a>
                                         <div class="dropdown-menu left" aria-labelledby="dropdownMenuLink10" style="will-change: transform; position: absolute; transform: translate3d(-141px, 19px, 0px); top: 0px; left: 0px;" x-placement="bottom-end">
-                                            <a class="dropdown-item" href="${daftarTestAssesmenRendered}" title="Daftar Test">
+                                            <a class="dropdown-item" href="${daftarTestAssesmenRendered}" title="Daftar Test Assesmen">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                                 Daftar Test Assesmen
                                             </a>
@@ -76,41 +78,38 @@
                             }
                         },
                         {
-                            data: 'asesor',
+                            data: 'user',
                             render: function(data) {
-                                return data ? data.user.name : 'N/A';
+                                return data ? data.name : 'N/A';
                             }
                         },
                         {
-                            data: 'skema',
+                            data: 'user',
                             render: function(data) {
-                                return data ? data.judul_skema : 'N/A';
+                                return data ? data.email : 'N/A';
                             }
                         },
                         {
-                            data: 'kelas',
+                            data: 'nim'
+                        },
+                        {
+                            data: 'user',
                             render: function(data) {
-                                return data ? data.nama_kelas : 'N/A';
+                                return data ? data.phone : 'N/A';
                             }
                         },
                         {
-                            data: 'event',
+                            data: 'user',
                             render: function(data) {
-                                return data ? data.tuk : 'N/A';
+                                return data ? data.jenis_kelamin : 'N/A';
                             }
                         },
                         {
-                            data: 'event',
+                            data: 'user',
                             render: function(data) {
-                                return data ? moment(data.event_mulai).format('DD MMMM Y H:mm') +' WIB' : 'N/A';
+                                return data ? data.address : 'N/A';
                             }
                         },
-                        {
-                            data: 'event',
-                            render: function(data) {
-                                return data ? moment(data.event_selesai).format('DD MMMM Y H:mm') +' WIB' : 'N/A';
-                            }
-                        }
                     ]
                 });
             },

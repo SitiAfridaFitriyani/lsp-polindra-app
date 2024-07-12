@@ -30,16 +30,16 @@ return new class extends Migration
             $table->string('email_institusi', 50)->nullable()->unique();
             $table->string('fax',50)->nullable();
             $table->string('tujuan_assesmen');
-            $table->string('jabatan');
-            $table->string('no_reg');
-            $table->enum('status_rekomendasi',['Diterima','Tidak Diterima']);
-            $table->string('ttd_admin_lsp');
+            $table->string('jabatan')->nullable();
+            $table->string('no_reg')->nullable();
+            $table->enum('status_rekomendasi',['Pending','Diterima','Tidak Diterima'])->default('Pending');
+            $table->string('ttd_admin_lsp')->nullable();
             $table->string('ttd_asesi');
-            $table->timestamp('tgl_ttd_admin_lsp');
+            $table->timestamp('tgl_ttd_admin_lsp')->nullable();
             $table->timestamp('tgl_ttd_asesi');
-            $table->foreignId('skema_id')->constrained('m_skema')->cascadeOnDelete();
+            $table->string('catatan')->nullable();
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
-            $table->foreignId('asesor_id')->constrained('m_asesor')->cascadeOnDelete();
+            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->timestamps();
         });
     }

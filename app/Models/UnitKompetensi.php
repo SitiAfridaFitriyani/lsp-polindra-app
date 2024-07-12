@@ -28,4 +28,9 @@ class UnitKompetensi extends Model
     {
         return $this->hasMany(Elemen::class, 'unit_kompetensi_id');
     }
+
+    public function testTulis()
+    {
+        return $this->hasMany(TestTulis::class,'unit_kompetensi_id');
+    }
 }

@@ -1,76 +1,3 @@
-@extends('layouts.app.main')
-@section('title','Daftar FRAPL Assesmen')
-@section('content')
-    <div class="row layout-top-spacing" id="cancel-row">
-        <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
-            <nav class="breadcrumb-one" aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a></li>
-                    <li class="breadcrumb-item dropdown">
-                        <a class="dropdown-toggle" href="{{ route('event-asesi.show', $kelompokAsesor['uuid']) }}" role="button" id="pendingTask" aria-haspopup="true" aria-expanded="true">
-                            Event Saya
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Daftar FRAPL Assesmen</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="col-lg-6">
-            <div class="statbox widget box box-shadow">
-                <div class="widget-content widget-content-area">
-                    <div class="table-responsive">
-                        <table class="table table-borderless">
-                            <tbody>
-                                <tr>
-                                    <th style="border: none !important;">
-                                        FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN
-                                    </th>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Skema Sertifikasi</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['jenis_standar'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Nomor Skema</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['no_skema'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Judul Skema</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['judul_skema'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>TUK</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->event['tuk'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Pelaksanaan Assesmen</th>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>Hari/Tanggal</td>
-                                    <td>:</td>
-                                    <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('dddd, DD MMMM Y') }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>Waktu</td>
-                                    <td>:</td>
-                                    <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('HH:mm') }} WIB</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>TUK</td>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->event['tuk'] }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     @can('asesi')
         {{-- MODAL TTD ASESI --}}
         <div class="modal fade" id="create-ttd-asesi" tabindex="-1" role="dialog" aria-hidden="true">
@@ -200,41 +127,27 @@
         });
         function getData() {
             $.ajax({
-                url: "{{ route('persetujuanAssesmen.show-by-kelompokAsesor') }}",
+                url: "{{ route('userTestPraktek.show-by-kelompokAsesor') }}",
                 type: 'GET',
                 data: {kelompok_asesor: @json($kelompokAsesor['uuid'])},
                 success: function(response) {
+                    // Cleared Canvas after get Data
                     @can('asesi')
                         document.getElementById('clearCanvasAsesiButton').click();
                     @endcan
                     @can('asesor')
                         document.getElementById('clearCanvasAsesorButton').click();
                     @endcan
+                    // Variabel
                     const data = response.data;
-                    const berkas = JSON.parse(data.berkas);
+                    if (window.jawabanTestPraktek) {
+                        window.jawabanTestPraktek.setData(data.jawaban);
+                    }
                     const urlTtdAsesi = `{{ asset('storage/${data.ttd_asesi}') }}`;
-
+                    // TTD Asesi
                     if(data.ttd_asesi) {
                         $('#available-ttdAsesi').html(`<img style="width: 130px; height: 60px;" src="${urlTtdAsesi}" style="width:70px; height:70px"/>`);
                     }
-
-                    berkas.forEach(item => {
-                        if (item === "TL : Verifikasi Portofolio") {
-                            document.getElementById('ckportofolio').checked = true;
-                        }
-                        if (item === "L : Observasi") {
-                            document.getElementById('ckoberservasi').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Tulis") {
-                            document.getElementById('cktestTulis').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Lisan") {
-                            document.getElementById('cktestLisan').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Wawancara") {
-                            document.getElementById('cktestWawancara').checked = true;
-                        }
-                    });
                 },
                 error: function(xhr, status, error) {
                     snackBarAlert('Data gagal dimuat', '#e7515a');
@@ -242,4 +155,3 @@
             });
         }
     </script>
-@endsection

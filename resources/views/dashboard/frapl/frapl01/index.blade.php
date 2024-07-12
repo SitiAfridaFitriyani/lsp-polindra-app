@@ -25,19 +25,12 @@
         </div>
         <div class="col-12 layout-spacing">
             <div class="statbox widget box box-shadow">
-                <div class="widget-header">
-                    <div class="row">
-                        <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                            <h4>FRAPL-01. PERMOHONAN SERTIFIKASI KOMPETENSI</h4>
-                        </div>
-                    </div>
-                </div>
                 <div class="widget-content widget-content-area">
-                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl01.store', ['uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
+                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl01.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
+                        <input type="hidden" name="signatureAdminLSP" id="signatureAdminLSP" name="signatureAdminLSP">
                         <div id="example-basic">
-                            <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                            <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                             <h3>Pemohon Sertifikasi</h3>
                             <section>
                                 <div class="row mb-4">
@@ -47,7 +40,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="name" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Lengkap<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="name" value="{{ Auth::user()->name }}" disabled>
+                                        <input type="text" class="form-control" id="name" value="{{ Auth::user()->name }}" name="name" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -74,17 +67,17 @@
                                         <div class="col-xl-10 col-lg-9 col-sm-10">
                                             <div class="form-check mb-2">
                                                 <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jklakilaki" disabled class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Laki-laki')>
+                                                    <input type="radio" id="jklakilaki" name="jenis_kelamin" value="Laki-laki" readonly class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Laki-laki')>
                                                     <label class="custom-control-label" for="jklakilaki">Laki-laki</label>
                                                 </div>
                                             </div>
                                             <div class="form-check mb-2">
                                                 <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jkperempuan" disabled class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Perempuan')>
+                                                    <input type="radio" id="jkperempuan" name="jenis_kelamin" value="Perempuan" readonly class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Perempuan')>
                                                     <label class="custom-control-label" for="jkperempuan">Perempuan</label>
                                                 </div>
                                             </div>
-                                            <p class="badge bg-danger mt-2">Jika Jenis Kelamin kosong harap lengkapi di menu profile saya</p>
+                                            <p class="badge bg-danger mt-2">Jika Jenis Kelamin kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -97,14 +90,8 @@
                                 <div class="form-group row mb-4">
                                     <label for="address" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Rumah<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" id="address" cols="20" rows="5" disabled>{{ Auth::user()->address }}</textarea>
-                                        <p class="badge bg-danger mt-2">Jika Alamat Rumah kosong harap lengkapi di menu profile saya</p>
-                                    </div>
-                                </div>
-                                <div class="form-group row mb-4">
-                                    <label for="alamat_kantor" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Kantor</label>
-                                    <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" name="alamat_kantor" id="alamat_kantor" cols="20" rows="5" placeholder="Masukkan kantor peserta (optional)"></textarea>
+                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly>{{ Auth::user()->address }}</textarea>
+                                        <p class="badge bg-danger mt-2">Jika Alamat Rumah kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -116,26 +103,26 @@
                                 <div class="form-group row mb-4">
                                     <label for="phone" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="phone" value="{{ Auth::user()->phone }}" disabled>
-                                        <p class="badge bg-danger mt-2">Jika No. Telp Peserta kosong harap lengkapi di menu profile saya</p>
+                                        <input type="number" class="form-control" id="phone" value="{{ Auth::user()->phone }}" name="phone" readonly>
+                                        <p class="badge bg-danger mt-2">Jika No. Telp Peserta kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
                                     <label for="tlp_rumah" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Rumah</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="tlp_rumah" name="tlp_rumah" placeholder="Masukkan No. Telp/HP/WA rumah (pilih salah satu optional)">
+                                        <input type="number" class="form-control" id="tlp_rumah" name="tlp_rumah" placeholder="Masukkan No. Telp/HP/WA rumah (pilih salah satu opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
                                     <label for="tlp_kantor" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Kantor</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="tlp_kantor" name="tlp_kantor" placeholder="Masukkan No. Telp/HP/WA kantor (pilih salah satu optional)">
+                                        <input type="number" class="form-control" id="tlp_kantor" name="tlp_kantor" placeholder="Masukkan No. Telp/HP/WA kantor (pilih salah satu opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
                                     <label for="email" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="email" class="form-control" id="email" value="{{ Auth::user()->email }}" disabled>
+                                        <input type="email" class="form-control" id="email" value="{{ Auth::user()->email }}" name="email" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -150,31 +137,43 @@
                                 <div class="form-group row mb-4">
                                     <label for="nama_institusi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Institusi</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="nama_institusi" name="nama_institusi" placeholder="Masukkan nama institusi (optional)">
+                                        <input type="text" class="form-control" id="nama_institusi" name="nama_institusi" placeholder="Masukkan nama institusi (opsional)">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-4">
+                                    <label for="jabatan" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Jabatan</label>
+                                    <div class="col-xl-10 col-lg-9 col-sm-10">
+                                        <input type="text" class="form-control" id="jabatan" name="jabatan" placeholder="Masukkan jabatan terakhir (opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
                                     <label for="no_tlp_institusi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Institusi</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="no_tlp_institusi" name="no_tlp_institusi" placeholder="Masukkan No. Telp/HP/WA institusi (pilih salah satu optional)">
+                                        <input type="number" class="form-control" id="no_tlp_institusi" name="no_tlp_institusi" placeholder="Masukkan No. Telp/HP/WA institusi (pilih salah satu opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
-                                    <label for="kode_pos_instituasi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Kode Pos Institusi</label>
+                                    <label for="kode_pos_institusi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Kode Pos Institusi</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="kode_pos_instituasi" name="kode_pos_instituasi" placeholder="Masukkan kode pos institusi (optional)">
+                                        <input type="number" class="form-control" id="kode_pos_institusi" name="kode_pos_institusi" placeholder="Masukkan kode pos institusi (opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
-                                    <label for="email_instituasi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Institusi</label>
+                                    <label for="email_institusi" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Institusi</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="email" class="form-control" id="email_instituasi" placeholder="Masukkan email institusi (optional)">
+                                        <input type="email" class="form-control" id="email_institusi" name="email_institusi" placeholder="Masukkan email institusi (opsional)">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
                                     <label for="fax" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">FAX Institusi</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="fax" name="fax" placeholder="Masukkan fax institusi (optional)">
+                                        <input type="text" class="form-control" id="fax" name="fax" placeholder="Masukkan fax institusi (opsional)">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-4">
+                                    <label for="alamat_kantor" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Kantor</label>
+                                    <div class="col-xl-10 col-lg-9 col-sm-10">
+                                        <textarea class="form-control" name="alamat_kantor" id="alamat_kantor" cols="20" rows="5" placeholder="Masukkan kantor peserta (opsional)"></textarea>
                                     </div>
                                 </div>
                             </section>
@@ -215,19 +214,19 @@
                                     <div class="ml-3">
                                         <div class="n-chk">
                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" value="Sertifikasi">
+                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" id="ckSertifikasi" value="Sertifikasi">
                                             <span class="new-control-indicator"></span><span class="new-radio-content">Sertifikasi</span>
                                             </label>
                                         </div>
                                         <div class="n-chk">
                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" value="Sertifikasi Ulang">
+                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" id="ckSertifikasiulang" value="Sertifikasi Ulang">
                                             <span class="new-control-indicator"></span><span class="new-radio-content">Sertifikasi Ulang</span>
                                             </label>
                                         </div>
                                         <div class="n-chk">
                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" value="Pengakuan Kompetensi Terkini (PKT)">
+                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" id="ckPKT" value="Pengakuan Kompetensi Terkini (PKT)">
                                             <span class="new-control-indicator"></span><span class="new-radio-content">Pengakuan Kompetensi Terkini (PKT)</span>
                                             </label>
                                         </div>
@@ -235,13 +234,13 @@
                                     <div class="ml-5">
                                         <div class="n-chk">
                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" value="Rekognisi Pembelajaran Lampau">
+                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" id="ckRPL" value="Rekognisi Pembelajaran Lampau">
                                             <span class="new-control-indicator"></span><span class="new-radio-content">Rekognisi Pembelajaran Lampau</span>
                                             </label>
                                         </div>
                                         <div class="n-chk">
                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" value="Lainnya">
+                                            <input type="radio" class="new-control-input" name="tujuan_assesmen" id="ckLainnya" value="Lainnya">
                                             <span class="new-control-indicator"></span><span class="new-radio-content">Lainnya</span>
                                             </label>
                                         </div>
@@ -254,7 +253,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div class="table-responsive">
+                                <div class="table-responsive" style="height: 250px; overflow-y: auto;">
                                     <table class="table table-borderless">
                                         <thead>
                                             <th class="text-center" scope="col">No</th>
@@ -300,29 +299,30 @@
                                                     <td>
                                                         <div class="n-chk">
                                                             <label class="new-control new-radio new-radio-text radio-classic-success">
-                                                            <input type="radio" class="new-control-input" name="statusBerkasPemohon[{{ $index }}]" value="Memenuhi Syarat">
-                                                            <span class="new-control-indicator"></span><span class="new-radio-content">Memenuhi Syarat</span>
+                                                                <input type="radio" class="new-control-input" id="statusBerkasPemohon_{{ $index }}"name="statusBerkasPemohon[{{ $index }}]" value="Memenuhi Syarat">
+                                                                <span class="new-control-indicator"></span><span class="new-radio-content">Memenuhi Syarat</span>
                                                             </label>
                                                         </div>
                                                         <div class="n-chk">
                                                             <label class="new-control new-radio new-radio-text radio-classic-warning">
-                                                            <input type="radio" class="new-control-input" name="statusBerkasPemohon[{{ $index }}]" value="Tidak Memenuhi Syarat">
-                                                            <span class="new-control-indicator"></span><span class="new-radio-content">Tidak Memenuhi Syarat</span>
+                                                                <input type="radio" class="new-control-input" name="statusBerkasPemohon[{{ $index }}]" value="Tidak Memenuhi Syarat">
+                                                                <span class="new-control-indicator"></span><span class="new-radio-content">Tidak Memenuhi Syarat</span>
                                                             </label>
                                                         </div>
                                                         <div class="n-chk">
                                                             <label class="new-control new-radio new-radio-text radio-classic-danger">
-                                                            <input type="radio" class="new-control-input" name="statusBerkasPemohon[{{ $index }}]" value="Tidak Ada">
-                                                            <span class="new-control-indicator"></span><span class="new-radio-content">Tidak Ada</span>
+                                                                <input type="radio" class="new-control-input" name="statusBerkasPemohon[{{ $index }}]" value="Tidak Ada">
+                                                                <span class="new-control-indicator"></span><span class="new-radio-content">Tidak Ada</span>
                                                             </label>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="custom-file mb-4">
-                                                            <input type="file" class="custom-file-input" id="berkasFilePemohon" name="berkasFilePemohon[{{ $index }}]" accept=".pdf">
-                                                            <label class="custom-file-label" for="berkasFilePemohon">Choose file</label>
+                                                            <input type="file" class="custom-file-input" id="berkasFilePemohon_{{ $index }}" name="berkasFilePemohon[{{ $index }}]" accept=".pdf">
+                                                            <label class="custom-file-label" for="berkasFilePemohon_{{ $index }}">Choose file</label>
                                                         </div>
-                                                        <p><small>Available format: .PDF Max: 2MB</small></p>
+                                                        <p><small>Available format: .PDF Max: 2MB <span id="uploadStatus_{{ $index }}" class="text-danger"> (Belum Upload)</span> </small></p>
+                                                        <p>File: <a href="" class="text-primary d-none" style="text-decoration: underline;" target="__blank" id="fileLink_{{ $index }}">Tampilkan file</a></p>
                                                     </td>
                                                 </tr>
                                             @empty
@@ -333,20 +333,20 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <table class="table table-borderless">
-                                    <tbody>
-                                        <tr style="border: none !important;">
-                                            <th>Catatan Admin LSP</th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="form-group row mb-4">
-                                    <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" name="catatan" id="catatan" cols="20" rows="5" placeholder="Masukkan catatan (optional)"></textarea>
+                                @can('admin')
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr style="border: none !important;">
+                                                <th>Catatan Admin LSP</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="form-group row mb-4">
+                                        <div class="col-12">
+                                            <textarea class="form-control" name="catatan" id="catatan" cols="20" rows="5" placeholder="Masukkan catatan (opsional)"></textarea>
+                                        </div>
                                     </div>
-                                </div>
-                                <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                                <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
+                                @endcan
                                 <div class="table-responsive">
                                     <table class="table table-borderless">
                                         <tbody>
@@ -373,7 +373,7 @@
                                             </div>
                                             <br>
                                             @can('admin')
-                                                <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                                <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-adminLSP"> Tanda Tangan Asesor</span>
                                             @else
                                                 <span class="text-primary ml-2">Tanda Tangan Admin LSP</span>
                                             @endcan
@@ -387,175 +387,5 @@
             </div>
         </div>
     </div>
-    @can('asesi')
-        {{-- MODAL TTD ASESI --}}
-        <div class="modal fade" id="create-ttd-asesi" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Tanda Tangan Asesi</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body text-center">
-                            <canvas id="signatureCanvasAsesi" width="400" height="200" style="border: 1px solid black;"></canvas>
-                            <div class="modal-footer bg-transparent d-flex justify-content-center">
-                                <button onclick="clearCanvasAsesi()" id="clearCanvasAsesiButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- TTD ASESI SCRIPT --}}
-        <script>
-            var canvasAsesi = document.getElementById('signatureCanvasAsesi');
-            var ctxAsesi = canvasAsesi.getContext('2d');
-            var isDrawingAsesi = false;
-            var lastXAsesi = 0;
-            var lastYAsesi = 0;
-            var inputSignatureAsesi = document.getElementById('signatureAsesi');
-            canvasAsesi.addEventListener('mousedown', (e) => {
-                isDrawingAsesi = true;
-                [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
-            });
-            canvasAsesi.addEventListener('mousemove', draw);
-            canvasAsesi.addEventListener('mouseup', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
-            canvasAsesi.addEventListener('mouseout', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
-            function draw(e) {
-                if (!isDrawingAsesi) return;
-                ctxAsesi.beginPath();
-                ctxAsesi.moveTo(lastXAsesi, lastYAsesi);
-                ctxAsesi.lineTo(e.offsetX, e.offsetY);
-                ctxAsesi.stroke();
-                [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
-            }
-            function updateSignatureInputAsesi() {
-                inputSignatureAsesi.value = canvasAsesi.toDataURL();
-            }
-            function clearCanvasAsesi() {
-                inputSignatureAsesi.value = "";
-                ctxAsesi.clearRect(0, 0, canvasAsesi.width, canvasAsesi.height);
-            }
-        </script>
-    @endcan
-    @can('admin')
-        {{-- MODAL TTD ASESOR --}}
-        <div class="modal fade" id="create-ttd-asesor" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Tanda Tangan Asesor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body text-center">
-                            <canvas id="signatureCanvasAsesor" width="400" height="200" style="border: 1px solid black;"></canvas>
-                            <div class="modal-footer bg-transparent d-flex justify-content-center">
-                                <button onclick="clearCanvasAsesor()" id="clearCanvasAsesorButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- TTD ASESOR SCRIPT --}}
-        <script>
-            var canvasAsesor = document.getElementById('signatureCanvasAsesor');
-            var ctxAsesor = canvasAsesor.getContext('2d');
-            var isDrawingAsesor = false;
-            var lastXAsesor = 0;
-            var lastYAsesor = 0;
-            var inputSignatureAsesor = document.getElementById('signatureAsesor');
-            canvasAsesor.addEventListener('mousedown', (e) => {
-                isDrawingAsesor = true;
-                [lastXAsesor, lastYAsesor] = [e.offsetX, e.offsetY];
-            });
-            canvasAsesor.addEventListener('mousemove', draw);
-            canvasAsesor.addEventListener('mouseup', () => {
-                isDrawingAsesor = false;
-                updateSignatureInputAsesor();
-            });
-            canvasAsesor.addEventListener('mouseout', () => {
-                isDrawingAsesor = false;
-                updateSignatureInputAsesor();
-            });
-            function draw(e) {
-                if (!isDrawingAsesor) return;
-                ctxAsesor.beginPath();
-                ctxAsesor.moveTo(lastXAsesor, lastYAsesor);
-                ctxAsesor.lineTo(e.offsetX, e.offsetY);
-                ctxAsesor.stroke();
-                [lastXAsesor, lastYAsesor] = [e.offsetX, e.offsetY];
-            }
-            function updateSignatureInputAsesor() {
-                inputSignatureAsesor.value = canvasAsesor.toDataURL();
-            }
-            function clearCanvasAsesor() {
-                inputSignatureAsesor.value = "";
-                ctxAsesor.clearRect(0, 0, canvasAsesor.width, canvasAsesor.height);
-            }
-        </script>
-    @endcan
-    {{-- GET DATA --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            getData();
-        });
-        function getData() {
-            $.ajax({
-                url: "{{ route('persetujuanAssesmen.show-by-kelompokAsesor') }}",
-                type: 'GET',
-                data: {kelompok_asesor: @json($kelompokAsesor['uuid'])},
-                success: function(response) {
-                    @can('asesi')
-                        document.getElementById('clearCanvasAsesiButton').click();
-                    @endcan
-                    @can('admin')
-                        document.getElementById('clearCanvasAsesorButton').click();
-                    @endcan
-                    const data = response.data;
-                    // const berkas = JSON.parse(data.berkas);
-                    const urlTtdAsesi = `{{ asset('storage/${data.ttd_asesi}') }}`;
-
-                    if(data.ttd_asesi) {
-                        $('#available-ttdAsesi').html(`<img style="width: 130px; height: 60px;" src="${urlTtdAsesi}" style="width:70px; height:70px"/>`);
-                    }
-
-                    // berkas.forEach(item => {
-                    //     if (item === "TL : Verifikasi Portofolio") {
-                    //         document.getElementById('ckportofolio').checked = true;
-                    //     }
-                    //     if (item === "L : Observasi") {
-                    //         document.getElementById('ckoberservasi').checked = true;
-                    //     }
-                    //     if (item === "T: Hasil Tes Tulis") {
-                    //         document.getElementById('cktestTulis').checked = true;
-                    //     }
-                    //     if (item === "T: Hasil Tes Lisan") {
-                    //         document.getElementById('cktestLisan').checked = true;
-                    //     }
-                    //     if (item === "T: Hasil Tes Wawancara") {
-                    //         document.getElementById('cktestWawancara').checked = true;
-                    //     }
-                    // });
-                },
-                error: function(xhr, status, error) {
-                    snackBarAlert('Data gagal dimuat', '#e7515a');
-                }
-            });
-        }
-    </script>
+    @include('dashboard.frapl.frapl01.scriptComponent')
 @endsection

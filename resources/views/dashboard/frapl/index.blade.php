@@ -22,6 +22,16 @@
                 </ol>
             </nav>
         </div>
+        @php
+            $is_frapl01 = $kelompokAsesor->frapl01
+                ->where('asesi_id', Auth::user()->asesi['id'])
+                ->where('kelompok_asesor_id',$kelompokAsesor['id'])
+                ->isNotEmpty();
+            $is_frapl02 = $kelompokAsesor->frapl02
+                ->where('asesi_id', Auth::user()->asesi['id'])
+                ->where('kelompok_asesor_id',$kelompokAsesor['id'])
+                ->isNotEmpty();
+        @endphp
         <div class="col-md-6 layout-spacing">
             <div class="widget widget-card-two h-100">
                 <div class="widget-content">
@@ -36,7 +46,13 @@
                             <img src="{{ asset($image) }}" alt="avatar">
                         </div>
                         <div class="media-body">
-                            <h6>{{ Auth::user()->name }}</h6>
+                            <h6>{{ Auth::user()->name }}
+                                <span @class(['badge','p1',
+                                    'bg-success' => $is_frapl02,
+                                    'bg-danger' => !$is_frapl02,
+                                    ])> {{ $is_frapl02 ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
+                                </span>
+                            </h6>
                             <p class="meta-date-time">{{ Auth::user()->role }}</p>
                         </div>
                     </div>
@@ -67,7 +83,13 @@
                             <img src="{{ asset($image) }}" alt="avatar">
                         </div>
                         <div class="media-body">
-                            <h6>{{ Auth::user()->name }}</h6>
+                            <h6>{{ Auth::user()->name }}
+                                <span @class(['badge','p1',
+                                    'bg-success' => $is_frapl02,
+                                    'bg-danger' => !$is_frapl02,
+                                    ])> {{ $is_frapl02 ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
+                                </span>
+                            </h6>
                             <p class="meta-date-time">{{ Auth::user()->role }}</p>
                         </div>
                     </div>

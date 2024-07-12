@@ -1,5 +1,5 @@
 @extends('layouts.app.main')
-@section('title','Persetujuan Kerahasiaan')
+@section('title','Test Tulis Assesmen')
 @section('content')
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
@@ -10,16 +10,34 @@
                         <a class="dropdown-toggle" href="javascript:void(0);" role="button" id="pendingTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             Event Saya
                         </a>
+                        @php
+                            $basePrefixUrl = 'event-asesi.show';
+                        @endphp
+                        @can('asesor')
+                            @php
+                                $basePrefixUrl = 'event-asesor.show';
+                            @endphp
+                        @endcan
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('frapl.index',$kelompokAsesor['uuid']) }}">Daftar FRAPL Assesmen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">FRAPL-02. ASSESMEN MANDIRI</li>
+                    @php
+                        $kelompokAsesorId = '';
+                        $baseUrl = route('testAssesmen.index', $kelompokAsesor['uuid']);
+                    @endphp
+                    @can('asesor')
+                        @php
+                            $baseUrl = route('testAssesmen.index', request('asesi-id'));
+                            $kelompokAsesorId = '&kelompok-asesor-id=' . $kelompokAsesor['uuid'];
+                        @endphp
+                    @endcan
+                    <li class="breadcrumb-item"><a href="{{ $baseUrl . $kelompokAsesorId }}">Daftar Test Assesmen</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">PERTANYAAN TERTULIS PILIHAN GANDA</li>
                 </ol>
             </nav>
         </div>
@@ -71,21 +89,27 @@
                         </table>
                     </div>
                     <div class="row mb-4">
-                        <h5 class="col-12 mb-3">ASSESMEN MANDIRI</h5>
+                        <h5 class="col-12 mb-3">Test Tulis</h5>
                     </div>
-                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl02.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
+                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('userTestTulis.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         <section style="height: 170vh; overflow-y: auto;">
                             @php
                                 foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
                                     $groupedUnitKompetensi[$unitKom['judul_unit']][] = $unitKom;
                                 }
+                                $asesiId = '';
+                                if (Gate::allows('asesor')) {
+                                    $asesiId = request('asesi-id');
+                                }
                             @endphp
                             <table class="table table-borderless">
                                 <tbody>
                                     @isset($groupedUnitKompetensi)
+                                        @php
+                                            $loopCount = 0;
+                                        @endphp
                                         @forelse($groupedUnitKompetensi as $unitKom => $data)
                                             <tr style="border: none !important;">
                                                 @php
@@ -98,41 +122,32 @@
                                                 @endphp
                                                 <th>{{ 'Unit Kompetensi : [' . $kodeUnit . '] ' . $unitKom }}</th>
                                             </tr>
-                                            <tr>
-                                                <th>Daftar Elemen</th>
-                                            </tr>
                                             @forelse($data as $val)
-                                                @forelse($val->elemen as $elemen)
+                                                @forelse($val->testTulis as $testTulisData)
+                                                    @php($loopCount++)
                                                     <tr>
-                                                        <td>
-                                                            <p class="text-wrap">{{ $elemen['nama_elemen'] }}</p>
+                                                        <td class="d-flex font-weight-bold text-wrap">
+                                                            <span>{{ $loopCount }}.</span> &nbsp;
+                                                            <p class="text-wrap">{!! $testTulisData['pertanyaan'] !!}</p>
                                                         </td>
-                                                        <td>
-                                                            <div class="n-chk">
-                                                                <label class="new-control new-radio new-radio-text radio-classic-success">
-                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $elemen['id'] }}]" value="Kompeten">
-                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Kompeten (K)</span>
-                                                                </label>
-                                                            </div>
-                                                            <div class="n-chk">
-                                                                <label class="new-control new-radio new-radio-text radio-classic-danger">
-                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $elemen['id'] }}]" value="Belum Kompeten">
-                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Belum Kompeten (BK)</span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="custom-file mb-4">
-                                                                <input type="file" class="custom-file-input" id="berkasFilePemohon_{{ $elemen['id'] }}" name="berkasFilePemohon[{{ $elemen['id'] }}]" accept=".pdf">
-                                                                <label class="custom-file-label" for="berkasFilePemohon_{{ $elemen['id'] }}">Choose file</label>
-                                                            </div>
-                                                            <p><small>Available format: .PDF Max: 2MB <span id="uploadStatus_{{ $elemen['id'] }}" class="text-danger"> (Belum Upload)</span> </small></p>
-                                                            <p>File: <a href="" class="text-primary d-none" style="text-decoration: underline;" target="__blank" id="fileLink_{{ $elemen['id'] }}">Tampilkan file</a></p>
+                                                        <td class="text-wrap">
+                                                            <ul>
+                                                                @foreach(json_decode($testTulisData['jawaban'],true) as $jawaban)
+                                                                    <div class="n-chk">
+                                                                        <li style="list-style-type: upper-alpha">
+                                                                            <label class="new-control new-radio new-radio-text radio-classic-success">
+                                                                                <input type="radio" class="new-control-input" name="jawabanTestTulisAsesi[{{ $testTulisData['unit_kompetensi_id'] }}][{{ $testTulisData['id'] }}]" value="{{ $jawaban }}">
+                                                                                <span class="new-control-indicator"></span><span class="new-radio-content">{{ $jawaban }}</span>
+                                                                            </label>
+                                                                        </li>
+                                                                    </div>
+                                                                @endforeach
+                                                            </ul>
                                                         </td>
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td class="text-danger">Daftar elemen tidak tersedia pada unit kompetensi ini</td>
+                                                        <td class="text-danger">Daftar soal tidak tersedia pada unit kompetensi ini</td>
                                                     </tr>
                                                 @endforelse
                                             @empty
@@ -166,9 +181,9 @@
                                     </div>
                                     <br>
                                     @can('asesi')
-                                        <span class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                        <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
                                     @else
-                                        <span class="text-primary">Tanda Tangan Asesi</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesi"></span>
                                     @endcan
                                 </div>
                                 <div class="ttd-asesor text-center ml-5">
@@ -177,18 +192,20 @@
                                     </div>
                                     <br>
                                     @can('asesor')
-                                        <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                        <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
                                     @else
-                                        <span class="text-primary ml-2">Tanda Tangan Asesor</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesor"></span>
                                     @endcan
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @can('asesi')
+                                <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @endcan
                         </section>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @include('dashboard.frapl.frapl02.scriptComponent')
+    @include('dashboard.testAssesmen.testTulis.scriptComponent')
 @endsection

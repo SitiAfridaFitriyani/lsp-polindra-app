@@ -33,4 +33,9 @@ class Skema extends Model
     {
         return $this->hasMany(UnitKompetensi::class,'skema_id');
     }
+
+    public function testPraktek()
+    {
+        return $this->hasOne(TestPraktek::class,'skema_id');
+    }
 }

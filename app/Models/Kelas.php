@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\FuncCall;
+
 class Kelas extends Model
 {
     use HasFactory;
@@ -27,6 +29,11 @@ class Kelas extends Model
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class,'jurusan_id');
+    }
+
+    public function asesi()
+    {
+        return $this->hasMany(Asesi::class,'kelas_id');
     }
 
 }

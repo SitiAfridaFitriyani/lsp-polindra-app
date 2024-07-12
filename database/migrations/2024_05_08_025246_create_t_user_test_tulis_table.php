@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('t_user_test_tulis', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
+            $table->json('jawaban');
+            $table->string('ttd_asesor')->nullable();
+            $table->string('ttd_asesi');
+            $table->timestamp('tgl_ttd_asesor')->nullable();
+            $table->timestamp('tgl_ttd_asesi');
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
             $table->foreignId('unit_kompetensi_id')->constrained('m_unit_kompetensi')->cascadeOnDelete();
-            $table->foreignId('asesor_id')->constrained('m_asesor')->cascadeOnDelete();
-            $table->foreignId('skema_id')->constrained('m_skema')->cascadeOnDelete();
-            $table->foreignId('test_tulis_id')->constrained('m_test_tulis')->cascadeOnDelete();
+            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->timestamps();
         });
     }

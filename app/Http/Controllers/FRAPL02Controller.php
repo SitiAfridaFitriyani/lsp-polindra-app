@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FRAPL02;
-use App\Http\Requests\StoreFRAPL02Request;
+use Illuminate\Http\Request;
+use App\Models\{KelompokAsesor,FRAPL02};
+use Illuminate\Support\Facades\{Storage,Validator,Auth,DB};
 use App\Http\Requests\UpdateFRAPL02Request;
 
 class FRAPL02Controller extends Controller
@@ -13,23 +14,128 @@ class FRAPL02Controller extends Controller
      */
     public function index()
     {
-        //
-    }
+        $fullQueryString = request()->getQueryString();
+        $uuid = request()->query->keys()[0];
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $query = KelompokAsesor::with(['skema.unitKompetensi.elemen','event','kelas','asesor.user']);
+        $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
+        $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+
+        return view('dashboard.frapl.frapl02.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreFRAPL02Request $request)
+    public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'signatureAsesi' => ['nullable'],
+            'berkasFilePemohon' => ['nullable'],
+            'statusAssesmenMandiri' => ['required'],
+            'kelompok-asesor-uuid' => ['required', 'exists:t_kelompok_asesor,uuid']
+        ], $this->messageValidation());
+
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', request('kelompok-asesor-uuid'));
+        if(empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+        }
+
+        $existingData = FRAPL02::firstWhere([
+            ['asesi_id', Auth::user()->asesi['id']],
+            ['kelompok_asesor_id', $kelompokAsesor['id']]
+        ]);
+
+        if(empty($existingData)) {
+            $request->validate([
+                'signatureAsesi' => ['required'],
+                'berkasFilePemohon' => ['required']
+            ],$this->messageValidation());
+        }
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
+        }
+        $validated = $validator->validated();
+        try {
+            DB::beginTransaction();
+
+            // TTD Asesi
+            $signatureAsesi = $request->input('signatureAsesi');
+            if($signatureAsesi) {
+                if(!empty($existingData) && $existingData['ttd_asesi'] != null && Storage::exists($existingData['ttd_asesi'])) {
+                    Storage::delete($existingData['ttd_asesi']);
+                }
+                $imageName = time() . '.png';
+                $path = public_path('storage/asesi_signatureFRAPL02/' . $imageName);
+                $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
+                $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
+                file_put_contents($path, base64_decode($signatureAsesi));
+                $validated['ttd_asesi'] = 'asesi_signatureFRAPL02/'.$imageName;
+            } else {
+                $validated['ttd_asesi'] = $existingData['ttd_asesi'];
+            }
+
+            if(isset($validated['berkasFilePemohon']) && !empty($existingData)) {
+                $jcdBerkas = json_decode($existingData['berkas_pemohon_asesi'],true);
+                foreach($jcdBerkas as $berkas) {
+                    Storage::delete($berkas['berkas']);
+                }
+                $existingData->update(['berkas_pemohon_asesi' => json_encode([])]);
+            }
+
+            // Loop Berkas & File
+            $arrStatusBerkas = [];
+            if (isset($validated['statusAssesmenMandiri'])) :
+                foreach ($validated['statusAssesmenMandiri'] as $keterangan) {
+                    $arrStatusBerkas[] = [
+                        'keterangan' => $keterangan
+                    ];
+                }
+            endif;
+            $arrFileBerkas = [];
+            if (isset($validated['berkasFilePemohon'])) :
+                foreach ($validated['berkasFilePemohon'] as $b) {
+                    $path = $b->store('berkas_frpapl02');
+                    $arrFileBerkas[] = [
+                        'berkas' => $path
+                    ];
+                }
+                for ($i = 0; $i < count($validated['berkasFilePemohon']); $i++) {
+                    $mergedBerkas[] = array_merge($arrStatusBerkas[$i], $arrFileBerkas[$i]);
+                }
+            else:
+                $jcdBerkas = json_decode($existingData['assesmen_mandiri'],true);
+                $mergedBerkas = $jcdBerkas;
+            endif;
+
+
+            $validated['assesmen_mandiri'] = json_encode($mergedBerkas);
+            $validated['asesi_id'] = Auth::user()->asesi['id'];
+            $validated['tgl_ttd_asesi'] = now();
+
+            $result = FRAPL02::updateOrCreate([
+                    'asesi_id' => Auth::user()->asesi['id'],
+                    'kelompok_asesor_id' => $kelompokAsesor['id']
+                ],
+                [
+                    'ttd_asesi' => $validated['ttd_asesi'],
+                    'assesmen_mandiri' => $validated['assesmen_mandiri'],
+                    'asesi_id' => $validated['asesi_id'],
+                    'tgl_ttd_asesi' => $validated['tgl_ttd_asesi']
+                ]);
+            if ($result) {
+                DB::commit();
+                return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data FRAPL-02 berhasil ditambahkan'], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
+            }
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['status' => 'error','code' => '500', 'message' => $th->getMessage()], 500);
+        }
     }
 
     /**
@@ -62,5 +168,22 @@ class FRAPL02Controller extends Controller
     public function destroy(FRAPL02 $fRAPL02)
     {
         //
+    }
+
+    public function showByKelompokAsesor()
+    {
+        $kelompokAsesorUuid = request('kelompok_asesor');
+
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
+        if(empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+        }
+
+        $data = FRAPL02::firstWhere([
+            ['asesi_id', Auth::user()->asesi['id']],
+            ['kelompok_asesor_id', $kelompokAsesor['id']]
+        ]);
+        return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }
