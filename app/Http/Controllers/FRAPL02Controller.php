@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{KelompokAsesor,FRAPL02};
-use Illuminate\Support\Facades\{Storage,Validator,Auth,DB};
+use App\Models\{KelompokAsesor,FRAPL02,Asesi};
 use App\Http\Requests\UpdateFRAPL02Request;
+use Illuminate\Support\Facades\{Storage,Validator,Auth,DB,Gate};
 
 class FRAPL02Controller extends Controller
 {
@@ -14,9 +14,10 @@ class FRAPL02Controller extends Controller
      */
     public function index()
     {
-        $fullQueryString = request()->getQueryString();
         $uuid = request()->query->keys()[0];
-
+        if(Gate::allows('asesor')) {
+            $uuid = explode('?', $uuid)[0];
+        }
         $query = KelompokAsesor::with(['skema.unitKompetensi.elemen','event','kelas','asesor.user']);
         $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
         $kelompokAsesor = $query->firstWhere('uuid',$uuid);
@@ -52,6 +53,8 @@ class FRAPL02Controller extends Controller
                 'signatureAsesi' => ['required'],
                 'berkasFilePemohon' => ['required']
             ],$this->messageValidation());
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Kamu sudah melakukan submit sebelumnya'], 500);
         }
 
         if ($validator->fails()) {
@@ -138,6 +141,51 @@ class FRAPL02Controller extends Controller
         }
     }
 
+    public function asesorSignature(Request $request)
+    {
+        $signatureAsesor = $request->input('signature');
+        $asesiUuid = $request->asesi_id;
+        $kelompokAsesorUuid = $request->kelompok_asesor;
+        DB::beginTransaction();
+        $asesi = Asesi::firstWhere('uuid',$asesiUuid);
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid',$kelompokAsesorUuid);
+        if(empty($asesi) || empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        $frapl02 = FRAPL02::firstWhere([
+            ['asesi_id',$asesi['id']],
+            ['kelompok_asesor_id',$kelompokAsesor['id']]
+        ]);
+
+        if($signatureAsesor) {
+            if(!empty($frapl02) && $frapl02['ttd_asesor'] != null && Storage::exists($frapl02['ttd_asesor'])) {
+                Storage::delete($frapl02['ttd_asesor']);
+            }
+            $imageName = time() . '.png';
+            $path = public_path('storage/asesor_signatureFRAPL02/' . $imageName);
+            $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
+            $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
+            file_put_contents($path, base64_decode($signatureAsesor));
+            $resultTtdAsesor = 'asesor_signatureFRAPL02/'.$imageName;
+        } else {
+            $resultTtdAsesor = $frapl02['ttd_asesor'];
+        }
+
+        $result = $frapl02->update([
+            'tgl_ttd_asesor' => now(),
+            'ttd_asesor' => $resultTtdAsesor
+        ]);
+        if ($result) {
+            DB::commit();
+            return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data FRAPL-02 berhasil ditandatangani'], 200);
+        } else {
+            DB::rollBack();
+            return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
@@ -180,8 +228,14 @@ class FRAPL02Controller extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
         }
 
+        if(Gate::allows('asesi')) {
+            $asesiId = Auth::user()->asesi['id'];
+        } elseif (Gate::allows('asesor')) {
+            $asesiId = Asesi::firstWhere('uuid',request('asesi_id'))->pluck('id');
+        }
+
         $data = FRAPL02::firstWhere([
-            ['asesi_id', Auth::user()->asesi['id']],
+            ['asesi_id', $asesiId],
             ['kelompok_asesor_id', $kelompokAsesor['id']]
         ]);
         return response()->json(['status' => 'success', 'data' => $data], 200);

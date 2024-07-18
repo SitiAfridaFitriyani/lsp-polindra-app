@@ -1,6 +1,19 @@
 @extends('layouts.app.main')
 @section('title','Persetujuan Kerahasiaan')
 @section('content')
+    @php
+        $basePrefixUrl = 'event-asesi.show';
+        $asesiId = '';
+        $kelompokAsesorId = '';
+        $baseUrl = route('frapl.index', $kelompokAsesor['uuid']);
+
+        if (Gate::allows('asesor')) {
+            $basePrefixUrl = 'event-asesor.show';
+            $asesiId = request('asesi-id');
+            $baseUrl = route('frapl.index', request('asesi-id'));
+            $kelompokAsesorId = '&kelompok-asesor-id=' . $kelompokAsesor['uuid'];
+        }
+    @endphp
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
             <nav class="breadcrumb-one" aria-label="breadcrumb">
@@ -12,14 +25,14 @@
                         </a>
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ $basePrefixUrl . $data['uuid'] }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('frapl.index',$kelompokAsesor['uuid']) }}">Daftar FRAPL Assesmen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">FRAPL-01. PERMOHONAN SERTIFIKASI KOMPETENSI</li>
+                    <li class="breadcrumb-item"><a href="{{ $baseUrl . $kelompokAsesorId }}">Daftar FRAPL Assesmen</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">PERMOHONAN SERTIFIKASI KOMPETENSI</li>
                 </ol>
             </nav>
         </div>
@@ -29,7 +42,6 @@
                     <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl01.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <input type="hidden" name="signatureAdminLSP" id="signatureAdminLSP" name="signatureAdminLSP">
                         <div id="example-basic">
                             <h3>Pemohon Sertifikasi</h3>
                             <section>
@@ -40,7 +52,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="name" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Lengkap<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="name" value="{{ Auth::user()->name }}" name="name" readonly>
+                                        <input type="text" class="form-control" id="name" name="name" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -67,13 +79,13 @@
                                         <div class="col-xl-10 col-lg-9 col-sm-10">
                                             <div class="form-check mb-2">
                                                 <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jklakilaki" name="jenis_kelamin" value="Laki-laki" readonly class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Laki-laki')>
+                                                    <input type="radio" id="jklakilaki" name="jenis_kelamin" value="Laki-laki" readonly class="custom-control-input">
                                                     <label class="custom-control-label" for="jklakilaki">Laki-laki</label>
                                                 </div>
                                             </div>
                                             <div class="form-check mb-2">
                                                 <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jkperempuan" name="jenis_kelamin" value="Perempuan" readonly class="custom-control-input" @checked(Auth::user()->jenis_kelamin === 'Perempuan')>
+                                                    <input type="radio" id="jkperempuan" name="jenis_kelamin" value="Perempuan" readonly class="custom-control-input">
                                                     <label class="custom-control-label" for="jkperempuan">Perempuan</label>
                                                 </div>
                                             </div>
@@ -90,7 +102,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="address" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Rumah<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly>{{ Auth::user()->address }}</textarea>
+                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly></textarea>
                                         <p class="badge bg-danger mt-2">Jika Alamat Rumah kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
@@ -103,7 +115,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="phone" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="phone" value="{{ Auth::user()->phone }}" name="phone" readonly>
+                                        <input type="number" class="form-control" id="phone" name="phone" readonly>
                                         <p class="badge bg-danger mt-2">Jika No. Telp Peserta kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
@@ -122,7 +134,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="email" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="email" class="form-control" id="email" value="{{ Auth::user()->email }}" name="email" readonly>
+                                        <input type="email" class="form-control" id="email" name="email" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -362,20 +374,20 @@
                                             </div>
                                             <br>
                                             @can('asesi')
-                                                <span class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                                <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
                                             @else
-                                                <span class="text-primary">Tanda Tangan Asesi</span>
+                                                <span class="text-primary ml-2" id="date-ttdAsesi"></span>
                                             @endcan
                                         </div>
                                         <div class="ttd-asesor text-center ml-5">
                                             <div style="margin-left:27px; border: 1px solid black; width: 130px; height: 60px;">
-                                                <div id="available-ttdAsesor"></div>
+                                                <div id="available-ttdAdminLSP"></div>
                                             </div>
                                             <br>
                                             @can('admin')
-                                                <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-adminLSP"> Tanda Tangan Asesor</span>
+                                                <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAdminLSP" data-toggle="modal" data-target="#create-ttd-adminLSP"> Tanda Tangan Asesor</span>
                                             @else
-                                                <span class="text-primary ml-2">Tanda Tangan Admin LSP</span>
+                                            <span class="text-primary ml-2" id="date-ttdAdminLSP"></span>
                                             @endcan
                                         </div>
                                     </div>

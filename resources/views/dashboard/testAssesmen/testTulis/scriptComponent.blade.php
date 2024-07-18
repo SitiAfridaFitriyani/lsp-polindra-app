@@ -176,7 +176,7 @@
                         document.getElementById('clearCanvasAsesiButton').click();
                     @endcan
                     @can('asesor')
-                        if(data != null) {
+                        if(data != null && data.ttd_asesor != null) {
                             const modalTtdAsesor = document.getElementById('modal-ttdAsesor');
                             modalTtdAsesor.style.display = 'none';
                             const spanElement = document.createElement('span');
@@ -198,6 +198,7 @@
                     }
                     $('#date-ttdAsesor').html(dateTtdAsesor);
                     $('#date-ttdAsesi').html(dateTtdAsesi);
+
                     // Berkas Permohonan
                     berkasData.forEach((item, index) => {
                         const radioButtons = document.querySelectorAll(`input[name="jawabanTestTulisAsesi[${item.unit_kompetensi_id}][${item.test_tulis_id}]"]`);

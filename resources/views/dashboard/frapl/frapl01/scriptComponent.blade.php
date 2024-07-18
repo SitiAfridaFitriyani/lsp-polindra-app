@@ -75,7 +75,7 @@
                             <canvas id="signatureCanvasAdminLSP" width="400" height="200" style="border: 1px solid black;"></canvas>
                             <div class="modal-footer bg-transparent d-flex justify-content-center">
                                 <button onclick="clearCanvasAdminLSP()" id="clearCanvasAdminLSPButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
+                                <button type="button" onclick="saveSignature()" class="btn btn-primary" data-dismiss="modal">Simpan</button>
                             </div>
                         </div>
                     </div>
@@ -89,20 +89,16 @@
             var isDrawingAdminLSP = false;
             var lastXAdminLSP = 0;
             var lastYAdminLSP = 0;
-            var inputSignatureAdminLSP = document.getElementById('signatureAdminLSP');
+
             canvasAdminLSP.addEventListener('mousedown', (e) => {
                 isDrawingAdminLSP = true;
                 [lastXAdminLSP, lastYAdminLSP] = [e.offsetX, e.offsetY];
             });
+
             canvasAdminLSP.addEventListener('mousemove', draw);
-            canvasAdminLSP.addEventListener('mouseup', () => {
-                isDrawingAdminLSP = false;
-                updateSignatureInputAdminLSP();
-            });
-            canvasAdminLSP.addEventListener('mouseout', () => {
-                isDrawingAdminLSP = false;
-                updateSignatureInputAdminLSP();
-            });
+            canvasAdminLSP.addEventListener('mouseup', () => isDrawingAdminLSP = false);
+            canvasAdminLSP.addEventListener('mouseout', () => isDrawingAdminLSP = false);
+
             function draw(e) {
                 if (!isDrawingAdminLSP) return;
                 ctxAdminLSP.beginPath();
@@ -111,12 +107,35 @@
                 ctxAdminLSP.stroke();
                 [lastXAdminLSP, lastYAdminLSP] = [e.offsetX, e.offsetY];
             }
-            function updateSignatureInputAdminLSP() {
-                inputSignatureAdminLSP.value = canvasAdminLSP.toDataURL();
-            }
+
             function clearCanvasAdminLSP() {
-                inputSignatureAdminLSP.value = "";
                 ctxAdminLSP.clearRect(0, 0, canvasAdminLSP.width, canvasAdminLSP.height);
+            }
+
+            function saveSignature() {
+                const dataURL = canvasAdminLSP.toDataURL();
+                let asesiUuId = @json($asesiId);
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('frapl01.admin-signature') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        signature: dataURL,
+                        kelompok_asesor: @json($kelompokAsesor['uuid']),
+                        asesi_id: asesiUuId
+                    },
+                    success: function(response) {
+                        snackBarAlert(response.message, '#1abc9c');
+                        getData();
+                        clearCanvasAdminLSP();
+                    },
+                    error: function(xhr, status, error) {
+                        snackBarAlert('Tanda tangan gagal', '#e7515a');
+                        clearCanvasAdminLSP();
+                    }
+                });
             }
         </script>
     @endcan
@@ -142,27 +161,63 @@
             });
         });
         function getData() {
+            let asesiUuId = @json($asesiId);
             $.ajax({
                 url: "{{ route('frapl01.show-by-kelompokAsesor') }}",
                 type: 'GET',
-                data: {kelompok_asesor: @json($kelompokAsesor['uuid'])},
+                data: {
+                    kelompok_asesor: @json($kelompokAsesor['uuid']),
+                    asesi_id: asesiUuId
+                },
                 success: function(response) {
-                    // Cleared Canvas after get Data
-                    @can('asesi')
-                        document.getElementById('clearCanvasAsesiButton').click();
-                    @endcan
-                    @can('admin')
-                        document.getElementById('clearCanvasAdminLSPButton').click();
-                    @endcan
                     // Variabel
                     const data = response.data;
                     const tujuanAssesmen = data.tujuan_assesmen;
+                    const jenisKelamin = data.asesi.user.jenis_kelamin;
                     const berkasData = JSON.parse(data.berkas_pemohon_asesi);
                     const urlTtdAsesi = `{{ asset('storage/${data.ttd_asesi}') }}`;
-                    // TTD Asesi
+                    const urlTtdAdminLSP = `{{ asset('storage/${data.ttd_admin_lsp}') }}`;
+                    let dateTtdAdminLSP = `<span>Tanggal: -</span>`;
+                    let dateTtdAsesi = `<span>Tanggal: -</span>`;
+                    @can('asesor')
+                        document.getElementById('btn-form').style.display = 'none';
+                    @endcan
+                    @can('asesi')
+                        if(data != null) {
+                            const modalTtdAsesi = document.getElementById('modal-ttdAsesi');
+                            const buttonFormAsesi = document.getElementById('btn-form');
+                            modalTtdAsesi.style.display = 'none';
+                            buttonFormAsesi.style.display = 'none';
+                            const spanElement = document.createElement('span');
+                            spanElement.className = 'text-primary ml-2';
+                            spanElement.id = 'date-ttdAsesi';
+                            modalTtdAsesi.after(spanElement);
+                        }
+                        document.getElementById('clearCanvasAsesiButton').click();
+                    @endcan
+                    @can('admin')
+                        if(data != null && data.ttd_admin_lsp != null) {
+                            const modalTtdAdminLSP = document.getElementById('modal-ttdAdminLSP');
+                            modalTtdAdminLSP.style.display = 'none';
+                            const spanElement = document.createElement('span');
+                            spanElement.className = 'text-primary ml-2';
+                            spanElement.id = 'date-ttdAdminLSP';
+                            modalTtdAdminLSP.after(spanElement);
+                        }
+                        document.getElementById('clearCanvasAdminLSPButton').click();
+                    @endcan
+
+                    // TTD Asesi & Admin LSP
                     if(data.ttd_asesi) {
                         $('#available-ttdAsesi').html(`<img style="width: 130px; height: 60px;" src="${urlTtdAsesi}" style="width:70px; height:70px"/>`);
+                        dateTtdAsesi = `<span>Tanggal: ${moment(data.tgl_ttd_asesi).format('DD MMMM Y')}</span>`;
                     }
+                    if(data.ttd_admin_lsp) {
+                        $('#available-ttdAdminLSP').html(`<img style="width: 130px; height: 60px;" src="${urlTtdAdminLSP}" style="width:70px; height:70px"/>`);
+                        dateTtdAdminLSP = `<span>Tanggal: ${moment(data.tgl_ttd_admin_lsp).format('DD MMMM Y')}</span>`;
+                    }
+                    $('#date-ttdAdminLSP').html(dateTtdAdminLSP);
+                    $('#date-ttdAsesi').html(dateTtdAsesi);
                     // Tujuan Assesmen
                     if(tujuanAssesmen === "Sertifikasi") {
                         document.getElementById('ckSertifikasi').checked = true;
@@ -203,6 +258,16 @@
                         }
                     });
                     // Input Lainnya
+                    $('#name').val(data.asesi.user.name);
+                    $('#email').val(data.asesi.user.email);
+                    $('#address').val(data.asesi.user.address);
+                    $('#phone').val(data.asesi.user.phone);
+                    if(jenisKelamin === "Laki-laki") {
+                        document.getElementById('jklakilaki').checked = true;
+                    }
+                    if(jenisKelamin === "Perempuan") {
+                        document.getElementById('jkperempuan').checked = true;
+                    }
                     $('#no_ktp').val(data.no_ktp);
                     $('#tempat_lahir').val(data.tempat_lahir);
                     $('#tgl_lahir').val(data.tgl_lahir);

@@ -31,13 +31,13 @@
             </nav>
         </div>
         @php
-            // Ttd Asesi Check
+            // Ttd Asesi Check Test Tulis
             $queryTestTulisAsesi = $kelompokAsesor->userTestTulis
                 ->where('asesi_id', $asesiId)
                 ->where('kelompok_asesor_id',$kelompokAsesor['id']);
             $is_testTulisTtdAsesor = (clone $queryTestTulisAsesi)->where('ttd_asesor','!=', null)->first();
             $is_testTulisTtdAsesi = $queryTestTulisAsesi->where('ttd_asesi','!=', null)->first();
-            // Ttd Asesor Check
+            // Ttd Asesor Check Test Praktek
             $queryTestPraktekAsesor = $kelompokAsesor->userTestPraktek
                 ->where('asesi_id', $asesiId)
                 ->where('kelompok_asesor_id',$kelompokAsesor['id']);
@@ -47,32 +47,31 @@
             $eventMulai = Carbon\Carbon::parse($kelompokAsesor->event['event_mulai']);
             $eventSelesai = Carbon\Carbon::parse($kelompokAsesor->event['event_selesai']);
             $rangeWaktuEvent = $eventSelesai->diffForHumans(['parts' => 3, 'join' => true, 'short' => true, 'syntax' => Carbon\Carbon::DIFF_ABSOLUTE]);
+
+            $asesiId = '';
+            $baseUrlTestTulis = route('userTestTulis.index', $kelompokAsesor['uuid']);
+            $baseUrlTestPraktek = route('userTestPraktek.index', [$kelompokAsesor['uuid']]);
+
+            $image = 'admin/assets/img/nopict.png';
+            if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
+                $image = 'storage/'. $asesiPhoto;
+            }
         @endphp
+        @can('asesor')
+            @php
+                $asesiId = '&asesi-id=' . request()->query->keys()[0];
+            @endphp
+        @endcan
         {{-- Test Tulis --}}
         <div class="col-lg-6 mb-3">
             <div class="widget widget-account-invoice-three">
                 <div class="widget-heading">
                     <div class="wallet-usr-info">
                         <div class="usr-name">
-                            @php
-                                $image = 'admin/assets/img/nopict.png';
-                                if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
-                                    $image = 'storage/'. $asesiPhoto;
-                                }
-                            @endphp
                             <span><img src="{{ asset($image) }}" alt="admin-profile" class="img-fluid"> {{ $asesiName }}</span>
                         </div>
                         <div class="add">
-                            @php
-                                $asesiId = '';
-                                $baseUrl = route('userTestTulis.index', $kelompokAsesor['uuid']);
-                            @endphp
-                            @can('asesor')
-                                @php
-                                    $asesiId = '&asesi-id=' . request()->query->keys()[0];
-                                @endphp
-                            @endcan
-                            <span title="Kerjakan Soal Test Tulis" onclick="window.location.href='{{ $baseUrl . $asesiId }}'">
+                            <span title="Kerjakan Soal Test Tulis" onclick="window.location.href='{{ $baseUrlTestTulis . $asesiId }}'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             </span>
                         </div>
@@ -98,19 +97,19 @@
                     </div>
                 </div>
                 <div class="widget-content">
-                    <div class="d-flex">
+                    <div class="d-flex mb-3">
                         <div class="mr-2">
                             <span @class(['text-wrap','badge','p1',
                                 'bg-success' => $is_testTulisTtdAsesi,
                                 'bg-danger' => !$is_testTulisTtdAsesi,
-                                ])> {{ $is_testTulisTtdAsesi ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
+                                ])> {{ $is_testTulisTtdAsesi ? 'Ditandatangani oleh Asesi' : 'Belum Ditandatangani Asesi' }}
                             </span>
                         </div>
                         <div>
                             <span @class(['text-wrap','badge','p1',
                                 'bg-success' => $is_testTulisTtdAsesor,
                                 'bg-danger' => !$is_testTulisTtdAsesor,
-                                ])> {{ $is_testTulisTtdAsesor ? 'Ditandatangi oleh Asesor' : 'Belum Ditandatangi oleh Asesor' }}
+                                ])> {{ $is_testTulisTtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Asesor' }}
                             </span>
                         </div>
                     </div>
@@ -121,7 +120,7 @@
                                 <p><span class="bill-amount">Pilihan Ganda</span></p>
                             </div>
                             <div class="info-detail-2">
-                                <p>Total Soal</p>
+                                <p>Jumlah Soal</p>
                                 <p><span class="bill-amount">{{ $testTulisCount }} Soal</span></p>
                             </div>
                             <div class="info-detail-3">
@@ -139,16 +138,12 @@
                 <div class="widget-heading">
                     <div class="wallet-usr-info">
                         <div class="usr-name">
-                            @php
-                                $image = 'admin/assets/img/nopict.png';
-                                if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
-                                    $image = 'storage/'. $asesiPhoto;
-                                }
-                            @endphp
                             <span><img src="{{ asset($image) }}" alt="admin-profile" class="img-fluid"> {{ $asesiName }}</span>
                         </div>
                         <div class="add">
-                            <span title="Kerjakan Soal Test Tulis" onclick="window.location.href='{{ route('userTestPraktek.index',[$kelompokAsesor['uuid']]) }}'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                            <span title="Kerjakan Soal Test Praktek" onclick="window.location.href='{{ $baseUrlTestPraktek . $asesiId }}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </span>
                         </div>
                     </div>
                     <div class="wallet-balance">
@@ -172,19 +167,19 @@
                     </div>
                 </div>
                 <div class="widget-content">
-                    <div class="d-flex">
+                    <div class="d-flex mb-3">
                         <div class="mr-2">
                             <span @class(['badge','p1',
                                 'bg-success' => $is_testPraktekTtdAsesi,
                                 'bg-danger' => !$is_testPraktekTtdAsesi,
-                                ])> {{ $is_testPraktekTtdAsesi ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
+                                ])> {{ $is_testPraktekTtdAsesi ? 'Ditandatangani oleh Asesi' : 'Belum Ditandatangani Asesi' }}
                             </span>
                         </div>
                         <div>
                             <span @class(['badge','p1',
                                 'bg-success' => $is_testPraktekTtdAsesor,
                                 'bg-danger' => !$is_testPraktekTtdAsesor,
-                                ])> {{ $is_testPraktekTtdAsesor ? 'Ditandatangi oleh Asesor' : 'Belum Ditandatangi oleh Asesor' }}
+                                ])> {{ $is_testPraktekTtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Asesor' }}
                             </span>
                         </div>
                     </div>
@@ -195,7 +190,7 @@
                                 <p><span class="bill-amount">Upload Dokumen/Teori/Materi</span></p>
                             </div>
                             <div class="info-detail-2">
-                                <p>Total Soal</p>
+                                <p>Jumlah Soal</p>
                                 <p><span class="bill-amount">{{ $testPraktikCount }} Soal</span></p>
                             </div>
                             <div class="info-detail-3">

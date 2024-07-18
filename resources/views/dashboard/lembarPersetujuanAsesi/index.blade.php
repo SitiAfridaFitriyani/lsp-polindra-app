@@ -1,6 +1,15 @@
 @extends('layouts.app.main')
 @section('title','Persetujuan Kerahasiaan')
 @section('content')
+    @php
+        $asesiId = '';
+        $basePrefixUrl = 'event-asesi.show';
+
+        if (Gate::allows('asesor')) {
+            $asesiId = request()->query->keys()[0];
+            $basePrefixUrl = 'event-asesor.show';
+        }
+    @endphp
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
             <nav class="breadcrumb-one" aria-label="breadcrumb">
@@ -12,7 +21,7 @@
                         </a>
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
@@ -27,7 +36,7 @@
                 <div class="widget-header">
                     <div class="row">
                         <div class="col-12">
-                            <h4>FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h4>
+                            <h4>PERSETUJUAN ASESMEN DAN KERAHASIAAN</h4>
                         </div>
                     </div>
                 </div>
@@ -88,7 +97,6 @@
                     <form class="needs-validation" id="form-berkas-persetujuan" novalidate method="POST" action="{{ route('persetujuanAssesmen.store', ['uuid' => $kelompokAsesor['uuid']]) }}">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         <div class="d-flex">
                             <div class="ml-3">
                                 <div class="custom-control custom-checkbox mb-2">
@@ -130,9 +138,9 @@
                                     </div>
                                     <br>
                                     @can('asesi')
-                                        <span class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                        <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
                                     @else
-                                        <span class="text-primary">Tanda Tangan Asesi</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesi"></span>
                                     @endcan
                                 </div>
                                 <div class="ttd-asesor text-center ml-5">
@@ -141,14 +149,16 @@
                                     </div>
                                     <br>
                                     @can('asesor')
-                                        <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                        <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
                                     @else
-                                        <span class="text-primary ml-2">Tanda Tangan Asesor</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesor"></span>
                                     @endcan
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-3" id="btn-form" type="submit">Simpan</button>
+                        @can('asesi')
+                            <button class="btn btn-primary mt-3" id="btn-form" type="submit">Simpan</button>
+                        @endcan
                     </form>
                 </div>
             </div>

@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Observasi;
+use App\Models\{KelompokAsesor,Asesi,Observasi};
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreObservasiRequest;
 use App\Http\Requests\UpdateObservasiRequest;
 
@@ -13,7 +14,23 @@ class ObservasiController extends Controller
      */
     public function index()
     {
-        //
+        $uuid = request()->query->keys()[0];
+        $query = KelompokAsesor::with(['skema.unitKompetensi.elemen','event','kelas','asesor.user']);
+
+        if(Gate::allows('asesor')) {
+            $asesi = Asesi::firstWhere('uuid',$uuid);
+            $kelompokAsesorId = request('kelompok-asesor-id');
+            $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$kelompokAsesorId)->get();
+            $kelompokAsesor = $query->where([
+                ['kelas_id',$asesi['kelas_id']],
+                ['uuid', $kelompokAsesorId]
+            ])->first();
+        } elseif (Gate::allows('asesi')) {
+            $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
+            $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+        }
+        return view('dashboard.checklistObservasiAsesi.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
+
     }
 
     /**

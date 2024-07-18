@@ -20,6 +20,7 @@ class UserTestTulisController extends Controller
         $query = KelompokAsesor::with(['skema.unitKompetensi','skema.unitKompetensi.testTulis','event','kelas','asesor.user']);
         $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
         $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+
         return view('dashboard.testAssesmen.testTulis.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
     }
 
@@ -117,9 +118,6 @@ class UserTestTulisController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function asesorSignature(Request $request)
     {
         $signatureAsesor = $request->input('signature');

@@ -10,9 +10,17 @@
                         <a class="dropdown-toggle" href="javascript:void(0);" role="button" id="pendingTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             Event Saya
                         </a>
+                        @php
+                            $basePrefixUrl = 'event-asesi.show';
+                        @endphp
+                        @can('asesor')
+                            @php
+                                $basePrefixUrl = 'event-asesor.show';
+                            @endphp
+                        @endcan
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
@@ -23,48 +31,72 @@
             </nav>
         </div>
         @php
-            $is_frapl01 = $kelompokAsesor->frapl01
-                ->where('asesi_id', Auth::user()->asesi['id'])
-                ->where('kelompok_asesor_id',$kelompokAsesor['id'])
-                ->isNotEmpty();
-            $is_frapl02 = $kelompokAsesor->frapl02
-                ->where('asesi_id', Auth::user()->asesi['id'])
-                ->where('kelompok_asesor_id',$kelompokAsesor['id'])
-                ->isNotEmpty();
+            // TTD Asesi Check FRAPL01
+            $queryFRAPL01Asesi = $kelompokAsesor->frapl01
+                ->where('asesi_id', $asesiId)
+                ->where('kelompok_asesor_id',$kelompokAsesor['id']);
+            $is_frapl01TtdAsesor = (clone $queryFRAPL01Asesi)->where('ttd_asesor','!=', null)->first();
+            $is_frapl01TtdAsesi = $queryFRAPL01Asesi->where('ttd_asesi','!=', null)->first();
+
+            // TTD Asesi Check FRAPL02
+            $queryFRAPL02Asesi = $kelompokAsesor->frapl02
+                ->where('asesi_id', $asesiId)
+                ->where('kelompok_asesor_id',$kelompokAsesor['id']);
+            $is_frapl02TtdAsesor = (clone $queryFRAPL02Asesi)->where('ttd_asesor','!=', null)->first();
+            $is_frapl02TtdAsesi = $queryFRAPL02Asesi->where('ttd_asesi','!=', null)->first();
+
+            $asesiId = '';
+            $baseUrlFRAPL01 = route('frapl01.index', $kelompokAsesor['uuid']);
+            $baseUrlFRAPL02 = route('frapl02.index', [$kelompokAsesor['uuid']]);
+
+            $image = 'admin/assets/img/nopict.png';
+            if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
+                $image = 'storage/'. $asesiPhoto;
+            }
         @endphp
+        @can('asesor')
+            @php
+                $asesiId = '&asesi-id=' . request()->query->keys()[0];
+            @endphp
+        @endcan
         <div class="col-md-6 layout-spacing">
             <div class="widget widget-card-two h-100">
                 <div class="widget-content">
                     <div class="media">
                         <div class="w-img">
-                            @php
-                                $image = 'admin/assets/img/nopict.png';
-                                if(Auth::user()->photo != null && Storage::exists(Auth::user()->photo)) {
-                                    $image = 'storage/'. Auth::user()->photo;
-                                }
-                            @endphp
                             <img src="{{ asset($image) }}" alt="avatar">
                         </div>
                         <div class="media-body">
-                            <h6>{{ Auth::user()->name }}
-                                <span @class(['badge','p1',
-                                    'bg-success' => $is_frapl02,
-                                    'bg-danger' => !$is_frapl02,
-                                    ])> {{ $is_frapl02 ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
-                                </span>
+                            <h6>{{ $asesiName }}
+                                <p class="meta-date-time">{{ $asesiRole }}</p>
                             </h6>
-                            <p class="meta-date-time">{{ Auth::user()->role }}</p>
+                            <div class="d-flex mt-3">
+                                <div class="mr-2">
+                                    <span @class(['text-wrap','badge','p1',
+                                        'bg-success' => $is_frapl01TtdAsesi,
+                                        'bg-danger' => !$is_frapl01TtdAsesi,
+                                        ])> {{ $is_frapl01TtdAsesi ? 'Ditandatangani oleh Asesi' : 'Belum Ditandatangani Asesi' }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span @class(['text-wrap','badge','p1',
+                                        'bg-success' => $is_frapl01TtdAsesor,
+                                        'bg-danger' => !$is_frapl01TtdAsesor,
+                                        ])> {{ $is_frapl01TtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Admin LSP' }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card-bottom-section">
-                        <h5>FRAPL-01. PERMOHONAN SERTIFIKASI KOMPETENSI</h5>
+                        <h5>PERMOHONAN SERTIFIKASI KOMPETENSI</h5>
                         <ul style="list-style-type: decimal; text-align: left;">
                             <li>Rincian Data Pemohon Sertifikasi</li>
                             <li>Data Sertifikasi</li>
                             <li>Bukti Kelengkapan Pemohon</li>
                         </ul>
-                        <a href="{{ route('frapl01.index', $kelompokAsesor['uuid']) }}" class="btn" style="margin-top: 79px">Selengkapnya</a>
+                        <a href="{{ $baseUrlFRAPL01 . $asesiId }}" class="btn" style="margin-top: 79px">Selengkapnya</a>
                     </div>
                 </div>
             </div>
@@ -74,33 +106,38 @@
                 <div class="widget-content d-flex flex-column">
                     <div class="media">
                         <div class="w-img">
-                            @php
-                                $image = 'admin/assets/img/nopict.png';
-                                if(Auth::user()->photo != null && Storage::exists(Auth::user()->photo)) {
-                                    $image = 'storage/'. Auth::user()->photo;
-                                }
-                            @endphp
                             <img src="{{ asset($image) }}" alt="avatar">
                         </div>
                         <div class="media-body">
-                            <h6>{{ Auth::user()->name }}
-                                <span @class(['badge','p1',
-                                    'bg-success' => $is_frapl02,
-                                    'bg-danger' => !$is_frapl02,
-                                    ])> {{ $is_frapl02 ? 'Ditandatangi oleh Asesi' : 'Belum Ditandatangi oleh Asesi' }}
-                                </span>
+                            <h6>{{ $asesiName }}
+                                <p class="meta-date-time">{{ $asesiRole }}</p>
                             </h6>
-                            <p class="meta-date-time">{{ Auth::user()->role }}</p>
+                            <div class="d-flex mt-3">
+                                <div class="mr-2">
+                                    <span @class(['text-wrap','badge','p1',
+                                        'bg-success' => $is_frapl02TtdAsesi,
+                                        'bg-danger' => !$is_frapl02TtdAsesi,
+                                        ])> {{ $is_frapl02TtdAsesi ? 'Ditandatangani oleh Asesi' : 'Belum Ditandatangani Asesi' }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span @class(['text-wrap','badge','p1',
+                                        'bg-success' => $is_frapl02TtdAsesor,
+                                        'bg-danger' => !$is_frapl02TtdAsesor,
+                                        ])> {{ $is_frapl02TtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Asesor' }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-bottom-section">
-                        <h5>FRAPL-02. ASESMEN MANDIRI</h5>
+                        <h5>ASESMEN MANDIRI</h5>
                         <ul style="list-style-type: decimal; text-align: left;">
                             <li>Baca setiap pertanyaan di kolom sebelah kiri</li>
                             <li>Beri tanda centang (✅) pada kotak jika Anda yakin dapat melakukan tugas yang dijelaskan.</li>
                             <li>Isi kolom di sebelah kanan dengan mendaftar bukti yang Anda miliki untuk menunjukkan bahwa Anda melakukan tugas-tugas ini.</li>
                         </ul>
-                        <a href="{{ route('frapl02.index',$kelompokAsesor['uuid']) }}" class="btn mt-auto">Selengkapnya</a>
+                        <a href="{{ $baseUrlFRAPL02 . $asesiId }}" class="btn mt-auto">Selengkapnya</a>
                     </div>
                 </div>
             </div>

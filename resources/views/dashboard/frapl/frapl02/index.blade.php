@@ -1,6 +1,19 @@
 @extends('layouts.app.main')
 @section('title','Persetujuan Kerahasiaan')
 @section('content')
+    @php
+        $basePrefixUrl = 'event-asesi.show';
+        $asesiId = '';
+        $kelompokAsesorId = '';
+        $baseUrl = route('frapl.index', $kelompokAsesor['uuid']);
+
+        if (Gate::allows('asesor')) {
+            $basePrefixUrl = 'event-asesor.show';
+            $asesiId = request('asesi-id');
+            $baseUrl = route('frapl.index', request('asesi-id'));
+            $kelompokAsesorId = '&kelompok-asesor-id=' . $kelompokAsesor['uuid'];
+        }
+    @endphp
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
             <nav class="breadcrumb-one" aria-label="breadcrumb">
@@ -12,14 +25,14 @@
                         </a>
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('frapl.index',$kelompokAsesor['uuid']) }}">Daftar FRAPL Assesmen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">FRAPL-02. ASSESMEN MANDIRI</li>
+                    <li class="breadcrumb-item"><a href="{{ $baseUrl . $kelompokAsesorId }}">Daftar FRAPL Assesmen</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">ASSESMEN MANDIRI</li>
                 </ol>
             </nav>
         </div>
@@ -76,7 +89,6 @@
                     <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('frapl02.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         <section style="height: 170vh; overflow-y: auto;">
                             @php
                                 foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
@@ -166,9 +178,9 @@
                                     </div>
                                     <br>
                                     @can('asesi')
-                                        <span class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                        <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
                                     @else
-                                        <span class="text-primary">Tanda Tangan Asesi</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesi"></span>
                                     @endcan
                                 </div>
                                 <div class="ttd-asesor text-center ml-5">
@@ -177,13 +189,15 @@
                                     </div>
                                     <br>
                                     @can('asesor')
-                                        <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                        <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
                                     @else
-                                        <span class="text-primary ml-2">Tanda Tangan Asesor</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesor"></span>
                                     @endcan
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @can('asesi')
+                                <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @endcan
                         </section>
                     </form>
                 </div>

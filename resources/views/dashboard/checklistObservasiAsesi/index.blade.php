@@ -1,6 +1,15 @@
 @extends('layouts.app.main')
-@section('title','Test Tulis Assesmen')
+@section('title','Persetujuan Kerahasiaan')
 @section('content')
+    @php
+        $asesiId = '';
+        $basePrefixUrl = 'event-asesi.show';
+
+        if (Gate::allows('asesor')) {
+            $asesiId = request()->query->keys()[0];
+            $basePrefixUrl = 'event-asesor.show';
+        }
+    @endphp
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
             <nav class="breadcrumb-one" aria-label="breadcrumb">
@@ -10,19 +19,6 @@
                         <a class="dropdown-toggle" href="javascript:void(0);" role="button" id="pendingTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             Event Saya
                         </a>
-                        @php
-                            $basePrefixUrl = 'event-asesi.show';
-                            $kelompokAsesorId = '';
-                            $baseUrl = route('testAssesmen.index', $kelompokAsesor['uuid']);
-                            $asesiId = '';
-
-                            if (Gate::allows('asesor')) {
-                                $asesiId = request('asesi-id');
-                                $basePrefixUrl = 'event-asesor.show';
-                                $baseUrl = route('testAssesmen.index', request('asesi-id'));
-                                $kelompokAsesorId = '&kelompok-asesor-id=' . $kelompokAsesor['uuid'];
-                            }
-                        @endphp
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
                                 <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
@@ -31,16 +27,22 @@
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ $baseUrl . $kelompokAsesorId }}">Daftar Test Assesmen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">PERTANYAAN TERTULIS PILIHAN GANDA</li>
+                    <li class="breadcrumb-item active" aria-current="page">Lembar Checklist Observasi</li>
                 </ol>
             </nav>
         </div>
         <div class="col-lg-12">
             <div class="statbox widget box box-shadow">
+                <div class="widget-header">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>CHECKLIST OBSERVASI DAN AKTIVITAS KERJA</h4>
+                        </div>
+                    </div>
+                </div>
                 <div class="widget-content widget-content-area">
-                    <div class="">
-                        <table class="table table-borderless" style="background-color: #ebf3fe; border-radius: 5px;">
+                    <div class="table-responsive" style="background-color: #ebf3fe; border-radius: 5px;">
+                        <table class="table table-borderless">
                             <tbody>
                                 <tr style="border: none !important;">
                                     <th>Skema Sertifikasi</th>
@@ -83,24 +85,18 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="row mb-4">
-                        <h5 class="col-12 mb-3">Test Tulis</h5>
-                    </div>
-                    <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('userTestTulis.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
+                    <form class="needs-validation" id="form-berkas-persetujuan" novalidate method="POST" action="{{ route('persetujuanAssesmen.store', ['uuid' => $kelompokAsesor['uuid']]) }}">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <section style="height: 170vh; overflow-y: auto;">
-                            @php
-                                foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
-                                    $groupedUnitKompetensi[$unitKom['judul_unit']][] = $unitKom;
-                                }
-                            @endphp
+                        @php
+                            foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
+                                $groupedUnitKompetensi[$unitKom['judul_unit']][] = $unitKom;
+                            }
+                        @endphp
+                        <div class="table-responsive" style="overflow-y: auto; height: 100vh;">
                             <table class="table table-borderless">
                                 <tbody>
                                     @isset($groupedUnitKompetensi)
-                                        @php
-                                            $loopCount = 0;
-                                        @endphp
                                         @forelse($groupedUnitKompetensi as $unitKom => $data)
                                             <tr style="border: none !important;">
                                                 @php
@@ -113,32 +109,50 @@
                                                 @endphp
                                                 <th>{{ 'Unit Kompetensi : [' . $kodeUnit . '] ' . $unitKom }}</th>
                                             </tr>
+                                            <tr>
+                                                <th>Daftar Elemen</th>
+                                            </tr>
                                             @forelse($data as $val)
-                                                @forelse($val->testTulis as $testTulisData)
-                                                    @php($loopCount++)
+                                                @forelse($val->elemen as $elemen)
                                                     <tr>
-                                                        <td class="d-flex font-weight-bold text-wrap">
-                                                            <span>{{ $loopCount }}.</span> &nbsp;
-                                                            <p class="text-wrap">{!! $testTulisData['pertanyaan'] !!}</p>
-                                                        </td>
                                                         <td class="text-wrap">
-                                                            <ul>
-                                                                @foreach(json_decode($testTulisData['jawaban'],true) as $jawaban)
-                                                                    <div class="n-chk">
-                                                                        <li style="list-style-type: upper-alpha">
-                                                                            <label class="new-control new-radio new-radio-text radio-classic-success">
-                                                                                <input type="radio" class="new-control-input" name="jawabanTestTulisAsesi[{{ $testTulisData['unit_kompetensi_id'] }}][{{ $testTulisData['id'] }}]" value="{{ $jawaban }}">
-                                                                                <span class="new-control-indicator"></span><span class="new-radio-content">{{ $jawaban }}</span>
-                                                                            </label>
-                                                                        </li>
+                                                            <p>{{ $elemen['nama_elemen'] }}</p>
+                                                        </td>
+                                                        <td>
+                                                            <textarea name="benchmark[{{ $elemen['id'] }}]" id="benchmark[{{ $elemen['id'] }}]" cols="30" rows="10" placeholder="Benchmark"></textarea>
+                                                        </td>
+                                                        <td>
+                                                            @forelse($elemen->kriteriaUnjukKerja as $kuk)
+                                                                <div class="card mb-2">
+                                                                    <div class="d-flex align-items-center card-body">
+                                                                        <p class="text-wrap mr-2" style="width: 270px">
+                                                                            {{ $kuk['nama_kriteria_kerja'] }}
+                                                                        </p>
+                                                                        <div>
+                                                                            <div class="n-chk">
+                                                                                <label class="new-control new-radio new-radio-text radio-classic-success">
+                                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $kuk['id'] }}]" value="Kompeten">
+                                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Kompeten (K)</span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="n-chk">
+                                                                                <label class="new-control new-radio new-radio-text radio-classic-danger">
+                                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $kuk['id'] }}]" value="Belum Kompeten">
+                                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Belum Kompeten (BK)</span>
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <textarea name="penilaian_lanjut[{{ $kuk['id'] }}]" class="d-block" id="penilaian_lanjut[{{ $kuk['id'] }}]" cols="30" rows="3" placeholder="Penilaian Lanjut"></textarea>
                                                                     </div>
-                                                                @endforeach
-                                                            </ul>
+                                                                </div>
+                                                            @empty
+                                                                <p class="text-danger">Daftar kriteria unjuk kerja tidak tersedia pada elemen ini</p>
+                                                            @endforelse
                                                         </td>
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td class="text-danger">Daftar soal tidak tersedia pada unit kompetensi ini</td>
+                                                        <td class="text-danger">Daftar elemen tidak tersedia pada unit kompetensi ini</td>
                                                     </tr>
                                                 @endforelse
                                             @empty
@@ -158,6 +172,8 @@
                                     @endisset
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="table-responsive">
                             <table class="table table-borderless">
                                 <tbody>
                                     <tr style="border: none !important;">
@@ -189,14 +205,14 @@
                                     @endcan
                                 </div>
                             </div>
-                            @can('asesi')
-                                <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
-                            @endcan
-                        </section>
+                        </div>
+                        @can('asesi')
+                            <button class="btn btn-primary mt-3" id="btn-form" type="submit">Simpan</button>
+                        @endcan
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @include('dashboard.testAssesmen.testTulis.scriptComponent')
+    @include('dashboard.lembarPersetujuanAsesi.scriptComponent')
 @endsection

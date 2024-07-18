@@ -8,13 +8,21 @@
             dataType: 'json',
             success: function(response) {
                 const data = response.data;
-                const listAsesorRoute = '{{ route("asesor.listByUuid", [":uuid"]) }}';
-                const fraplRoute = '{{ route("frapl.index", [":uuid"]) }}';
-                const persetujuanAssesmen = '{{ route("persetujuanAssesmen.index", [":uuid"]) }}';
                 const kelompokAsesorId = @json(request()->segment(2));
+
+                const checklistObservasiRouteBaseURL = '{{ route("checklistObservasi.index", ":uuid") }}';
+                const checklistObservasiRouteURL = `${checklistObservasiRouteBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
+
+                const fraplRouteBaseURL = '{{ route("frapl.index", ":uuid") }}';
+                const fraplRouteURL = `${fraplRouteBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
+
+                const persetujuanAssesmenBaseURL = '{{ route("persetujuanAssesmen.index", ":uuid") }}';
+                const persetujuanAssesmenURL = `${persetujuanAssesmenBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
+
                 const testAssesmenBaseURL = '{{ route("testAssesmen.index", ":uuid") }}';
                 const testAssesmenURL = `${testAssesmenBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
                 let kelasName = '';
+
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
                         "<'table-responsive'tr>" +
@@ -38,9 +46,9 @@
                         {
                             data: 'uuid',
                             render: function(data) {
-                                const listAsesorRouteRendered = listAsesorRoute.replace(':uuid', data);
-                                const fraplRouteRendered = fraplRoute.replace(':uuid', data);
-                                const persetujuanAssesmenRendered = persetujuanAssesmen.replace(':uuid', data);
+                                const checklistObservasiRouteRendered = checklistObservasiRouteURL.replace(':uuid', data);
+                                const fraplRouteRendered = fraplRouteURL.replace(':uuid', data);
+                                const persetujuanAssesmenRendered = persetujuanAssesmenURL.replace(':uuid', data);
                                 const daftarTestAssesmenRendered = testAssesmenURL.replace(':uuid', data);
 
                                 return `
@@ -53,7 +61,7 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                                 Daftar Test Assesmen
                                             </a>
-                                            <a class="dropdown-item" href="javascript:void(0);" onclick="handleListPersetujuanAssesmen(this)" data-route="${listAsesorRouteRendered}" data-modal="modal-list-persetujuanAssesmen" title="Daftar Checklist Observasi">
+                                            <a class="dropdown-item" href="${checklistObservasiRouteRendered}" title="Daftar Checklist Observasi">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                                                 Daftar Checklist Observasi
                                             </a>

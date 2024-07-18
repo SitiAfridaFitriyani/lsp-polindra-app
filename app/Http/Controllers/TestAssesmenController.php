@@ -13,7 +13,6 @@ class TestAssesmenController extends Controller
      */
     public function __invoke()
     {
-        $fullQueryString = request()->getQueryString();
         $uuid = request()->query->keys()[0];
         $query = KelompokAsesor::with(['skema.unitKompetensi.testTulis','event','kelas','asesor.user','userTestTulis','userTestPraktek']);
 

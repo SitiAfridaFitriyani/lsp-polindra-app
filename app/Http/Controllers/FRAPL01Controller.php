@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\{KelompokAsesor,FRAPL01};
 use App\Http\Requests\UpdateFRAPL01Request;
-use Illuminate\Support\Facades\{Auth, DB, Gate, Validator};
+use Illuminate\Support\Facades\{Auth,DB,Gate,Validator};
 
 class FRAPL01Controller extends Controller
 {
@@ -16,9 +16,10 @@ class FRAPL01Controller extends Controller
      */
     public function index()
     {
-        $fullQueryString = request()->getQueryString();
         $uuid = request()->query->keys()[0];
-
+        if(Gate::allows('asesor')) {
+            $uuid = explode('?', $uuid)[0];
+        }
         $query = KelompokAsesor::with(['skema.berkasPermohonan','event','kelas','asesor.user']);
         $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
         $kelompokAsesor = $query->firstWhere('uuid',$uuid);
@@ -76,6 +77,8 @@ class FRAPL01Controller extends Controller
                 'signatureAsesi' => ['required'],
                 'berkasFilePemohon' => ['required']
             ],$this->messageValidation());
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Kamu sudah melakukan submit sebelumnya'], 500);
         }
 
         if ($validator->fails()) {
@@ -178,77 +181,49 @@ class FRAPL01Controller extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function storeByAdminLSP(Request $request)
+    public function adminSignature(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'catatan' => ['nullable','string','max:255'],
-            'signatureAdminLSP' => ['nullable'],
-            'status_rekomendasi' => ['required','in:Pending,Diterima,Tidak Diterima'],
-            'no_reg' => ['required','string','max:255'],
-            'kelompok-asesor-uuid' => ['required', 'exists:t_kelompok_asesor,uuid'],
-            'asesi-uuid' => ['required', 'exists:m_asesi,uuid']
-        ], $this->messageValidation());
-
-        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', request('kelompok-asesor-uuid'));
-        $asesi = Asesi::firstWhere('uuid', request('asesi-uuid'));
-        if(empty($kelompokAsesor)) {
+        $signatureAdminLSP = $request->input('signature');
+        $asesiUuid = $request->asesi_id;
+        $kelompokAsesorUuid = $request->kelompok_asesor;
+        DB::beginTransaction();
+        $asesi = Asesi::firstWhere('uuid',$asesiUuid);
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid',$kelompokAsesorUuid);
+        if(empty($asesi) || empty($kelompokAsesor)) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
-        $existingData = FRAPL01::firstWhere([
-            ['asesi_id','!=', $asesi['id']],
-            ['kelompok_asesor_id', $kelompokAsesor['id']]
+
+        $frapl01 = FRAPL01::firstWhere([
+            ['asesi_id',$asesi['id']],
+            ['kelompok_asesor_id',$kelompokAsesor['id']]
         ]);
 
-        if(empty($existingData)) {
-            $request->validate([
-                'signatureAdminLSP' => ['required']
-            ],$this->messageValidation());
+        if($signatureAdminLSP) {
+            if(!empty($frapl01) && $frapl01['ttd_admin_lsp'] != null && Storage::exists($frapl01['ttd_admin_lsp'])) {
+                Storage::delete($frapl01['ttd_admin_lsp']);
+            }
+            $imageName = time() . '.png';
+            $path = public_path('storage/adminLSP_signatureFRAPL01/' . $imageName);
+            $signatureAdminLSP = str_replace('data:image/png;base64,', '', $signatureAdminLSP);
+            $signatureAdminLSP = str_replace(' ', '+', $signatureAdminLSP);
+            file_put_contents($path, base64_decode($signatureAdminLSP));
+            $resultTtdAdminLSP = 'adminLSP_signatureFRAPL01/'.$imageName;
+        } else {
+            $resultTtdAdminLSP = $frapl01['ttd_admin_lsp'];
         }
 
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
-        }
-        $validated = $validator->validated();
-        try {
-            DB::beginTransaction();
+        $result = $frapl01->update([
+            'tgl_ttd_admin_lsp' => now(),
+            'ttd_admin_lsp' => $resultTtdAdminLSP
+        ]);
 
-            $validated['tgl_ttd_admin_lsp'] = now();
-            // TTD Admin LSP
-            $signatureAsesi = $request->input('signatureAdminLSP');
-            if($signatureAsesi) {
-                if(!empty($existingData) && $existingData['ttd_admin_lsp'] != null && Storage::exists($existingData['ttd_admin_lsp'])) {
-                    Storage::delete($existingData['ttd_admin_lsp']);
-                }
-                $imageName = time() . '.png';
-                $path = public_path('storage/adminLSP_signatureFRAPL01/' . $imageName);
-                $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
-                $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
-                file_put_contents($path, base64_decode($signatureAsesi));
-                $validated['ttd_admin_lsp'] = 'adminLSP_signatureFRAPL01/'.$imageName;
-            } else {
-                $validated['ttd_admin_lsp'] = $existingData['ttd_admin_lsp'];
-            }
-            // $result = $existingData->update([
-            //     'ttd_admin_lsp' => $validated['ttd_admin_lsp'],
-            //     'tgl_ttd_admin_lsp' => $validated['tgl_ttd_admin_lsp'],
-            //     'no_reg' => $validated['no_reg'],
-            //     'status_rekomendasi' => $validated['status_rekomendasi']
-            // ]);
-            $result = $existingData->update($validated);
-            if ($result) {
-                DB::commit();
-                return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Berhasil melakukan tanda tangan ditambahkan'], 200);
-            } else {
-                DB::rollBack();
-                return response()->json(['status' => 'error', 'code' => '500', 'message' => 'Server Error 500'], 500);
-            }
-        } catch (\Throwable $th) {
+        if ($result) {
+            DB::commit();
+            return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data frapl01 assesmen berhasil ditandatangani'], 200);
+        } else {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'code' => '500', 'message' => 'Server Error 500'], 500);
+            return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
         }
     }
 
@@ -286,8 +261,14 @@ class FRAPL01Controller extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
         }
 
-        $data = FRAPL01::firstWhere([
-            ['asesi_id', Auth::user()->asesi['id']],
+        if(Gate::allows('asesi')) {
+            $asesiId = Auth::user()->asesi['id'];
+        } elseif (Gate::allows('asesor')) {
+            $asesiId = Asesi::firstWhere('uuid',request('asesi_id'))->pluck('id');
+        }
+
+        $data = FRAPL01::with('asesi.user')->firstWhere([
+            ['asesi_id', $asesiId],
             ['kelompok_asesor_id', $kelompokAsesor['id']]
         ]);
         return response()->json(['status' => 'success', 'data' => $data], 200);

@@ -15,15 +15,17 @@
         $idUrl = request()->segment(2);
         if(request()->routeIs('persetujuanAssesmen.*') ||
             request()->routeIs('frapl.*') ||
-            request()->routeIs('frapl01.*') ||
-            request()->routeIs('frapl02.*') ||
-            request()->routeIs('userTestPraktek.*') ||
-            request()->routeIs('testAssesmen.index')
+            request()->routeIs('testAssesmen.index') ||
+            request()->routeIs('checklistObservasi.*')
         ) {
             $idUrl = request('kelompok-asesor-id');
         }
 
-        if(request()->routeIs('userTestTulis.*')) {
+        if(request()->routeIs('userTestTulis.*') ||
+            request()->routeIs('userTestPraktek.*') ||
+            request()->routeIs('frapl01.*') ||
+            request()->routeIs('frapl02.*')
+        ) {
             $idUrl = request()->query->keys()[0];
         }
 @endphp
@@ -41,7 +43,8 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
-        request()->routeIs('testAssesmen.index')
+        request()->routeIs('testAssesmen.index') ||
+        request()->routeIs('checklistObservasi.*')
     ])>
     <a href="#kategori-ujian" data-toggle="collapse" aria-expanded="{{ request()->routeIs('event-asesor.*') ||
         request()->routeIs('persetujuanAssesmen.*') ||
@@ -50,6 +53,7 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
+        request()->routeIs('checklistObservasi.*') ||
         request()->routeIs('testAssesmen.index') ? 'true' : 'false' }}" class="dropdown-toggle">
         <div>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
@@ -67,7 +71,8 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
-        request()->routeIs('testAssesmen.index')
+        request()->routeIs('testAssesmen.index') ||
+        request()->routeIs('checklistObservasi.*')
     ]) id="kategori-ujian" data-parent="#accordionExample">
         @forelse($kelompokAsesor as $data)
             <li @class(['active' => request()->routeIs('event-asesor.*') && $idUrl === $data['uuid'] ||
@@ -77,7 +82,8 @@
                 request()->routeIs('frapl02.*') && $idUrl === $data['uuid'] ||
                 request()->routeIs('userTestTulis.*') && $idUrl === $data['uuid'] ||
                 request()->routeIs('userTestPraktek.*') && $idUrl === $data['uuid'] ||
-                request()->routeIs('testAssesmen.index') && $idUrl === $data['uuid']
+                request()->routeIs('testAssesmen.index') && $idUrl === $data['uuid'] ||
+                request()->routeIs('checklistObservasi.*') && $idUrl === $data['uuid']
             ])>
                 <a class="text-wrap" href="{{ route('event-asesor.show', $data['uuid']) }}"> {{ $data->event['nama_event'] }} </a>
             </li>

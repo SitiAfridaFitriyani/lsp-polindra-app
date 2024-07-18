@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{Asesi,Asesor,KelompokAsesor,PersetujuanKerahasiaan};
-use Illuminate\Support\Facades\{Auth, DB, Storage,Validator};
+use Illuminate\Support\Facades\{Gate,Auth,DB,Storage,Validator};
 use App\Http\Requests\UpdatePersetujuanKerahasiaanRequest;
 
 class PersetujuanKerahasiaanController extends Controller
@@ -14,12 +14,21 @@ class PersetujuanKerahasiaanController extends Controller
      */
     public function index()
     {
-        $fullQueryString = request()->getQueryString();
         $uuid = request()->query->keys()[0];
-
         $query = KelompokAsesor::with(['skema.unitKompetensi.elemen','event','kelas','asesor.user']);
-        $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
-        $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+
+        if(Gate::allows('asesor')) {
+            $asesi = Asesi::firstWhere('uuid',$uuid);
+            $kelompokAsesorId = request('kelompok-asesor-id');
+            $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$kelompokAsesorId)->get();
+            $kelompokAsesor = $query->where([
+                ['kelas_id',$asesi['kelas_id']],
+                ['uuid', $kelompokAsesorId]
+            ])->first();
+        } elseif (Gate::allows('asesi')) {
+            $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
+            $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+        }
         return view('dashboard.lembarPersetujuanAsesi.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
     }
 
@@ -62,6 +71,8 @@ class PersetujuanKerahasiaanController extends Controller
                 $request->validate([
                     'signatureAsesi' => ['required']
                 ],$this->messageValidation());
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'Kamu sudah melakukan submit sebelumnya'], 500);
             }
             // TTD Asesi
             $signatureAsesi = $request->input('signatureAsesi');
@@ -101,6 +112,52 @@ class PersetujuanKerahasiaanController extends Controller
         }
     }
 
+    public function asesorSignature(Request $request)
+    {
+        $signatureAsesor = $request->input('signature');
+        $asesiUuid = $request->asesi_id;
+        $kelompokAsesorUuid = $request->kelompok_asesor;
+        DB::beginTransaction();
+        $asesi = Asesi::firstWhere('uuid',$asesiUuid);
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid',$kelompokAsesorUuid);
+        if(empty($asesi) || empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        $persetujuanAssesmen = PersetujuanKerahasiaan::firstWhere([
+            ['asesi_id',$asesi['id']],
+            ['kelompok_asesor_id',$kelompokAsesor['id']]
+        ]);
+
+        if($signatureAsesor) {
+            if(!empty($persetujuanAssesmen) && $persetujuanAssesmen['ttd_asesor'] != null && Storage::exists($persetujuanAssesmen['ttd_asesor'])) {
+                Storage::delete($persetujuanAssesmen['ttd_asesor']);
+            }
+            $imageName = time() . '.png';
+            $path = public_path('storage/asesor_signaturePersetujuanKerahasiaan/' . $imageName);
+            $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
+            $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
+            file_put_contents($path, base64_decode($signatureAsesor));
+            $resultTtdAsesor = 'asesor_signaturePersetujuanKerahasiaan/'.$imageName;
+        } else {
+            $resultTtdAsesor = $persetujuanAssesmen['ttd_asesor'];
+        }
+
+        $result = $persetujuanAssesmen->update([
+            'tgl_ttd_asesor' => now(),
+            'ttd_asesor' => $resultTtdAsesor
+        ]);
+
+        if ($result) {
+            DB::commit();
+            return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data persetujuan assesmen berhasil ditandatangani'], 200);
+        } else {
+            DB::rollBack();
+            return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
+        }
+    }
+
     public function showByKelompokAsesor()
     {
         $kelompokAsesorUuid = request('kelompok_asesor');
@@ -111,8 +168,14 @@ class PersetujuanKerahasiaanController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
         }
 
+        if(Gate::allows('asesi')) {
+            $asesiId = Auth::user()->asesi['id'];
+        } elseif (Gate::allows('asesor')) {
+            $asesiId = Asesi::firstWhere('uuid',request('asesi_id'))->pluck('id');
+        }
+
         $data = PersetujuanKerahasiaan::firstWhere([
-            'asesi_id' => Auth::user()->asesi['id'],
+            'asesi_id' => $asesiId,
             'kelompok_asesor_id' => $kelompokAsesor['id']
         ]);
         return response()->json(['status' => 'success', 'data' => $data], 200);

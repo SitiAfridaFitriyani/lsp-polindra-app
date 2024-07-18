@@ -14,6 +14,7 @@ use App\Http\Controllers\{
     JurusanController,
     KelasController,
     KriteriaUnjukKerjaController,
+    ObservasiController,
     PengaturanConctroller,
     PersetujuanKerahasiaanController,
     ProfileController,
@@ -31,7 +32,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/',fn() => to_route('dashboard'));
 
 Route::middleware('auth')->group(function () {
-    // Admin
+    // Admin Middleware
     Route::middleware('can:admin')->group(function() {
         // Event
         Route::resource('event', EventController::class)->except(['create', 'show']);
@@ -118,9 +119,11 @@ Route::middleware('auth')->group(function () {
             Route::get('datatable', [PengaturanConctroller::class, 'datatable'])->name('pengaturan.datatable');
             Route::delete('delete-image/{type}',[PengaturanConctroller::class,'deleteImage'])->name('pengaturan.image-delete');
         });
+        // TTD FRAPL01 & FRAPL02
+        Route::post('frapl01-assesmen/admin-signature',[FRAPL01Controller::class,'adminSignature'])->name('frapl01.admin-signature');
     });
 
-    // Asesi
+    // Asesi Middleware
     Route::middleware('can:asesi')->group(function() {
         Route::prefix('event-asesi')->group(function () {
             Route::get('{uuid}/datatable', [EventAsesiController::class, 'datatable'])->name('event-asesi.datatable');
@@ -128,15 +131,21 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Asesor
+    // Asesor Middleware
     Route::middleware('can:asesor')->group(function() {
         Route::prefix('event-asesor')->group(function () {
             Route::get('{uuid}/datatable', [EventAsesorController::class, 'datatable'])->name('event-asesor.datatable');
             Route::get('{uuid}/show',[EventAsesorController::class,'show'])->name('event-asesor.show');
         });
-        // TTD Test Tulis
+        // TTD Test Tulis & Praktek
         Route::post('test-tulis-assesmen/asesor-signature',[UserTestTulisController::class,'asesorSignature'])->name('userTestTulis.asesor-signature');
+        Route::post('test-praktek-assesmen/asesor-signature',[UserTestPraktekController::class,'asesorSignature'])->name('userTestPraktek.asesor-signature');
+        // TTD Persetujuan Assesmen
+        Route::post('persetujuan-assesmen/asesor-signature',[PersetujuanKerahasiaanController::class,'asesorSignature'])->name('persetujuanAssesmen.asesor-signature');
+        // TTD FRAPL02
+        Route::post('frapl02-assesmen/asesor-signature',[FRAPL02Controller::class,'asesorSignature'])->name('frapl02.asesor-signature');
     });
+
     // All
     Route::view('/dashboard','dashboard.index')->name('dashboard');
     // Profile
@@ -152,6 +161,8 @@ Route::middleware('auth')->group(function () {
         Route::get('list-by-asesor/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesorUUID'])->name('persetujuanAssesmen.listByAsesorUuid'); // Catatan Error
         Route::get('list-by-asesi/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesiUUID'])->name('persetujuanAssesmen.listByAsesiUuid');
     });
+    // Checklist Observasi
+    Route::resource('checklist-observasi-assesmen',ObservasiController::class)->names('checklistObservasi')->except(['create', 'show']);
 
     // FRAPL MAIN
     Route::get('frapl-assesmen',FRAPLcontroller::class)->name('frapl.index');

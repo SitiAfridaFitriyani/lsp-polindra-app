@@ -1,6 +1,19 @@
 @extends('layouts.app.main')
 @section('title','Test Praktek Assesmen')
 @section('content')
+    @php
+        $asesiId = '';
+        $basePrefixUrl = 'event-asesi.show';
+
+        if (Gate::allows('asesor')) {
+            $asesiId = request('asesi-id');
+        }
+    @endphp
+    @can('asesor')
+        @php
+            $basePrefixUrl = 'event-asesor.show';
+        @endphp
+    @endcan
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
             <nav class="breadcrumb-one" aria-label="breadcrumb">
@@ -12,13 +25,23 @@
                         </a>
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             @forelse($kelompokAsesorNotIn as $data)
-                                <a class="dropdown-item" href="{{ route('event-asesi.show', $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
+                                <a class="dropdown-item" href="{{ route($basePrefixUrl, $data['uuid']) }}">{{ $data->event['nama_event'] }}</a>
                             @empty
                                 <a class="dropdown-item" href="javascript:void(0);">Tidak ada data</a>
                             @endforelse
                         </div>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('testAssesmen.index',$kelompokAsesor['uuid']) }}">Daftar Test Assesmen</a></li>
+                    @php
+                        $kelompokAsesorId = '';
+                        $baseUrl = route('testAssesmen.index', $kelompokAsesor['uuid']);
+                    @endphp
+                    @can('asesor')
+                        @php
+                            $baseUrl = route('testAssesmen.index', request('asesi-id'));
+                            $kelompokAsesorId = '&kelompok-asesor-id=' . $kelompokAsesor['uuid'];
+                        @endphp
+                    @endcan
+                    <li class="breadcrumb-item"><a href="{{ $baseUrl . $kelompokAsesorId }}">Daftar Test Assesmen</a></li>
                     <li class="breadcrumb-item active" aria-current="page">TUGAS PRAKTEK</li>
                 </ol>
             </nav>
@@ -73,7 +96,6 @@
                     <form class="needs-validation" id="form-berkas-frapl01" novalidate method="POST" action="{{ route('userTestPraktek.store', ['kelompok-asesor-uuid' => $kelompokAsesor['uuid']]) }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
-                        <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         <section style="height: 170vh; overflow-y: auto;">
                             <p style="height: 60vh; overflow-y: auto;">
                                 {!! $kelompokAsesor->skema->testPraktek['isi_prosedur_kerja'] !!}
@@ -110,9 +132,9 @@
                                     </div>
                                     <br>
                                     @can('asesi')
-                                        <span class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                        <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
                                     @else
-                                        <span class="text-primary">Tanda Tangan Asesi</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesi"></span>
                                     @endcan
                                 </div>
                                 <div class="ttd-asesor text-center ml-5">
@@ -121,13 +143,15 @@
                                     </div>
                                     <br>
                                     @can('asesor')
-                                        <span class="ml-1 btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                        <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
                                     @else
-                                        <span class="text-primary ml-2">Tanda Tangan Asesor</span>
+                                        <span class="text-primary ml-2" id="date-ttdAsesor"></span>
                                     @endcan
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @can('asesi')
+                                <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
+                            @endcan
                         </section>
                     </form>
                 </div>
@@ -136,36 +160,36 @@
     </div>
     @include('dashboard.testAssesmen.testPraktek.scriptComponent')
     @push('ckEditor')
-    <script>
-        ClassicEditor
-            .create(document.querySelector('#jawaban'), {
-                toolbar: {
-                    items: [
-                        'exportPDF','exportWord', '|',
-                        'findAndReplace', 'selectAll', '|',
-                        'heading', '|',
-                        'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
-                        'bulletedList', 'numberedList', 'todoList', '|',
-                        'outdent', 'indent', '|',
-                        'undo', 'redo',
-                        '-',
-                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
-                        'alignment', '|',
-                        'link', 'blockQuote', 'insertTable', 'codeBlock', 'htmlEmbed', '|',
-                        'specialCharacters', 'horizontalLine', 'pageBreak', '|',
-                        'textPartLanguage', '|',
-                        'sourceEditing'
-                    ],
-                    shouldNotGroupWhenFull: true
-                },
-                placeholder: 'Ketikkan jawabanmu disini...',
-            })
-            .then(editor => {
-                window.jawabanTestPraktek = editor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    </script>
-@endpush
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#jawaban'), {
+                    toolbar: {
+                        items: [
+                            'exportPDF','exportWord', '|',
+                            'findAndReplace', 'selectAll', '|',
+                            'heading', '|',
+                            'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                            'bulletedList', 'numberedList', 'todoList', '|',
+                            'outdent', 'indent', '|',
+                            'undo', 'redo',
+                            '-',
+                            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                            'alignment', '|',
+                            'link', 'blockQuote', 'insertTable', 'codeBlock', 'htmlEmbed', '|',
+                            'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                            'textPartLanguage', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    placeholder: 'Ketikkan jawabanmu disini...',
+                })
+                .then(editor => {
+                    window.jawabanTestPraktek = editor;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        </script>
+    @endpush
 @endsection
