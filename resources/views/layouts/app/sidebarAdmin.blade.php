@@ -37,8 +37,8 @@
         </li>
     </ul>
 </li>
-<li @class(['menu','active' => request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*')])>
-    <a href="#kategori-ujian" data-toggle="collapse" aria-expanded="{{ request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*') ? 'true' : 'false' }}" class="dropdown-toggle">
+<li @class(['menu','active' => request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*') || request()->routeIs('ujianWawancara.*')])>
+    <a href="#kategori-ujian" data-toggle="collapse" aria-expanded="{{ request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*') || request()->routeIs('ujianWawancara.*') ? 'true' : 'false' }}" class="dropdown-toggle">
         <div class="">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
             <span>Kategori Test</span>
@@ -47,12 +47,15 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
     </a>
-    <ul @class(['collapse','submenu','list-unstyled','show' => request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*')]) id="kategori-ujian" data-parent="#accordionExample">
-        <li @class(['active' => request()->routeIs('ujianTulis.*')])>
+    <ul @class(['collapse','submenu','list-unstyled','show' => request()->routeIs('ujianTulis.*') || request()->routeIs('ujianPraktek.*') || request()->routeIs('ujianWawancara.*')]) id="kategori-ujian" data-parent="#accordionExample">
+        {{-- <li @class(['active' => request()->routeIs('ujianTulis.*')])>
             <a href="{{ route('ujianTulis.index') }}"> Test Tulis </a>
         </li>
         <li @class(['active' => request()->routeIs('ujianPraktek.*')])>
             <a href="{{ route('ujianPraktek.index') }}"> Test Praktek </a>
+        </li> --}}
+        <li @class(['active' => request()->routeIs('ujianWawancara.*')])>
+            <a href="{{ route('ujianWawancara.index') }}"> Test Wawancara </a>
         </li>
     </ul>
 </li>

@@ -59,4 +59,9 @@ class KelompokAsesor extends Model
     {
         return $this->hasMany(UserTestPraktek::class,'kelompok_asesor_id');
     }
+
+    public function userTestWawancara()
+    {
+        return $this->hasMany(UserTestWawancara::class,'kelompok_asesor_id');
+    }
 }

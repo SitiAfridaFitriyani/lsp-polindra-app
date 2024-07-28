@@ -49,14 +49,12 @@
                                         Kolom jenis standar tidak boleh kosong
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-6 mb-4">
-                                    <label for="event_id">Event <span class="text-danger">*</span></label>
-                                    <select class="form-control select-event @error('event_id') is-invalid @enderror" name="event_id" id="event_id" required>
-                                    </select>
-                                    <div class="invalid-feedback" style="margin-top: -20px">
-                                        Kolom event tidak boleh kosong
-                                    </div>
-                                </div> --}}
+                            </div>
+                            <div class="form-row">
+                                <div class="col-12 mb-4">
+                                    <label for="deskripsi">Deskripsi <span class="text-danger">*</span></label>
+                                    <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" cols="30" rows="3"></textarea>
+                                </div>
                             </div>
                             <button class="btn btn-primary mt-3 text-center" id="btn-form" type="submit">Simpan</button>
                         </form>

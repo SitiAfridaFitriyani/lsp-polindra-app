@@ -46,7 +46,6 @@
                             </tr>
                         </thead>
                     </table>
-                    @include('dashboard.testTulis.modalAsesor')
                 </div>
             </div>
         </div>
@@ -54,7 +53,6 @@
     @push('datatable')
         @include('dashboard.testTulis.component')
         @include('dashboard.testTulis.datatable')
-        @include('dashboard.testTulis.listAsesor')
         @include('dashboard.testTulis.edit')
     @endpush
 @endsection

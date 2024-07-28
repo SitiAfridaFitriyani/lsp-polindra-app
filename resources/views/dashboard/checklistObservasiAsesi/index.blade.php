@@ -36,183 +36,163 @@
                 <div class="widget-header">
                     <div class="row">
                         <div class="col-12">
-                            <h4>CHECKLIST OBSERVASI DAN AKTIVITAS KERJA</h4>
+                            <h4>Checklist Observasi Dan Aktivitas Kerja</h4>
                         </div>
                     </div>
                 </div>
+                <div class="table-responsive mb-3" style="background-color: #ebf3fe; border-radius: 5px;">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr style="border: none !important;">
+                                <th>Skema Sertifikasi</th>
+                                <td>:</td>
+                                <td>{{ $kelompokAsesor->skema['jenis_standar'] }}</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <th>Nomor Skema</th>
+                                <td>:</td>
+                                <td>{{ $kelompokAsesor->skema['no_skema'] }}</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <th>Judul Skema</th>
+                                <td>:</td>
+                                <td>{{ $kelompokAsesor->skema['judul_skema'] }}</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <th>TUK</th>
+                                <td>:</td>
+                                <td>{{ $kelompokAsesor->event['tuk'] }}</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <th>Pelaksanaan Assesmen</th>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <td>Hari/Tanggal</td>
+                                <td>:</td>
+                                <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('dddd, DD MMMM Y') }}</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <td>Waktu</td>
+                                <td>:</td>
+                                <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('HH:mm') }} WIB</td>
+                            </tr>
+                            <tr style="border: none !important;">
+                                <td>TUK</td>
+                                <td>:</td>
+                                <td>{{ $kelompokAsesor->event['tuk'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="widget-content widget-content-area">
-                    <div class="table-responsive" style="background-color: #ebf3fe; border-radius: 5px;">
-                        <table class="table table-borderless">
-                            <tbody>
-                                <tr style="border: none !important;">
-                                    <th>Skema Sertifikasi</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['jenis_standar'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Nomor Skema</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['no_skema'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Judul Skema</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->skema['judul_skema'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>TUK</th>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->event['tuk'] }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <th>Pelaksanaan Assesmen</th>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>Hari/Tanggal</td>
-                                    <td>:</td>
-                                    <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('dddd, DD MMMM Y') }}</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>Waktu</td>
-                                    <td>:</td>
-                                    <td>{{ \Carbon\Carbon::parse($kelompokAsesor->event['event_mulai'])->isoFormat('HH:mm') }} WIB</td>
-                                </tr>
-                                <tr style="border: none !important;">
-                                    <td>TUK</td>
-                                    <td>:</td>
-                                    <td>{{ $kelompokAsesor->event['tuk'] }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <form class="needs-validation" id="form-berkas-persetujuan" novalidate method="POST" action="{{ route('persetujuanAssesmen.store', ['uuid' => $kelompokAsesor['uuid']]) }}">
+                    <form class="needs-validation" id="form-berkas-persetujuan" novalidate method="POST" action="{{ route('checklistObservasi.store', ['uuid' => $kelompokAsesor['uuid'],'asesi-id' => request()->query->keys()[0]]) }}">
                         @csrf
-                        <input type="hidden" name="signatureAsesi" id="signatureAsesi" name="signatureAsesi">
+                        <input type="hidden" name="signatureAsesor" id="signatureAsesor" name="signatureAsesor">
                         @php
                             foreach($kelompokAsesor->skema->unitKompetensi as $unitKom) {
                                 $groupedUnitKompetensi[$unitKom['judul_unit']][] = $unitKom;
                             }
+                            $loopCount = 0;
                         @endphp
-                        <div class="table-responsive" style="overflow-y: auto; height: 100vh;">
-                            <table class="table table-borderless">
-                                <tbody>
-                                    @isset($groupedUnitKompetensi)
-                                        @forelse($groupedUnitKompetensi as $unitKom => $data)
-                                            <tr style="border: none !important;">
-                                                @php
-                                                    $kodeUnit = '';
-                                                    foreach($data as $val) {
-                                                        if($val['judul_unit'] === $unitKom) {
-                                                            $kodeUnit = $val['kode_unit'];
-                                                        }
-                                                    }
-                                                @endphp
-                                                <th>{{ 'Unit Kompetensi : [' . $kodeUnit . '] ' . $unitKom }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Daftar Elemen</th>
-                                            </tr>
-                                            @forelse($data as $val)
-                                                @forelse($val->elemen as $elemen)
-                                                    <tr>
-                                                        <td class="text-wrap">
-                                                            <p>{{ $elemen['nama_elemen'] }}</p>
-                                                        </td>
-                                                        <td>
-                                                            <textarea name="benchmark[{{ $elemen['id'] }}]" id="benchmark[{{ $elemen['id'] }}]" cols="30" rows="10" placeholder="Benchmark"></textarea>
-                                                        </td>
-                                                        <td>
-                                                            @forelse($elemen->kriteriaUnjukKerja as $kuk)
-                                                                <div class="card mb-2">
-                                                                    <div class="d-flex align-items-center card-body">
-                                                                        <p class="text-wrap mr-2" style="width: 270px">
-                                                                            {{ $kuk['nama_kriteria_kerja'] }}
-                                                                        </p>
-                                                                        <div>
-                                                                            <div class="n-chk">
-                                                                                <label class="new-control new-radio new-radio-text radio-classic-success">
-                                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $kuk['id'] }}]" value="Kompeten">
-                                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Kompeten (K)</span>
-                                                                                </label>
-                                                                            </div>
-                                                                            <div class="n-chk">
-                                                                                <label class="new-control new-radio new-radio-text radio-classic-danger">
-                                                                                    <input type="radio" class="new-control-input" name="statusAssesmenMandiri[{{ $kuk['id'] }}]" value="Belum Kompeten">
-                                                                                    <span class="new-control-indicator"></span><span class="new-radio-content">Belum Kompeten (BK)</span>
-                                                                                </label>
-                                                                            </div>
-                                                                        </div>
-                                                                        <textarea name="penilaian_lanjut[{{ $kuk['id'] }}]" class="d-block" id="penilaian_lanjut[{{ $kuk['id'] }}]" cols="30" rows="3" placeholder="Penilaian Lanjut"></textarea>
-                                                                    </div>
+                        <div id="circle-basic">
+                            @isset($groupedUnitKompetensi)
+                                @forelse($groupedUnitKompetensi as $unitKom => $data)
+                                    @forelse($data as $val)
+                                        @foreach($val->elemen as $index => $elemen)
+                                            @php($loopCount++)
+                                            <h3>Elemen Ke-{{ $loopCount }}</h3>
+                                            <section style="background-color: #fff;">
+                                                <div class="form-row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="benchmark[{{ $val['id'] }}][{{ $elemen['id'] }}]">Benchmark</label>
+                                                        <textarea class="form-control" name="benchmark[{{ $val['id'] }}][{{ $elemen['id'] }}]" id="benchmark[{{ $val['id'] }}][{{ $elemen['id'] }}]" rows="8"></textarea>
+                                                    </div>
+                                                    <div class="col-12 mb-4">
+                                                        @forelse($elemen->kriteriaUnjukKerja as $kuk)
+                                                            <label for="">
+                                                                {{ $kuk['nama_kriteria_kerja'] }}
+                                                            </label>
+                                                            <div>
+                                                                <div class="n-chk">
+                                                                    <label class="new-control new-radio new-radio-text radio-classic-success">
+                                                                        <input type="radio" class="new-control-input" name="status_observasi[{{ $val['id'] }}][{{ $elemen['id'] }}][{{ $kuk['id'] }}]" value="Kompeten">
+                                                                        <span class="new-control-indicator"></span><span class="new-radio-content">Kompeten (K)</span>
+                                                                    </label>
                                                                 </div>
-                                                            @empty
-                                                                <p class="text-danger">Daftar kriteria unjuk kerja tidak tersedia pada elemen ini</p>
-                                                            @endforelse
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td class="text-danger">Daftar elemen tidak tersedia pada unit kompetensi ini</td>
-                                                    </tr>
-                                                @endforelse
-                                            @empty
-                                                <tr>
-                                                    <td class="text-danger">Daftar unit kompetensi tidak tersedia</td>
-                                                </tr>
-                                            @endforelse
-                                        @empty
-                                            <tr>
-                                                <td colspan="4">Data berkas Tidak Tersedia</td>
-                                            </tr>
-                                        @endforelse
-                                    @else
-                                        <tr>
-                                            <td colspan="4">Data unit kompetensi Tidak Tersedia</td>
+                                                                <div class="n-chk">
+                                                                    <label class="new-control new-radio new-radio-text radio-classic-danger">
+                                                                        <input type="radio" class="new-control-input" name="status_observasi[{{ $val['id'] }}][{{ $elemen['id'] }}][{{ $kuk['id'] }}]" value="Belum Kompeten">
+                                                                        <span class="new-control-indicator"></span><span class="new-radio-content">Belum Kompeten (BK)</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <textarea name="penilaian_lanjut[{{ $val['id'] }}][{{ $elemen['id'] }}][{{ $kuk['id'] }}]" class="form-control mb-3" id="penilaian_lanjut[{{ $val['id'] }}][{{ $elemen['id'] }}][{{ $kuk['id'] }}]" cols="30" rows="3" placeholder="Penilaian Lanjut"></textarea>
+                                                        @empty
+                                                            <p class="text-danger">Daftar kriteria unjuk kerja tidak tersedia pada elemen ini</p>
+                                                        @endforelse
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        @endforeach
+                                    @empty
+                                        <p class="text-danger">Daftar unit kompetensi tidak tersedia</p>
+                                    @endforelse
+                                @empty
+                                    <p class="text-danger">Data berkas Tidak Tersedia</p>
+                                @endforelse
+                            @else
+                                <p class="text-danger">Data unit kompetensi Tidak Tersedia</p>
+                            @endisset
+                            <div class="table-responsive" style="background-color: #fff; border-top: 1px solid #000">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr style="border: none !important;">
+                                            <th>Umpan Balik</th>
                                         </tr>
-                                    @endisset
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-borderless">
-                                <tbody>
-                                    <tr style="border: none !important;">
-                                        <th>Tanda Tangan Berkas</th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="d-flex mb-3">
-                                <div class="ttd-asesi text-center">
-                                    <div style="margin-left:12px; border: 1px solid black; width: 130px; height: 60px;">
-                                        <div id="available-ttdAsesi"></div>
-                                    </div>
-                                    <br>
-                                    @can('asesi')
-                                        <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
-                                    @else
-                                        <span class="text-primary ml-2" id="date-ttdAsesi"></span>
-                                    @endcan
+                                    </tbody>
+                                </table>
+                                <div class="col-12 mb-4">
+                                    <textarea name="umpan_balik" class="form-control mb-3" id="umpan_balik" cols="30" rows="3" placeholder="Umpan balik untuk asesi"></textarea>
                                 </div>
-                                <div class="ttd-asesor text-center ml-5">
-                                    <div style="margin-left:17px; border: 1px solid black; width: 130px; height: 60px;">
-                                        <div id="available-ttdAsesor"></div>
+                            </div>
+                            <div class="table-responsive" style="background-color: #fff;">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr style="border: none !important;">
+                                            <th>Tanda Tangan Berkas</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex mb-3">
+                                    <div class="ttd-asesi text-center">
+                                        <div style="margin-left:12px; border: 1px solid black; width: 130px; height: 60px;">
+                                            <div id="available-ttdAsesi"></div>
+                                        </div>
+                                        <br>
+                                        @can('asesi')
+                                            <span class="btn btn-sm btn-outline-primary" id="modal-ttdAsesi" data-toggle="modal" data-target="#create-ttd-asesi"> Tanda Tangan Asesi</span>
+                                        @else
+                                            <span class="text-primary ml-2" id="date-ttdAsesi"></span>
+                                        @endcan
                                     </div>
-                                    <br>
-                                    @can('asesor')
-                                        <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
-                                    @else
-                                        <span class="text-primary ml-2" id="date-ttdAsesor"></span>
-                                    @endcan
+                                    <div class="ttd-asesor text-center ml-5">
+                                        <div style="margin-left:17px; border: 1px solid black; width: 130px; height: 60px;">
+                                            <div id="available-ttdAsesor"></div>
+                                        </div>
+                                        <br>
+                                        @can('asesor')
+                                            <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAsesor" data-toggle="modal" data-target="#create-ttd-asesor"> Tanda Tangan Asesor</span>
+                                        @else
+                                            <span class="text-primary ml-2" id="date-ttdAsesor"></span>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        @can('asesi')
-                            <button class="btn btn-primary mt-3" id="btn-form" type="submit">Simpan</button>
-                        @endcan
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @include('dashboard.lembarPersetujuanAsesi.scriptComponent')
+    @include('dashboard.checklistObservasiAsesi.scriptComponent')
 @endsection

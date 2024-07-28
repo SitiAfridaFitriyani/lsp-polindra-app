@@ -12,7 +12,6 @@
                 const fraplRoute = '{{ route("frapl.index", [":uuid"]) }}';
                 const persetujuanAssesmen = '{{ route("persetujuanAssesmen.index", [":uuid"]) }}';
                 const testAssesmen = '{{ route("testAssesmen.index", [":uuid"]) }}';
-                let kelasName = '';
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
                         "<'table-responsive'tr>" +

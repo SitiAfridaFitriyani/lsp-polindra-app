@@ -19,11 +19,6 @@ class TestTulis extends Model
         });
     }
 
-    public function userTestTulis()
-    {
-        return $this->hasMany(UserTestTulis::class, 'test_tulis_id');
-    }
-
     public function kriteriaUnjukKerja()
     {
         return $this->belongsTo(KriteriaUnjukKerja::class,'kriteria_unjuk_kerja_id');

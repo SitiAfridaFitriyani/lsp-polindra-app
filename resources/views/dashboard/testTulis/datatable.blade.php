@@ -10,7 +10,6 @@
             success: function(response) {
                 const data = response.data;
                 const deleteRoute = '{{ route("ujianTulis.destroy", [":uuid"]) }}';
-                const listAsesorRoute = '{{ route("asesor.listByUuid", [":uuid"]) }}';
                 const editRoute = '{{ route("ujianTulis.edit", [":uuid"]) }}';
 
                 let kelasName = '';
@@ -68,16 +67,10 @@
                             data: 'uuid',
                             render: function(data) {
                                 const deleteRouteRendered = deleteRoute.replace(':uuid', data);
-                                const listAsesorRouteRendered = listAsesorRoute.replace(':uuid', data);
                                 const editRouteRendered = editRoute.replace(':uuid', data);
 
                                 return `
                                     <ul class="table-controls">
-                                        <li onclick="handleListAsesor(this)" data-modal="modal-list-asesor" data-route="${listAsesorRouteRendered}" data-kelasName="${kelasName}">
-                                            <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="List Asesor">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu p-1 br-6 mb-1"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                                            </a>
-                                        </li>
                                         <li onclick="handleEdit(this)" data-route="${editRouteRendered}" data-uuid="${data}">
                                             <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="Edit Ujian Test">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 p-1 br-6 mb-1"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>

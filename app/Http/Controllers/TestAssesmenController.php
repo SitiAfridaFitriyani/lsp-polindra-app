@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Asesi, TestTulis,TestPraktek,KelompokAsesor};
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
+use App\Models\{Asesi,TestTulis,TestPraktek,KelompokAsesor};
+use Illuminate\Support\Facades\{Gate,Auth};
 
 class TestAssesmenController extends Controller
 {

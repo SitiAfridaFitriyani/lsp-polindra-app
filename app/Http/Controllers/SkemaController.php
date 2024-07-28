@@ -25,18 +25,13 @@ class SkemaController extends Controller
             'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
             'kode_skema' => ['required','unique:m_skema,kode_skema'],
             'judul_skema' => ['required', 'string', 'max:255'],
-            // 'event_id' => ['required','exists:m_event,uuid'],
+            'deskripsi' => ['required','string']
         ], $this->messageValidation());
 
         if ($validator->fails()) {
             return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
         }
         $validated = $validator->validated();
-        // $event = Event::where('uuid', $validated['event_id'])->first();
-        // if(empty($event)) {
-        //     return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
-        // }
-        // $validated['event_id'] = $event['id'];
         $data =  Skema::create($validated);
         if ($data) {
             return response()->json(['status' => 'success', 'message' => 'Data skema berhasil ditambahkan'], 200);
@@ -68,7 +63,7 @@ class SkemaController extends Controller
             'jenis_standar' => ['required','in:KKNI,Okupasi,Klaster'],
             'kode_skema' => ['required','unique:m_skema,kode_skema,'. $uuid . ',uuid'],
             'judul_skema' => ['required', 'string', 'max:255'],
-            // 'event_id' => ['required','exists:m_event,uuid'],
+            'deskripsi' => ['required','string']
         ], $this->messageValidation());
 
         if ($validator->fails()) {
@@ -80,12 +75,6 @@ class SkemaController extends Controller
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data skema tidak ditemukan'], 404);
         }
-
-        // $event = Event::where('uuid', $validated['event_id'])->first();
-        // if(empty($event)) {
-        //     return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
-        // }
-        // $validated['event_id'] = $event['id'];
 
         $result =  $data->update($validated);
         if ($result) {

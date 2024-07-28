@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('kode_skema')->unique();
             $table->string('judul_skema');
             $table->string('no_skema')->unique();
+            $table->string('deskripsi');
             $table->enum('jenis_standar',['KKNI','Okupasi','Klaster']);
             $table->timestamps();
         });

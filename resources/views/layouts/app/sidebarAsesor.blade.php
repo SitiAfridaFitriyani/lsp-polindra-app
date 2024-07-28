@@ -23,6 +23,7 @@
 
         if(request()->routeIs('userTestTulis.*') ||
             request()->routeIs('userTestPraktek.*') ||
+            request()->routeIs('userTestWawancara.*') ||
             request()->routeIs('frapl01.*') ||
             request()->routeIs('frapl02.*')
         ) {
@@ -43,6 +44,7 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
+        request()->routeIs('userTestWawancara.*') ||
         request()->routeIs('testAssesmen.index') ||
         request()->routeIs('checklistObservasi.*')
     ])>
@@ -53,6 +55,7 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
+        request()->routeIs('userTestWawancara.*') ||
         request()->routeIs('checklistObservasi.*') ||
         request()->routeIs('testAssesmen.index') ? 'true' : 'false' }}" class="dropdown-toggle">
         <div>
@@ -71,6 +74,7 @@
         request()->routeIs('frapl02.*') ||
         request()->routeIs('userTestTulis.*') ||
         request()->routeIs('userTestPraktek.*') ||
+        request()->routeIs('userTestWawancara.*') ||
         request()->routeIs('testAssesmen.index') ||
         request()->routeIs('checklistObservasi.*')
     ]) id="kategori-ujian" data-parent="#accordionExample">
@@ -82,6 +86,7 @@
                 request()->routeIs('frapl02.*') && $idUrl === $data['uuid'] ||
                 request()->routeIs('userTestTulis.*') && $idUrl === $data['uuid'] ||
                 request()->routeIs('userTestPraktek.*') && $idUrl === $data['uuid'] ||
+                request()->routeIs('userTestWawancara.*') && $idUrl === $data['uuid'] ||
                 request()->routeIs('testAssesmen.index') && $idUrl === $data['uuid'] ||
                 request()->routeIs('checklistObservasi.*') && $idUrl === $data['uuid']
             ])>

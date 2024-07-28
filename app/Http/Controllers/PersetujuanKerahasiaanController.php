@@ -48,6 +48,7 @@ class PersetujuanKerahasiaanController extends Controller
         }
         $validated = $validator->validated();
         try {
+            DB::beginTransaction();
             $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $validated['uuid']);
             if(empty($kelompokAsesor)) {
                 DB::rollBack();

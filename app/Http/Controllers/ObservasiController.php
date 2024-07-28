@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{KelompokAsesor,Asesi,Observasi};
-use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\StoreObservasiRequest;
-use App\Http\Requests\UpdateObservasiRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth,Storage,Gate,DB,Validator};
+use App\Models\{KelompokAsesor,Asesi, Elemen, KriteriaUnjukKerja, Observasi, UnitKompetensi};
 
 class ObservasiController extends Controller
 {
@@ -30,54 +29,207 @@ class ObservasiController extends Controller
             $kelompokAsesor = $query->firstWhere('uuid',$uuid);
         }
         return view('dashboard.checklistObservasiAsesi.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreObservasiRequest $request)
+    public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'signatureAsesor' => ['nullable'],
+            'benchmark' => ['array'],
+            'status_observasi' => ['required','array'],
+            'penilaian_lanjut' => ['array'],
+            'uuid' => ['required', 'exists:t_kelompok_asesor,uuid'],
+            'asesi-id' => ['required','exists:m_asesi,uuid'],
+            'umpan_balik' => ['nullable']
+        ], $this->messageValidation());
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $request->uuid);
+        $asesi = Asesi::firstWhere('uuid',request('asesi-id'));
+
+        if(empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+        }
+        if(empty($asesi)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data asesi tidak ditemukan'], 404);
+        }
+
+        $existingData = Observasi::firstWhere([
+            ['asesi_id',$asesi['id']],
+            ['kelompok_asesor_id',$kelompokAsesor['id']]
+        ]);
+
+        if(empty($existingData)) {
+            $request->validate([
+                'signatureAsesor' => ['required']
+            ],$this->messageValidation());
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Kamu sudah melakukan submit sebelumnya'], 500);
+        }
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->messages(), 'errors' => $validator->errors()], 422);
+        }
+        $validated = $validator->validated();
+        try {
+            DB::beginTransaction();
+            $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $validated['uuid']);
+            if(empty($kelompokAsesor)) {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            }
+            $arrFinalData = [];
+            foreach ($validated['benchmark'] as $unitKomId => $b) {
+                $unitKom = UnitKompetensi::firstWhere('id', $unitKomId);
+                foreach ($b as $elemenId => $benchmark) {
+                    $elemen = Elemen::firstWhere('id', $elemenId);
+                    $arrStatusOberservasi = [];
+                    foreach ($validated['status_observasi'] as $unitKomId2 => $c) {
+                        if ($unitKomId !== $unitKomId2) continue;
+                        foreach ($c as $elemenId2 => $arrKuk) {
+                            if ($elemenId !== $elemenId2) continue;
+                            foreach ($arrKuk as $kukId => $status) {
+                                $kuk = KriteriaUnjukKerja::firstWhere('id', $kukId);
+                                $arrStatusOberservasi[] = [
+                                    'kriteria_unjuk_kerja_id' => $kuk['id'],
+                                    'status_observasi' => $status
+                                ];
+                            }
+                        }
+                    }
+                    $arrPenilaianLanjut = [];
+                    foreach ($arrStatusOberservasi as $aso) {
+                        foreach ($validated['penilaian_lanjut'] as $unitKomId3 => $d) {
+                            if ($unitKomId !== $unitKomId3) continue;
+                            foreach ($d as $elemenId3 => $arrKuk2) {
+                                if ($elemenId !== $elemenId3) continue;
+                                foreach ($arrKuk2 as $kukId3 => $keterangan) {
+                                    if ($aso['kriteria_unjuk_kerja_id'] === $kukId3) {
+                                        $arrPenilaianLanjut[] = [
+                                            'kriteria_unjuk_kerja_id' => $aso['kriteria_unjuk_kerja_id'],
+                                            'status_observasi' => $aso['status_observasi'],
+                                            'penilaian_lanjutan' => $keterangan
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $arrFinalData[] = [
+                        'unit_kompetensi_id' => $unitKom['id'],
+                        'elemen_id' => $elemen['id'],
+                        'benchmark' => $benchmark,
+                        'observasi' => $arrPenilaianLanjut,
+                    ];
+                }
+            }
+            // TTD Asesor
+            $signatureAsesor = $request->input('signatureAsesor');
+            if($signatureAsesor) {
+                if(!empty($existingData) && $existingData['ttd_asesor'] != null && Storage::exists($existingData['ttd_asesor'])) {
+                    Storage::delete($existingData['ttd_asesor']);
+                }
+                $imageName = time() . '.png';
+                $path = public_path('storage/asesor_signatureChecklistObservasi/' . $imageName);
+                $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
+                $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
+                file_put_contents($path, base64_decode($signatureAsesor));
+                $validated['ttd_asesor'] = 'asesor_signatureChecklistObservasi/'.$imageName;
+            } else {
+                $validated['ttd_asesor'] = $existingData['ttd_asesor'];
+            }
+            $arrResult = [
+                'asesi_id' => $asesi['id'],
+                'kelompok_asesor_id' => $kelompokAsesor['id'],
+                'jawaban' => json_encode($arrFinalData),
+                'umpan_balik' => $validated['umpan_balik'],
+                'ttd_asesor' => $validated['ttd_asesor'],
+                'tgl_ttd_asesor' => now()
+            ];
+
+            $data =  Observasi::create($arrResult);
+            if ($data) {
+                DB::commit();
+                return response()->json(['status' => 'success', 'message' => 'Data observasi assesmen berhasil ditambahkan'], 200);
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
+            }
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => $th->getMessage()], 500);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Observasi $observasi)
+    public function asesiSignature(Request $request)
     {
-        //
+        $signatureAsesi = $request->input('signature');
+        $asesiUuid = $request->asesi_id;
+        $kelompokAsesorUuid = $request->kelompok_asesor;
+        DB::beginTransaction();
+        $asesi = Asesi::firstWhere('uuid',$asesiUuid);
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid',$kelompokAsesorUuid);
+        if(empty($asesi) || empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        $testWawancara = Observasi::firstWhere([
+            ['asesi_id',$asesi['id']],
+            ['kelompok_asesor_id',$kelompokAsesor['id']]
+        ]);
+
+        if($signatureAsesi) {
+            if(!empty($testWawancara) && $testWawancara['ttd_asesi'] != null && Storage::exists($testWawancara['ttd_asesi'])) {
+                Storage::delete($testWawancara['ttd_asesi']);
+            }
+            $imageName = time() . '.png';
+            $path = public_path('storage/asesi_signatureChecklistObservasi/' . $imageName);
+            $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
+            $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
+            file_put_contents($path, base64_decode($signatureAsesi));
+            $resultTtdAsesi = 'asesi_signatureChecklistObservasi/'.$imageName;
+        } else {
+            $resultTtdAsesi = $testWawancara['ttd_asesi'];
+        }
+
+        $result = $testWawancara->update([
+            'tgl_ttd_asesi' => now(),
+            'ttd_asesi' => $resultTtdAsesi
+        ]);
+        if ($result) {
+            DB::commit();
+            return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data Test Wawancara berhasil ditandatangani'], 200);
+        } else {
+            DB::rollBack();
+            return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Observasi $observasi)
+    public function showByKelompokAsesor()
     {
-        //
-    }
+        $kelompokAsesorUuid = request('kelompok_asesor');
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateObservasiRequest $request, Observasi $observasi)
-    {
-        //
-    }
+        if(empty($kelompokAsesor)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Observasi $observasi)
-    {
-        //
+        if(Gate::allows('asesi')) {
+            $asesiId = Auth::user()->asesi['id'];
+        } elseif (Gate::allows('asesor')) {
+            $asesiId = Asesi::firstWhere('uuid', request('asesi_id'))->pluck('id');
+        }
+
+        $data = Observasi::firstWhere([
+            ['asesi_id', $asesiId],
+            ['kelompok_asesor_id', $kelompokAsesor['id']]
+        ]);
+        return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

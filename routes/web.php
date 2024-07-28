@@ -12,6 +12,7 @@ use App\Http\Controllers\{
     FRAPL02Controller,
     FRAPLcontroller,
     JurusanController,
+    GuestController,
     KelasController,
     KriteriaUnjukKerjaController,
     ObservasiController,
@@ -22,15 +23,17 @@ use App\Http\Controllers\{
     TestAssesmenController,
     TestPraktekController,
     TestTulisController,
+    TestWawancaraController,
     UnitKompetensiController,
     UserTestPraktekController,
-    UserTestTulisController
+    UserTestTulisController,
+    UserTestWawancaraController
 };
 use Illuminate\Support\Facades\Route;
 
 // Root
-Route::get('/',fn() => to_route('dashboard'));
-
+Route::get('/', [GuestController::class,'index'])->name('guest.index');
+Route::get('/assesmen-register/{uuid}',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
 Route::middleware('auth')->group(function () {
     // Admin Middleware
     Route::middleware('can:admin')->group(function() {
@@ -86,6 +89,11 @@ Route::middleware('auth')->group(function () {
         });
         // Ujian Praktek
         Route::resource('ujian-praktek',TestPraktekController::class)->names('ujianPraktek');
+        // Ujian Wawancara
+        Route::resource('ujian-wawancara',TestWawancaraController::class)->names('ujianWawancara')->except(['create', 'show']);
+        Route::prefix('ujian-wawancara')->group(function () {
+            Route::get('datatable', [TestWawancaraController::class, 'datatable'])->name('ujianWawancara.datatable');
+        });
         // Jurusan
         Route::resource('jurusan',JurusanController::class)->except(['create', 'show']);
         Route::prefix('jurusan')->group(function () {
@@ -129,6 +137,10 @@ Route::middleware('auth')->group(function () {
             Route::get('{uuid}/datatable', [EventAsesiController::class, 'datatable'])->name('event-asesi.datatable');
             Route::get('{uuid}/show',[EventAsesiController::class,'show'])->name('event-asesi.show');
         });
+        // TTD Test Wawancara
+        Route::post('test-wawancara-assesmen/asesi-signature',[UserTestWawancaraController::class,'asesiSignature'])->name('userTestWawancara.asesi-signature');
+        // TTD Checklist Observasi
+        Route::post('checklist-observasi-assesmen/asesi-signature',[ObservasiController::class,'asesiSignature'])->name('checklistObservasi.asesi-signature');
     });
 
     // Asesor Middleware
@@ -162,8 +174,10 @@ Route::middleware('auth')->group(function () {
         Route::get('list-by-asesi/{uuid}', [PersetujuanKerahasiaanController::class, 'listByAsesiUUID'])->name('persetujuanAssesmen.listByAsesiUuid');
     });
     // Checklist Observasi
-    Route::resource('checklist-observasi-assesmen',ObservasiController::class)->names('checklistObservasi')->except(['create', 'show']);
-
+    Route::resource('checklist-observasi-assesmen',ObservasiController::class)->names('checklistObservasi')->except(['create', 'show','edit','update','destroy']);
+    Route::prefix('checklist-observasi-assesmen')->group(function () {
+        Route::get('show-by-kelompokAsesor',[ObservasiController::class,'showByKelompokAsesor'])->name('checklistObservasi.show-by-kelompokAsesor');
+    });
     // FRAPL MAIN
     Route::get('frapl-assesmen',FRAPLcontroller::class)->name('frapl.index');
     // FRAPL01
@@ -180,7 +194,7 @@ Route::middleware('auth')->group(function () {
     // Test Assesmen MAIN
     Route::get('test-assesmen',TestAssesmenController::class)->name('testAssesmen.index');
     // Test Tulis User
-    Route::resource('test-tulis-assesmen-asesi',UserTestTulisController::class)->names('userTestTulis')->except(['create']);
+    Route::resource('test-tulis-assesmen-asesi',UserTestTulisController::class)->names('userTestTulis')->except(['create','show','edit','update','destroy']);
     Route::prefix('test-tulis-assesmen')->group(function () {
         Route::get('show-by-kelompokAsesor',[UserTestTulisController::class,'showByKelompokAsesor'])->name('userTestTulis.show-by-kelompokAsesor');
     });
@@ -189,6 +203,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('test-praktek-assesmen')->group(function () {
         Route::get('show-by-kelompokAsesor',[UserTestPraktekController::class,'showByKelompokAsesor'])->name('userTestPraktek.show-by-kelompokAsesor');
     });
+    // Test Wawancara
+    Route::resource('test-wawancara-assesmen-asesi', UserTestWawancaraController::class)->names('userTestWawancara')->except(['create','show','edit','update','destroy']);
+    Route::prefix('test-wawancara-assesmen-asesi')->group(function () {
+        Route::get('show-by-kelompokAsesor',[UserTestWawancaraController::class,'showByKelompokAsesor'])->name('userTestWawancara.show-by-kelompokAsesor');
+    });
+
 });
 
 require __DIR__.'/auth.php';

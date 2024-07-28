@@ -14,7 +14,7 @@
                             <canvas id="signatureCanvasAsesi" width="400" height="200" style="border: 1px solid black;"></canvas>
                             <div class="modal-footer bg-transparent d-flex justify-content-center">
                                 <button onclick="clearCanvasAsesi()" id="clearCanvasAsesiButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
+                                <button type="button" onclick="saveSignature()" class="btn btn-primary" data-dismiss="modal">Simpan</button>
                             </div>
                         </div>
                     </div>
@@ -28,20 +28,14 @@
             var isDrawingAsesi = false;
             var lastXAsesi = 0;
             var lastYAsesi = 0;
-            var inputSignatureAsesi = document.getElementById('signatureAsesi');
             canvasAsesi.addEventListener('mousedown', (e) => {
                 isDrawingAsesi = true;
                 [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
             });
             canvasAsesi.addEventListener('mousemove', draw);
-            canvasAsesi.addEventListener('mouseup', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
-            canvasAsesi.addEventListener('mouseout', () => {
-                isDrawingAsesi = false;
-                updateSignatureInputAsesi();
-            });
+            canvasAsesi.addEventListener('mouseup', () => isDrawingAsesi = false);
+            canvasAsesi.addEventListener('mouseout', () => isDrawingAsesi = false);
+
             function draw(e) {
                 if (!isDrawingAsesi) return;
                 ctxAsesi.beginPath();
@@ -50,12 +44,35 @@
                 ctxAsesi.stroke();
                 [lastXAsesi, lastYAsesi] = [e.offsetX, e.offsetY];
             }
-            function updateSignatureInputAsesi() {
-                inputSignatureAsesi.value = canvasAsesi.toDataURL();
-            }
+
             function clearCanvasAsesi() {
-                inputSignatureAsesi.value = "";
                 ctxAsesi.clearRect(0, 0, canvasAsesi.width, canvasAsesi.height);
+            }
+
+            function saveSignature() {
+                const dataURL = canvasAsesi.toDataURL();
+                let asesiUuId = @json($asesiId);
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('checklistObservasi.asesi-signature') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        signature: dataURL,
+                        kelompok_asesor: @json($kelompokAsesor['uuid']),
+                        asesi_id: asesiUuId
+                    },
+                    success: function(response) {
+                        snackBarAlert(response.message, '#1abc9c');
+                        getData();
+                        clearCanvasAsesi();
+                    },
+                    error: function(xhr, status, error) {
+                        snackBarAlert('Tanda tangan gagal', '#e7515a');
+                        clearCanvasAsesi();
+                    }
+                });
             }
         </script>
     @endcan
@@ -75,7 +92,7 @@
                             <canvas id="signatureCanvasAsesor" width="400" height="200" style="border: 1px solid black;"></canvas>
                             <div class="modal-footer bg-transparent d-flex justify-content-center">
                                 <button onclick="clearCanvasAsesor()" id="clearCanvasAsesorButton" class="btn btn-outline-danger">Clear Canvas</button>
-                                <button type="button" onclick="saveSignature()" class="btn btn-primary" data-dismiss="modal">Simpan</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Simpan</button>
                             </div>
                         </div>
                     </div>
@@ -89,6 +106,7 @@
             var isDrawingAsesor = false;
             var lastXAsesor = 0;
             var lastYAsesor = 0;
+            var inputSignatureAsesor = document.getElementById('signatureAsesor');
 
             canvasAsesor.addEventListener('mousedown', (e) => {
                 isDrawingAsesor = true;
@@ -96,8 +114,15 @@
             });
 
             canvasAsesor.addEventListener('mousemove', draw);
-            canvasAsesor.addEventListener('mouseup', () => isDrawingAsesor = false);
-            canvasAsesor.addEventListener('mouseout', () => isDrawingAsesor = false);
+            canvasAsesor.addEventListener('mouseup', () => {
+                isDrawingAsesor = false;
+                updateSignatureInputAsesor();
+            });
+
+            canvasAsesor.addEventListener('mouseout', () => {
+                isDrawingAsesor = false;
+                updateSignatureInputAsesor();
+            });
 
             function draw(e) {
                 if (!isDrawingAsesor) return;
@@ -108,34 +133,13 @@
                 [lastXAsesor, lastYAsesor] = [e.offsetX, e.offsetY];
             }
 
-            function clearCanvasAsesor() {
-                ctxAsesor.clearRect(0, 0, canvasAsesor.width, canvasAsesor.height);
+            function updateSignatureInputAsesor() {
+                inputSignatureAsesor.value = canvasAsesor.toDataURL();
             }
 
-            function saveSignature() {
-                const dataURL = canvasAsesor.toDataURL();
-                let asesiUuId = @json($asesiId);
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('persetujuanAssesmen.asesor-signature') }}',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: {
-                        signature: dataURL,
-                        kelompok_asesor: @json($kelompokAsesor['uuid']),
-                        asesi_id: asesiUuId
-                    },
-                    success: function(response) {
-                        snackBarAlert(response.message, '#1abc9c');
-                        getData();
-                        clearCanvasAsesor();
-                    },
-                    error: function(xhr, status, error) {
-                        snackBarAlert('Tanda tangan gagal', '#e7515a');
-                        clearCanvasAsesor();
-                    }
-                });
+            function clearCanvasAsesor() {
+                inputSignatureAsesor.value = "";
+                ctxAsesor.clearRect(0, 0, canvasAsesor.width, canvasAsesor.height);
             }
         </script>
     @endcan
@@ -147,7 +151,7 @@
         function getData() {
             let asesiUuId = @json($asesiId);
             $.ajax({
-                url: "{{ route('persetujuanAssesmen.show-by-kelompokAsesor') }}",
+                url: "{{ route('checklistObservasi.show-by-kelompokAsesor') }}",
                 type: 'GET',
                 data: {
                     kelompok_asesor: @json($kelompokAsesor['uuid']),
@@ -155,7 +159,8 @@
                 },
                 success: function(response) {
                     const data = response.data;
-                    const berkas = JSON.parse(data.berkas);
+                    const jawaban = JSON.parse(data.jawaban);
+                    const umpanBalik = document.getElementById(`umpan_balik`);
                     const urlTtdAsesi = `{{ asset('storage/${data.ttd_asesi}') }}`;
                     const urlTtdAsesor = `{{ asset('storage/${data.ttd_asesor}') }}`;
                     let dateTtdAsesor = `<span>Tanggal: -</span>`;
@@ -177,7 +182,9 @@
                     @can('asesor')
                         if(data != null && data.ttd_asesor != null) {
                             const modalTtdAsesor = document.getElementById('modal-ttdAsesor');
+                            const buttonFormAsesi = document.getElementById('btn-form');
                             modalTtdAsesor.style.display = 'none';
+                            buttonFormAsesi.style.display = 'none';
                             const spanElement = document.createElement('span');
                             spanElement.className = 'text-primary ml-2';
                             spanElement.id = 'date-ttdAsesor';
@@ -199,21 +206,27 @@
                     $('#date-ttdAsesor').html(dateTtdAsesor);
                     $('#date-ttdAsesi').html(dateTtdAsesi);
 
-                    berkas.forEach(item => {
-                        if (item === "TL : Verifikasi Portofolio") {
-                            document.getElementById('ckportofolio').checked = true;
-                        }
-                        if (item === "L : Observasi") {
-                            document.getElementById('ckoberservasi').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Tulis") {
-                            document.getElementById('cktestTulis').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Lisan") {
-                            document.getElementById('cktestLisan').checked = true;
-                        }
-                        if (item === "T: Hasil Tes Wawancara") {
-                            document.getElementById('cktestWawancara').checked = true;
+                    umpanBalik.value = data.umpan_balik;
+
+                    jawaban.forEach(item => {
+                        const benchmark = document.getElementById(`benchmark[${item.unit_kompetensi_id}][${item.elemen_id}]`);
+                        item.observasi.forEach(obs => {
+                            const radioButtons = document.querySelectorAll(`input[name="status_observasi[${item.unit_kompetensi_id}][${item.elemen_id}][${obs.kriteria_unjuk_kerja_id}]"]`);
+                            const penilaianLanjut = document.getElementById(`penilaian_lanjut[${item.unit_kompetensi_id}][${item.elemen_id}][${obs.kriteria_unjuk_kerja_id}]`);
+
+                            radioButtons.forEach(radio => {
+                                if (radio.value === obs.status_observasi) {
+                                    radio.checked = true;
+                                }
+
+                                if(obs.penilaian_lanjutan) {
+                                    penilaianLanjut.value = obs.penilaian_lanjutan;
+                                }
+                            });
+                        });
+
+                        if(item.benchmark) {
+                            benchmark.value = item.benchmark;
                         }
                     });
                 },

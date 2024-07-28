@@ -9,7 +9,7 @@
 	===============================
 */
 /*
-    Common 
+    Common
 */
 .wizard, .tabcontrol {
   display: block;
@@ -37,6 +37,7 @@
     Wizard
 */
 .wizard > .steps {
+  overflow-x: auto;
   position: relative;
   display: block;
   width: 100%; }
@@ -354,7 +355,7 @@
   display: block;
   position: absolute;
   top: 35px;
-  width: 235%;
+  /* width: 235%; */
   height: 3px;
   right: 0;
   left: 0;

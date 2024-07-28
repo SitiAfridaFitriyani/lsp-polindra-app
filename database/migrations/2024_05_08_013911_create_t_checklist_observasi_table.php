@@ -14,16 +14,12 @@ return new class extends Migration
         Schema::create('t_checklist_observasi', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->text('benchmark');
-            $table->text('umpan_balik');
-            $table->json('rekomendasi');
-            $table->json('penilaian_lanjut');
+            $table->json('jawaban');
+            $table->text('umpan_balik')->nullable();
             $table->string('ttd_asesor');
-            $table->string('ttd_asesi');
+            $table->string('ttd_asesi')->nullable();
             $table->timestamp('tgl_ttd_asesor');
-            $table->timestamp('tgl_ttd_asesi');
-            $table->foreignId('elemen_id')->constrained('m_elemen')->cascadeOnDelete();
-            $table->foreignId('unit_kompetensi_id')->constrained('m_unit_kompetensi')->cascadeOnDelete();
+            $table->timestamp('tgl_ttd_asesi')->nullable();
             $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
             $table->timestamps();

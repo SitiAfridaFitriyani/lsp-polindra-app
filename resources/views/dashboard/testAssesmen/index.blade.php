@@ -37,12 +37,18 @@
                 ->where('kelompok_asesor_id',$kelompokAsesor['id']);
             $is_testTulisTtdAsesor = (clone $queryTestTulisAsesi)->where('ttd_asesor','!=', null)->first();
             $is_testTulisTtdAsesi = $queryTestTulisAsesi->where('ttd_asesi','!=', null)->first();
-            // Ttd Asesor Check Test Praktek
+            // Ttd Check Test Praktek
             $queryTestPraktekAsesor = $kelompokAsesor->userTestPraktek
                 ->where('asesi_id', $asesiId)
                 ->where('kelompok_asesor_id',$kelompokAsesor['id']);
             $is_testPraktekTtdAsesor = (clone $queryTestPraktekAsesor)->where('ttd_asesor','!=', null)->first();
             $is_testPraktekTtdAsesi = $queryTestPraktekAsesor->where('ttd_asesi','!=', null)->first();
+            // Ttd Check Test Wawancara
+            $queryTestWawancaraAsesor = $kelompokAsesor->userTestWawancara
+                ->where('asesi_id',$asesiId)
+                ->where('kelompok_asesor_id',$kelompokAsesor['id']);
+            $is_testWawancaraTtdAsesor = (clone $queryTestWawancaraAsesor)->where('ttd_asesor','!=', null)->first();
+            $is_testWawancaraTtdAsesi = $queryTestWawancaraAsesor->where('ttd_asesi','!=', null)->first();
 
             $eventMulai = Carbon\Carbon::parse($kelompokAsesor->event['event_mulai']);
             $eventSelesai = Carbon\Carbon::parse($kelompokAsesor->event['event_selesai']);
@@ -51,19 +57,18 @@
             $asesiId = '';
             $baseUrlTestTulis = route('userTestTulis.index', $kelompokAsesor['uuid']);
             $baseUrlTestPraktek = route('userTestPraktek.index', [$kelompokAsesor['uuid']]);
+            $baseUrlTestWawancara = route('userTestWawancara.index', [$kelompokAsesor['uuid']]);
 
             $image = 'admin/assets/img/nopict.png';
             if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
                 $image = 'storage/'. $asesiPhoto;
             }
-        @endphp
-        @can('asesor')
-            @php
+            if (Gate::allows('asesor')) {
                 $asesiId = '&asesi-id=' . request()->query->keys()[0];
-            @endphp
-        @endcan
+            }
+        @endphp
         {{-- Test Tulis --}}
-        <div class="col-lg-6 mb-3">
+        {{-- <div class="col-12 mb-3">
             <div class="widget widget-account-invoice-three">
                 <div class="widget-heading">
                     <div class="wallet-usr-info">
@@ -77,7 +82,7 @@
                         </div>
                     </div>
                     <div class="wallet-balance">
-                        <p>PERTANYAAN TERTULIS</p>
+                        <p>Test Tulis</p>
                     </div>
                 </div>
                 <div class="widget-amount">
@@ -131,9 +136,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         {{-- Test Praktik --}}
-        <div class="col-lg-6">
+        {{-- <div class="col-12">
             <div class="widget widget-account-invoice-three">
                 <div class="widget-heading">
                     <div class="wallet-usr-info">
@@ -147,7 +152,7 @@
                         </div>
                     </div>
                     <div class="wallet-balance">
-                        <p>TUGAS PRAKTEK</p>
+                        <p>Test Praktek</p>
                     </div>
                 </div>
                 <div class="widget-amount">
@@ -188,6 +193,76 @@
                             <div class="info-detail-1">
                                 <p>Jenis Soal</p>
                                 <p><span class="bill-amount">Upload Dokumen/Teori/Materi</span></p>
+                            </div>
+                            <div class="info-detail-2">
+                                <p>Jumlah Soal</p>
+                                <p><span class="bill-amount">{{ $testPraktikCount }} Soal</span></p>
+                            </div>
+                            <div class="info-detail-3">
+                                <p>Siswa Waktu Pengerjaan</p>
+                                <p><span class="bill-amount">{{ $rangeWaktuEvent }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> --}}
+        {{-- Test Wawancara --}}
+        <div class="col-12">
+            <div class="widget widget-account-invoice-three">
+                <div class="widget-heading">
+                    <div class="wallet-usr-info">
+                        <div class="usr-name">
+                            <span><img src="{{ asset($image) }}" alt="admin-profile" class="img-fluid"> {{ $asesiName }}</span>
+                        </div>
+                        <div class="add">
+                            <span title="Kerjakan Soal Test Wawancara" onclick="window.location.href='{{ $baseUrlTestWawancara . $asesiId }}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="wallet-balance">
+                        <p>Test Wawancara</p>
+                    </div>
+                </div>
+                <div class="widget-amount">
+                    <div class="w-a-info funds-received">
+                        <span>Pelaksanaan</span>
+                        <p>
+                            {{ $eventMulai->isoFormat('dddd, DD MMMM Y') }}
+                            {{ $eventMulai->isoFormat('HH:mm') }} WIB
+                        </p>
+                    </div>
+                    <div class="w-a-info funds-spent">
+                        <span>Selesai</span>
+                        <p>
+                            {{ $eventSelesai->isoFormat('dddd, DD MMMM Y') }}
+                            {{ $eventSelesai->isoFormat('HH:mm') }} WIB
+                        </p>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="d-flex mb-3">
+                        <div class="mr-2">
+                            <span @class(['badge','p1',
+                                'bg-success' => $is_testWawancaraTtdAsesi,
+                                'bg-danger' => !$is_testWawancaraTtdAsesi,
+                                ])> {{ $is_testWawancaraTtdAsesi ? 'Ditandatangani oleh Asesi' : 'Belum Ditandatangani Asesi' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span @class(['badge','p1',
+                                'bg-success' => $is_testWawancaraTtdAsesor,
+                                'bg-danger' => !$is_testWawancaraTtdAsesor,
+                                ])> {{ $is_testWawancaraTtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Asesor' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invoice-list">
+                        <div class="inv-detail">
+                            <div class="info-detail-1">
+                                <p>Jenis Soal</p>
+                                <p><span class="bill-amount">Teori/Materi</span></p>
                             </div>
                             <div class="info-detail-2">
                                 <p>Jumlah Soal</p>
