@@ -143,6 +143,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             getData();
+            @can('admin')
+                const buttonFormAsesi = document.getElementById('btn-form');
+                buttonFormAsesi.style.display = 'none';
+            @endcan
             const fileInputs = document.querySelectorAll('input[type="file"][name^="berkasFilePemohon"]');
             fileInputs.forEach(function(fileInput) {
                 fileInput.addEventListener('change', function() {

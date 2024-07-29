@@ -15,7 +15,7 @@ class TestAssesmenController extends Controller
         $uuid = request()->query->keys()[0];
         $query = KelompokAsesor::with(['skema.unitKompetensi.testTulis','event','kelas','asesor.user','userTestTulis','userTestPraktek','userTestWawancara']);
 
-        if(Gate::allows('asesor')) {
+        if(Gate::allows('asesor') || Gate::allows('admin')) {
             $asesi = Asesi::firstWhere('uuid',$uuid);
             $kelompokAsesorId = request('kelompok-asesor-id');
             $asesiId = $asesi['id'];
@@ -32,13 +32,6 @@ class TestAssesmenController extends Controller
             $asesiPhoto = Auth::user()->photo;
             $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
             $kelompokAsesor = $query->firstWhere('uuid',$uuid);
-        } elseif(Gate::allows('admin')) {
-            $asesi = Asesi::firstWhere('uuid',$uuid);
-            $asesiId = $asesi['id'];
-            $asesiName = $asesi->user['name'];
-            $asesiPhoto = $asesi->user['photo'];
-            $kelompokAsesor = $query->where('kelas_id',$asesi['kelas_id'])->latest()->get();
-            dd($kelompokAsesor);
         }
         $testTulisCount = TestTulis::whereIn('unit_kompetensi_id',$kelompokAsesor->skema->unitKompetensi->pluck('id'))->count();
         $testPraktikCount = TestPraktek::where('skema_id', $kelompokAsesor->skema['id'])->count();

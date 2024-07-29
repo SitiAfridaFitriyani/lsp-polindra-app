@@ -186,58 +186,42 @@ class FRAPL02Controller extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(FRAPL02 $fRAPL02)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(FRAPL02 $fRAPL02)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateFRAPL02Request $request, FRAPL02 $fRAPL02)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(FRAPL02 $fRAPL02)
-    {
-        //
-    }
-
     public function showByKelompokAsesor()
     {
-        $kelompokAsesorUuid = request('kelompok_asesor');
+        DB::beginTransaction();
+        try {
+            $kelompokAsesorUuid = request('kelompok_asesor');
+            $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
 
-        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
-        if(empty($kelompokAsesor)) {
+            if (empty($kelompokAsesor)) {
+                return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            }
+
+            if (Gate::allows('asesi')) {
+                $asesiId = Auth::user()->asesi['id'];
+            } elseif (Gate::allows('asesor') || Gate::allows('admin')) {
+                $asesi = Asesi::firstWhere('uuid', request('asesi_id'));
+                if ($asesi) {
+                    $asesiId = $asesi->id;
+                } else {
+                    return response()->json(['status' => 'error', 'message' => 'Data asesi tidak ditemukan'], 404);
+                }
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'Anda tidak memiliki izin untuk mengakses data ini'], 403);
+            }
+
+            $data = FRAPL02::firstWhere([
+                ['asesi_id', $asesiId],
+                ['kelompok_asesor_id', $kelompokAsesor->id]
+            ]);
+
+            DB::commit();
+
+            return response()->json(['status' => 'success', 'data' => $data], 200);
+
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
-
-        if(Gate::allows('asesi')) {
-            $asesiId = Auth::user()->asesi['id'];
-        } elseif (Gate::allows('asesor')) {
-            $asesiId = Asesi::firstWhere('uuid',request('asesi_id'))->pluck('id');
-        }
-
-        $data = FRAPL02::firstWhere([
-            ['asesi_id', $asesiId],
-            ['kelompok_asesor_id', $kelompokAsesor['id']]
-        ]);
-        return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

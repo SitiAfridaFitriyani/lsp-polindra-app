@@ -162,6 +162,10 @@
         });
         function getData() {
             let asesiUuId = @json($asesiId);
+            @can('admin')
+                const buttonFormAsesi = document.getElementById('btn-form');
+                buttonFormAsesi.style.display = 'none';
+            @endcan
             $.ajax({
                 url: "{{ route('frapl01.show-by-kelompokAsesor') }}",
                 type: 'GET',

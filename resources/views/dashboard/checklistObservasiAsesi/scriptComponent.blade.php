@@ -154,6 +154,10 @@
                 const buttonFormAsesi = document.getElementById('btn-form');
                 buttonFormAsesi.style.display = 'none';
             @endcan
+            @can('admin')
+                const buttonFormAsesi = document.getElementById('btn-form');
+                buttonFormAsesi.style.display = 'none';
+            @endcan
             $.ajax({
                 url: "{{ route('checklistObservasi.show-by-kelompokAsesor') }}",
                 type: 'GET',

@@ -53,12 +53,10 @@
             if($asesiPhoto != null && Storage::exists($asesiPhoto)) {
                 $image = 'storage/'. $asesiPhoto;
             }
-        @endphp
-        @can('asesor')
-            @php
+            if(Gate::allows('asesor') || Gate::allows('admin')) {
                 $asesiId = '&asesi-id=' . request()->query->keys()[0];
-            @endphp
-        @endcan
+            }
+        @endphp
         <div class="col-md-6 layout-spacing">
             <div class="widget widget-card-two h-100">
                 <div class="widget-content">

@@ -17,7 +17,7 @@ class FRAPLcontroller extends Controller
         $uuid = request()->query->keys()[0];
         $query = KelompokAsesor::with(['skema','event','kelas','asesor.user','frapl01','frapl02']);
 
-        if(Gate::allows('asesor')) {
+        if(Gate::allows('asesor')  || Gate::allows('admin')) {
             $asesi = Asesi::firstWhere('uuid',$uuid);
             $kelompokAsesorId = request('kelompok-asesor-id');
             $asesiId = $asesi['id'];

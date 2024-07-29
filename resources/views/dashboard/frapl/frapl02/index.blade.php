@@ -7,7 +7,7 @@
         $kelompokAsesorId = '';
         $baseUrl = route('frapl.index', $kelompokAsesor['uuid']);
 
-        if (Gate::allows('asesor')) {
+        if (Gate::allows('asesor') || Gate::allows('admin')) {
             $basePrefixUrl = 'event-asesor.show';
             $asesiId = request('asesi-id');
             $baseUrl = route('frapl.index', request('asesi-id'));

@@ -7,7 +7,7 @@
         $kelompokAsesorId = '';
         $baseUrl = route('frapl.index', $kelompokAsesor['uuid']);
 
-        if (Gate::allows('asesor')) {
+        if (Gate::allows('asesor') || Gate::allows('admin')) {
             $basePrefixUrl = 'event-asesor.show';
             $asesiId = request('asesi-id');
             $baseUrl = route('frapl.index', request('asesi-id'));
@@ -385,7 +385,7 @@
                                             </div>
                                             <br>
                                             @can('admin')
-                                                <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAdminLSP" data-toggle="modal" data-target="#create-ttd-adminLSP"> Tanda Tangan Asesor</span>
+                                                <span class="ml-1 btn btn-sm btn-outline-primary" id="modal-ttdAdminLSP" data-toggle="modal" data-target="#create-ttd-adminLSP"> Tanda Tangan Admin LSP</span>
                                             @else
                                             <span class="text-primary ml-2" id="date-ttdAdminLSP"></span>
                                             @endcan

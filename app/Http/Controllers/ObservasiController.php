@@ -16,7 +16,7 @@ class ObservasiController extends Controller
         $uuid = request()->query->keys()[0];
         $query = KelompokAsesor::with(['skema.unitKompetensi.elemen','event','kelas','asesor.user']);
 
-        if(Gate::allows('asesor')) {
+        if(Gate::allows('asesor') || Gate::allows('admin')) {
             $asesi = Asesi::firstWhere('uuid',$uuid);
             $kelompokAsesorId = request('kelompok-asesor-id');
             $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$kelompokAsesorId)->get();
@@ -230,7 +230,7 @@ class ObservasiController extends Controller
 
             if (Gate::allows('asesi')) {
                 $asesiId = Auth::user()->asesi['id'];
-            } elseif (Gate::allows('asesor')) {
+            } elseif (Gate::allows('asesor')  || Gate::allows('admin')) {
                 $asesi = Asesi::firstWhere('uuid', request('asesi_id'));
                 if ($asesi) {
                     $asesiId = $asesi->id;

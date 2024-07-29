@@ -5,6 +5,7 @@ use App\Http\Controllers\{
     AsesorController,
     BerkasPemohonController,
     ElemenController,
+    EventAdminController,
     EventAsesiController,
     EventAsesorController,
     EventController,
@@ -44,6 +45,11 @@ Route::middleware('auth')->group(function () {
         Route::prefix('event')->group(function () {
             Route::get('datatable', [EventController::class, 'datatable'])->name('event.datatable');
             Route::get('list',[EventController::class,'list'])->name('event.list');
+        });
+        // Event Admin
+        Route::prefix('event-admin')->group(function () {
+            Route::get('',[EventAdminController::class,'index'])->name('event-admin.index');
+            Route::get('{uuid}/datatable', [EventAdminController::class, 'datatable'])->name('event-admin.datatable');
         });
         // Skema
         Route::resource('skema', SkemaController::class)->except(['create', 'show']);
