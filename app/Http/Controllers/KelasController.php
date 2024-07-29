@@ -130,8 +130,7 @@ class KelasController extends Controller
             ->where('uuid',$uuid)
             ->pluck('id');
         if(isset($jurusanId)) {
-            $result = Kelas::with(['kelompokAsesor','jurusan'])
-            ->where('jurusan_id', $jurusanId)
+            $result = Kelas::where('jurusan_id', $jurusanId)
             ->latest()
             ->get();
             return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);

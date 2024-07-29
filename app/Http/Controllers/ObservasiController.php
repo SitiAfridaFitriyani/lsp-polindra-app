@@ -178,14 +178,19 @@ class ObservasiController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
 
-        $testWawancara = Observasi::firstWhere([
+        $observasi = Observasi::firstWhere([
             ['asesi_id',$asesi['id']],
             ['kelompok_asesor_id',$kelompokAsesor['id']]
         ]);
 
+        if(empty($observasi)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Harap isi form sebelum melakukan tanda tangan'], 404);
+        }
+
         if($signatureAsesi) {
-            if(!empty($testWawancara) && $testWawancara['ttd_asesi'] != null && Storage::exists($testWawancara['ttd_asesi'])) {
-                Storage::delete($testWawancara['ttd_asesi']);
+            if(!empty($observasi) && $observasi['ttd_asesi'] != null && Storage::exists($observasi['ttd_asesi'])) {
+                Storage::delete($observasi['ttd_asesi']);
             }
             $imageName = time() . '.png';
             $path = public_path('storage/asesi_signatureChecklistObservasi/' . $imageName);
@@ -194,10 +199,10 @@ class ObservasiController extends Controller
             file_put_contents($path, base64_decode($signatureAsesi));
             $resultTtdAsesi = 'asesi_signatureChecklistObservasi/'.$imageName;
         } else {
-            $resultTtdAsesi = $testWawancara['ttd_asesi'];
+            $resultTtdAsesi = $observasi['ttd_asesi'];
         }
 
-        $result = $testWawancara->update([
+        $result = $observasi->update([
             'tgl_ttd_asesi' => now(),
             'ttd_asesi' => $resultTtdAsesi
         ]);
@@ -212,24 +217,43 @@ class ObservasiController extends Controller
 
     public function showByKelompokAsesor()
     {
-        $kelompokAsesorUuid = request('kelompok_asesor');
-        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
+        DB::beginTransaction();
 
-        if(empty($kelompokAsesor)) {
+        try {
+            $kelompokAsesorUuid = request('kelompok_asesor');
+            $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
+
+            if (empty($kelompokAsesor)) {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            }
+
+            if (Gate::allows('asesi')) {
+                $asesiId = Auth::user()->asesi['id'];
+            } elseif (Gate::allows('asesor')) {
+                $asesi = Asesi::firstWhere('uuid', request('asesi_id'));
+                if ($asesi) {
+                    $asesiId = $asesi->id;
+                } else {
+                    DB::rollBack();
+                    return response()->json(['status' => 'error', 'message' => 'Data asesi tidak ditemukan'], 404);
+                }
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Anda tidak memiliki izin untuk mengakses data ini'], 403);
+            }
+
+            $data = Observasi::where('asesi_id', $asesiId)
+                ->where('kelompok_asesor_id', $kelompokAsesor->id)
+                ->first();
+
+            DB::commit();
+
+            return response()->json(['status' => 'success', 'data' => $data], 200);
+
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Data kelompok asesor tidak ditemukan'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
         }
-
-        if(Gate::allows('asesi')) {
-            $asesiId = Auth::user()->asesi['id'];
-        } elseif (Gate::allows('asesor')) {
-            $asesiId = Asesi::firstWhere('uuid', request('asesi_id'))->pluck('id');
-        }
-
-        $data = Observasi::firstWhere([
-            ['asesi_id', $asesiId],
-            ['kelompok_asesor_id', $kelompokAsesor['id']]
-        ]);
-        return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 }

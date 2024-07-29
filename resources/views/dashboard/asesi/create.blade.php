@@ -80,8 +80,16 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-4" id="editForm-status">
-                                    <label for="status">Status</label>
+                                    <label for="status">Status Pengguna</label>
                                     <select class="form-control select-standar @error('status') is-invalid @enderror" name="status" id="status">
+                                        <option hidden selected disabled >Please select</option>
+                                        <option value="active">active</option>
+                                        <option value="nonactive">nonactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-4" id="editForm-status-assesmen">
+                                    <label for="status_assesmen">Status Assesmen</label>
+                                    <select class="form-control select-standar @error('status_assesmen') is-invalid @enderror" name="status_assesmen" id="status_assesmen">
                                         <option hidden selected disabled >Please select</option>
                                         <option value="active">active</option>
                                         <option value="nonactive">nonactive</option>

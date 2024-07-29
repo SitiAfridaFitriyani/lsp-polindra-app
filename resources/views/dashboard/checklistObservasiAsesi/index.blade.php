@@ -8,6 +8,9 @@
         if (Gate::allows('asesor')) {
             $asesiId = request()->query->keys()[0];
             $basePrefixUrl = 'event-asesor.show';
+        } elseif (Gate::allows('asesi')) {
+            $asesiId = Auth::user()->asesi['uuid'];
+            $basePrefixUrl = 'event-asesi.show';
         }
     @endphp
     <div class="row layout-top-spacing" id="cancel-row">

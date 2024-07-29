@@ -36,6 +36,7 @@
         $('#container-file-photo-show').addClass('d-none');
         $('#editForm-container').addClass('d-none');
         $('#editForm-status').addClass('d-none');
+        $('#editForm-status-assesmen').addClass('d-none');
         $(`${targetModal}`).modal('show');
         $('#asesi-modal-title').text('Tambah Asesi');
         $('#btn-form').text('Simpan');

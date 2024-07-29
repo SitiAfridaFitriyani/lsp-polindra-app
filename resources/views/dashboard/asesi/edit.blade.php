@@ -24,9 +24,11 @@
                 $('#container-file-photo-show').removeClass('d-none');
                 $('#editForm-container').removeClass('d-none');
                 $('#editForm-status').removeClass('d-none');
+                $('#editForm-status-assesmen').removeClass('d-none');
 
                 $('#username').val(data.user.username);
                 $('#status').val(data.user.status);
+                $('#status_assesmen').val(data.status);
                 $('#nim').val(data.nim);
                 $('#name').val(data.user.name);
                 $('#email').val(data.user.email);

@@ -13,6 +13,8 @@
                 const listPersetujuanAssesmenRoute = '{{ route("persetujuanAssesmen.listByAsesiUuid", [":uuid"]) }}';
                 const editRoute = '{{ route("asesi.edit", [":uuid"]) }}';
 
+                const testAssesmenBaseURL = '{{ route("testAssesmen.index", [":uuid"]) }}';
+
                 let asesiName = '';
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
@@ -40,6 +42,7 @@
                                 const deleteRouteRendered = deleteRoute.replace(':uuid', data);
                                 const listPersetujuanAssesmenRouteRendered = listPersetujuanAssesmenRoute.replace(':uuid', data);
                                 const editRouteRendered = editRoute.replace(':uuid', data);
+                                const daftarTestAssesmenRendered = testAssesmenBaseURL.replace(':uuid', data);
 
                                 return `
                                     <div class="dropdown">
@@ -47,7 +50,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                         </a>
                                         <div class="dropdown-menu left" aria-labelledby="dropdownMenuLink10" style="will-change: transform; position: absolute; transform: translate3d(-141px, 19px, 0px); top: 0px; left: 0px;" x-placement="bottom-end">
-                                            <a class="dropdown-item" href="javascript:void(0);" title="Daftar Test">
+                                            <a class="dropdown-item" href="${daftarTestAssesmenRendered}" title="Test Wawancara">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                                 Test Wawancara
                                             </a>
@@ -122,6 +125,12 @@
                             data: 'user',
                             render: function(data) {
                                 return data ? `<span class="badge ${data.status === 'active' ? 'badge-success' :'badge-danger'}">${data.status}</span>` : 'N/A';
+                            }
+                        },
+                        {
+                            data: 'status',
+                            render: function(data) {
+                                return data ? `<span class="badge ${data === 'active' ? 'badge-success' :'badge-danger'}">${data}</span>` : 'N/A';
                             }
                         }
                     ]

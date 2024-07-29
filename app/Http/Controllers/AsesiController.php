@@ -127,7 +127,8 @@ class AsesiController extends Controller
 
             $asesiUpdate = $data->update([
                 'nim' => $validated['nim'],
-                'kelas_id' => $validated['kelas_id']
+                'kelas_id' => $validated['kelas_id'],
+                'status' => $validated['status_assesmen']
             ]);
             $userUpdate = $user->update([
                 'name' => $validated['name'],

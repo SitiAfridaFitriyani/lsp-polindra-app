@@ -255,7 +255,7 @@
                                     {{ Str::limit($data['deskripsi'],50) }}
                                 </p>
                                 <div class="button">
-                                    <a class="btn-standard" href="{{ route('guest.assesmen-register', $data['uuid']) }}"><i class="fas fa-angle-right"></i> Daftar Sekarang</a>
+                                    <a class="btn-standard" href="{{ route('guest.assesmen-register') }}"><i class="fas fa-angle-right"></i> Daftar Sekarang</a>
                                 </div>
                             </div>
                         </div>

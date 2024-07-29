@@ -43,7 +43,8 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Gender</th>
-                                <th>Status</th>
+                                <th>Status Pengguna</th>
+                                <th>Status Assesmen</th>
                             </tr>
                         </thead>
                     </table>

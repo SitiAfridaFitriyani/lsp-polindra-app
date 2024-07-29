@@ -13,7 +13,7 @@ class TestAssesmenController extends Controller
     public function __invoke()
     {
         $uuid = request()->query->keys()[0];
-        $query = KelompokAsesor::with(['skema.unitKompetensi.testTulis','event','kelas','asesor.user','userTestTulis','userTestPraktek']);
+        $query = KelompokAsesor::with(['skema.unitKompetensi.testTulis','event','kelas','asesor.user','userTestTulis','userTestPraktek','userTestWawancara']);
 
         if(Gate::allows('asesor')) {
             $asesi = Asesi::firstWhere('uuid',$uuid);
@@ -22,16 +22,23 @@ class TestAssesmenController extends Controller
             $asesiName = $asesi->user['name'];
             $asesiPhoto = $asesi->user['photo'];
             $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$kelompokAsesorId)->get();
-            $kelompokAsesor = $query->where([
+            $kelompokAsesor = $query->firstWhere([
                 ['kelas_id',$asesi['kelas_id']],
                 ['uuid', $kelompokAsesorId]
-            ])->first();
+            ]);
         } elseif (Gate::allows('asesi')) {
             $asesiId = Auth::user()->asesi['id'];
             $asesiName = Auth::user()->name;
             $asesiPhoto = Auth::user()->photo;
             $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
             $kelompokAsesor = $query->firstWhere('uuid',$uuid);
+        } elseif(Gate::allows('admin')) {
+            $asesi = Asesi::firstWhere('uuid',$uuid);
+            $asesiId = $asesi['id'];
+            $asesiName = $asesi->user['name'];
+            $asesiPhoto = $asesi->user['photo'];
+            $kelompokAsesor = $query->where('kelas_id',$asesi['kelas_id'])->latest()->get();
+            dd($kelompokAsesor);
         }
         $testTulisCount = TestTulis::whereIn('unit_kompetensi_id',$kelompokAsesor->skema->unitKompetensi->pluck('id'))->count();
         $testPraktikCount = TestPraktek::where('skema_id', $kelompokAsesor->skema['id'])->count();

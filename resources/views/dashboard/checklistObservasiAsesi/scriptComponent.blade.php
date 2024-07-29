@@ -150,6 +150,10 @@
         });
         function getData() {
             let asesiUuId = @json($asesiId);
+            @can('asesi')
+                const buttonFormAsesi = document.getElementById('btn-form');
+                buttonFormAsesi.style.display = 'none';
+            @endcan
             $.ajax({
                 url: "{{ route('checklistObservasi.show-by-kelompokAsesor') }}",
                 type: 'GET',
@@ -167,11 +171,9 @@
                     let dateTtdAsesi = `<span>Tanggal: -</span>`;
 
                     @can('asesi')
-                        if(data != null) {
+                        if(data != null && data.ttd_asesi != null) {
                             const modalTtdAsesi = document.getElementById('modal-ttdAsesi');
-                            const buttonFormAsesi = document.getElementById('btn-form');
                             modalTtdAsesi.style.display = 'none';
-                            buttonFormAsesi.style.display = 'none';
                             const spanElement = document.createElement('span');
                             spanElement.className = 'text-primary ml-2';
                             spanElement.id = 'date-ttdAsesi';

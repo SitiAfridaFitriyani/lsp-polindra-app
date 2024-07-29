@@ -42,7 +42,8 @@ class UpdateAsesiRequest extends FormRequest
                 ],
             'jenis_kelamin' => ['nullable','in:Laki-laki,Perempuan'],
             'address' => ['nullable','string'],
-            'status' => ['nullable','in:active,nonactive']
+            'status' => ['nullable','in:active,nonactive'],
+            'status_assesmen' => ['nullable','in:active,nonactive']
         ];
     }
 

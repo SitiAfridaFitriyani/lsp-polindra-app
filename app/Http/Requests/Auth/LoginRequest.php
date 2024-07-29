@@ -32,6 +32,14 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'required' => 'Data tidak boleh kosong',
+            'email' => 'Format email salah'
+        ];
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *
@@ -44,9 +52,9 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+            // throw ValidationException::withMessages([
+            //     'email' => trans('auth.failed'),
+            // ]);
         }
 
         RateLimiter::clear($this->throttleKey());

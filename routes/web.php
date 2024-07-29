@@ -33,7 +33,9 @@ use Illuminate\Support\Facades\Route;
 
 // Root
 Route::get('/', [GuestController::class,'index'])->name('guest.index');
-Route::get('/assesmen-register/{uuid}',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
+Route::get('/assesmen-register',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
+Route::get('kelas/list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
+
 Route::middleware('auth')->group(function () {
     // Admin Middleware
     Route::middleware('can:admin')->group(function() {
@@ -105,7 +107,6 @@ Route::middleware('auth')->group(function () {
         Route::prefix('kelas')->group(function () {
             Route::get('datatable', [KelasController::class, 'datatable'])->name('kelas.datatable');
             Route::get('list',[KelasController::class,'list'])->name('kelas.list');
-            Route::get('list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
         });
         // Asesor
         Route::resource('asesor',AsesorController::class)->except(['create', 'show']);
@@ -160,6 +161,7 @@ Route::middleware('auth')->group(function () {
 
     // All
     Route::view('/dashboard','dashboard.index')->name('dashboard');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
