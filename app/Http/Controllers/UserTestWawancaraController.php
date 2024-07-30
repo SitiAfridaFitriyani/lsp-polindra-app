@@ -132,8 +132,9 @@ class UserTestWawancaraController extends Controller
                 return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
             }
         } catch (\Throwable $th) {
+            dd($th->getMessage());
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
+            return response()->json(['status' => 'error', 'message' => $th->getMessage()], 500);
         }
     }
 
@@ -201,7 +202,7 @@ class UserTestWawancaraController extends Controller
 
             if (Gate::allows('asesi')) {
                 $asesiId = Auth::user()->asesi['id'];
-            } elseif (Gate::allows('asesor')) {
+            } elseif (Gate::allows('asesor') || Gate::allows('admin')) {
                 $asesi = Asesi::firstWhere('uuid', request('asesi_id'));
                 if ($asesi) {
                     $asesiId = $asesi->id;

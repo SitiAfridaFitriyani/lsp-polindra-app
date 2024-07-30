@@ -36,6 +36,9 @@ class AuthenticatedSessionController extends Controller
             } elseif ($passwordCheck && $user['status'] === 'nonactive') {
                 return back()->with('status_account','Akun anda telah di nonaktifkan');
             }
+            if(!$passwordCheck) {
+                return back()->with('status_account','Username/Password salah');
+            }
         } else {
             return back()->with('status_account','Username/Password salah');
         }

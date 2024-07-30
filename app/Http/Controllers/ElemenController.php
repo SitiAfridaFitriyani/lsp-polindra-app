@@ -48,7 +48,7 @@ class ElemenController extends Controller
      */
     public function edit($uuid)
     {
-        $elemen = Elemen::with(['unitKompetensi','kriteriaUnjukKerja','checklistObservasi'])
+        $elemen = Elemen::with(['unitKompetensi','kriteriaUnjukKerja'])
             ->where('uuid', $uuid)
             ->first();
         if(!empty($elemen)) {
@@ -117,7 +117,7 @@ class ElemenController extends Controller
 
     public function list()
     {
-        $data = Elemen::with(['unitKompetensi','kriteriaUnjukKerja','checklistObservasi'])->latest()->get();
+        $data = Elemen::with(['unitKompetensi','kriteriaUnjukKerja'])->latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
@@ -127,7 +127,7 @@ class ElemenController extends Controller
         ->where('uuid',$uuid)
         ->pluck('id');
         if(isset($unitKompetensiId)) {
-            $result = Elemen::with(['unitKompetensi','kriteriaUnjukKerja','checklistObservasi'])
+            $result = Elemen::with(['unitKompetensi','kriteriaUnjukKerja'])
                 ->where('unit_kompetensi_id', $unitKompetensiId)
                 ->latest()
                 ->get();

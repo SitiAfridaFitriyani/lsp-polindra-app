@@ -4,7 +4,7 @@
     @php
         $asesiId = '';
         $basePrefixUrl = 'event-asesi.show';
-        if (Gate::allows('asesor')) {
+        if (Gate::allows('asesor') || Gate::allows('admin')) {
             $asesiId = request('asesi-id');
             $basePrefixUrl = 'event-asesor.show';
         } elseif (Gate::allows('asesi')) {

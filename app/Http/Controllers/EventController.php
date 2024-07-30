@@ -46,13 +46,12 @@ class EventController extends Controller
      */
     public function edit($uuid)
     {
-        $event = Event::where('uuid', $uuid)->first();
+        $event = Event::firstWhere('uuid', $uuid);
         if($event) {
             return response()->json(['status' => 'success', 'data' => $event], 200);
         } else {
             return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 404);
         }
-
     }
 
     /**

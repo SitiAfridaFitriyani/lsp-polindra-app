@@ -38,7 +38,7 @@ class RegisteredUserController extends Controller
             'phone' => ['required','regex:/(08)[0-9]{9}/', 'unique:'.User::class],
             'nim' => ['required','numeric', 'unique:'.Asesi::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ],$this->messageValidation());
         DB::beginTransaction();
         $user = User::create([
             'name' => $request->name,
