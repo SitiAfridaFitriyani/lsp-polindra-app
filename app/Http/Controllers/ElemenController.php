@@ -111,7 +111,7 @@ class ElemenController extends Controller
 
     public function datatable()
     {
-        $data = Elemen::with(['unitKompetensi','kriteriaUnjukKerja','checklistObservasi'])->latest()->get();
+        $data = Elemen::with(['unitKompetensi','kriteriaUnjukKerja'])->latest()->get();
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
