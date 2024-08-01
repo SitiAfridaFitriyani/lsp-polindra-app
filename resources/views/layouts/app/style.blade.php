@@ -44,7 +44,7 @@
     #formValidate .wizard > .content {min-height: 25em;}
     #example-vertical.wizard > .content {min-height: 24.5em;}
 </style>
-@if(request()->routeIs('login') || request()->routeIs('password.request'))
+@if(request()->routeIs('login') || request()->routeIs('password.request') || request()->routeIs('password.reset'))
     <link href="{{ asset('admin/assets/css/authentication/form-1.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/switches.css') }}">

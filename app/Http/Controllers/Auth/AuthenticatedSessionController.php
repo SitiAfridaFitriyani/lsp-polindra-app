@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use App\Providers\RouteServiceProvider;
 use App\Http\Requests\Auth\LoginRequest;
+use Mews\Captcha\Facades\Captcha;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -29,18 +30,22 @@ class AuthenticatedSessionController extends Controller
     {
         $user = User::firstWhere('email', $request->email);
         $password = $request->password;
-        if($user) {
-            $passwordCheck = Hash::check($password, $user['password']);
-            if($passwordCheck && $user->role == 'Asesi' && $user->asesi['status'] === 'nonactive') {
-                return back()->with('status_account','Akun assesmen anda belum di aktifkan, silahkan hubungi admin');
-            } elseif ($passwordCheck && $user['status'] === 'nonactive') {
-                return back()->with('status_account','Akun anda telah di nonaktifkan');
-            }
-            if(!$passwordCheck) {
+        if (Captcha::check($request->captcha)) {
+            if($user) {
+                $passwordCheck = Hash::check($password, $user['password']);
+                if($passwordCheck && $user->role == 'Asesi' && $user->asesi['status'] === 'nonactive') {
+                    return back()->with('status_account','Akun assesmen anda belum di aktifkan, silahkan hubungi admin');
+                } elseif ($passwordCheck && $user['status'] === 'nonactive') {
+                    return back()->with('status_account','Akun anda telah di nonaktifkan');
+                }
+                if(!$passwordCheck) {
+                    return back()->with('status_account','Username/Password salah');
+                }
+            } else {
                 return back()->with('status_account','Username/Password salah');
             }
         } else {
-            return back()->with('status_account','Username/Password salah');
+            return back()->with('failed-captcha','Kode Captcha tidak sesuai');
         }
         $request->authenticate();
 

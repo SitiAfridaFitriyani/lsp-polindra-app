@@ -31,11 +31,15 @@ use App\Http\Controllers\{
     UserTestWawancaraController
 };
 use Illuminate\Support\Facades\Route;
+use Mews\Captcha\Facades\Captcha;
 
 // Root
 Route::get('/', [GuestController::class,'index'])->name('guest.index');
 Route::get('/assesmen-register',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
 Route::get('kelas/list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
+Route::get('/captcha-refresh', function () {
+    return response()->json(['captcha' => Captcha::img()]);
+});
 
 Route::middleware('auth')->group(function () {
     // Admin Middleware

@@ -97,6 +97,22 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="captcha col-5" draggable="false">
+                                    {!! Captcha::img() !!}
+                                </div>
+                                <div class="col-7">
+                                    <div class="form-group">
+                                        <input type="text" id="captcha" name="captcha" class="form-control @error('captcha') is-invalid @enderror @if(session()->has('failed-captcha')) is-invalid @endif" required placeholder="Kode Captcha">
+                                        @error('captcha')
+                                            <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                        @enderror
+                                        @if($message = session()->get('failed-captcha'))
+                                            <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                        @endif                                    </div>
+                                </div>
+                                <a href="javascript:void(0);" class="reload d-block" id="reloadCaptcha">&#x21bb; Reload captcha</a>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-12">
                                     <button type="submit" name="submit" id="submit">
                                         Daftar Sekarang <i class="fa fa-paper-plane"></i>
@@ -138,6 +154,14 @@
                 error: function(xhr, status, error) {
                     alert('Terjadi kesalahan');
                 }
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('reloadCaptcha').onclick = function () {
+            axios.get('/captcha-refresh').then(function (response) {
+                document.querySelector('.captcha').innerHTML = response.data.captcha;
             });
         }
     </script>

@@ -15,8 +15,8 @@
     <title>{{ $pengaturan }} @yield('title')</title>
     @include('layouts.app.style')
 </head>
-<body @class(['sidebar-noneoverflow' => !request()->routeIs('login') && !request()->routeIs('password.request'), 'form' => request()->routeIs('login') && request()->routeIs('password.request')])>
-    @if(!request()->routeIs('login') && !request()->routeIs('password.request'))
+<body @class(['sidebar-noneoverflow' => !request()->routeIs('login') && !request()->routeIs('password.request') && !request()->routeIs('password.reset'), 'form' => request()->routeIs('login') && request()->routeIs('password.request') && request()->routeIs('password.reset')])>
+    @if(!request()->routeIs('login') && !request()->routeIs('password.request') && !request()->routeIs('password.reset'))
         <div id="load_screen"> <div class="loader"> <div class="loader-content">
             <div class="spinner-grow align-self-center"></div>
         </div></div></div>

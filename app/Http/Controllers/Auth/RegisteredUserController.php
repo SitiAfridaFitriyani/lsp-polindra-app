@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Mews\Captcha\Facades\Captcha;
 
 class RegisteredUserController extends Controller
 {
@@ -34,33 +35,53 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required','regex:/(08)[0-9]{9}/', 'unique:'.User::class],
-            'nim' => ['required','numeric', 'unique:'.Asesi::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'phone' => ['required','regex:/(08)[0-9]{9}/'],
+            'nim' => ['required','numeric'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ],$this->messageValidation());
         DB::beginTransaction();
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-        ]);
+        if (Captcha::check($request->captcha)) {
+            $existingEmail = User::where('email',$request->email)->exists();
+            $existingPhone = User::where('phone',$request->phone)->exists();
+            $existingNim = Asesi::where('nim',$request->nim)->exists();
 
-        $asesi = Asesi::create([
-            'user_id' => $user['id'],
-            'nim' => $request->nim,
-            'kelas_id' => $request->kelas_id
-        ]);
+            if($existingNim) {
+                DB::rollBack();
+                return back()->with('error','NIM/NPM telah terdaftar, silahkan coba lagi!');
+            }
+            if($existingEmail) {
+                DB::rollBack();
+                return back()->with('error','Email telah terdaftar, silahkan coba lagi!');
+            }
+            if($existingPhone) {
+                DB::rollBack();
+                return back()->with('error','No Telepon telah terdaftar, silahkan coba lagi!');
+            }
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+            ]);
 
-        if(!$user || !$asesi) {
+            $asesi = Asesi::create([
+                'user_id' => $user['id'],
+                'nim' => $request->nim,
+                'kelas_id' => $request->kelas_id
+            ]);
+
+            if(!$user || !$asesi) {
+                DB::rollBack();
+                return back()->with('error','Terjadi kesalahan dalam mendaftar, silahkan coba lagi!');
+            }
+        } else {
             DB::rollBack();
-            return back()->with('error','Terjadi kesalahan dalam mendaftar, silahkan coba lagi!');
+            return back()->with('failed-captcha','Kode Captcha tidak sesuai');
         }
-
         // event(new Registered($user));
         // Auth::login($user);
         DB::commit();
-        return back()->with('success','Selamat, Kamu berhasil mendaftar. Selanjutnya akunmu akan ditinjau oleh admin untuk dilakukan verifikasi.');
+        return back()->with('success','Selamat, Kamu berhasil mendaftar. Selanjutnya akunmu akan ditinjau oleh Admin Maks. 3x24 Jam untuk dilakukan verifikasi.');
     }
 }

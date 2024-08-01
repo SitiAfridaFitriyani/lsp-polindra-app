@@ -29,6 +29,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'captcha' => 'required|string'
         ];
     }
 
@@ -36,7 +37,9 @@ class LoginRequest extends FormRequest
     {
         return [
             'required' => 'Data tidak boleh kosong',
-            'email' => 'Format email salah'
+            'email' => 'Format email salah',
+            'captcha.required' => 'Captcha tidak boleh kosong',
+            'captcha.string' => 'Input harus string'
         ];
     }
 
