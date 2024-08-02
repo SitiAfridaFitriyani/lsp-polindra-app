@@ -13,8 +13,8 @@
                         <table id="table-list-testTulis" class="table table-bordered mb-4">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Pertanyaan</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

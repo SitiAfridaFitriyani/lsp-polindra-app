@@ -13,9 +13,9 @@
                         <table id="table-list-kelas" class="table table-bordered mb-4">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Nama Kelas</th>
                                     <th>Keterangan</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

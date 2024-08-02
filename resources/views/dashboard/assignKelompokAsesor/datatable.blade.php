@@ -1,19 +1,17 @@
 <script>
     function getData() {
-        const table = $('#table-event');
+        const table = $('#table-kelompokAsesor');
         const dataRoute = table.data('route');
-
         $.ajax({
             url: dataRoute,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
                 const data = response.data;
-                const deleteRoute = '{{ route("event.destroy", [":uuid"]) }}';
-                const editRoute = '{{ route("event.edit", [":uuid"]) }}';
+                const deleteRoute = '{{ route("kelompokAsesor.destroy", [":uuid"]) }}';
+                const editRoute = '{{ route("kelompokAsesor.edit", [":uuid"]) }}';
 
-                let eventName = '';
-                $('#table-event').DataTable({
+                table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
                         "<'table-responsive'tr>" +
                         "<'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>",
@@ -34,22 +32,28 @@
                     "data": data,
                     "columns": [
                         {
-                            data: 'nama_event',
+                            data: 'event',
                             render: function(data) {
-                                return eventName = data;
+                                return data ? data.nama_event : 'N/A';
                             }
                         },
                         {
-                            data: 'tuk'
+                            data: 'skema',
+                            render: function(data) {
+                                return data ? data.judul_skema : 'N/A';
+                            }
                         },
                         {
-                            data: 'event_mulai'
+                            data: 'kelas',
+                            render: function(data) {
+                                return data ? data.nama_kelas : 'N/A';
+                            }
                         },
                         {
-                            data: 'event_selesai'
-                        },
-                        {
-                            data: 'keterangan'
+                            data: 'asesor',
+                            render: function(data) {
+                                return data ? data.user.name : 'N/A';
+                            }
                         },
                         {
                             data: 'uuid',
@@ -60,12 +64,12 @@
                                 return `
                                     <ul class="table-controls">
                                         <li onclick="handleEdit(this)" data-route="${editRouteRendered}" data-uuid="${data}">
-                                            <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="Edit Event">
+                                            <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="Edit Kelompok Asesor">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 p-1 br-6 mb-1"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                             </a>
                                         </li>
                                         <li onclick="handleDelete(this)" data-route="${deleteRouteRendered}">
-                                            <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="Hapus Event">
+                                            <a href="javascript:void(0);" class="bs-tooltip" data-toggle="tooltip" data-placement="top" title="Delete Kelompok Asesor">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash p-1 br-6 mb-1"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                             </a>
                                         </li>
@@ -76,7 +80,7 @@
                 });
             },
             error: function(xhr, status, error) {
-                snackBarAlert('Data gagal dimuat', '#e7515a');
+                snackBarAlert('Data gagal termuat', '#e7515a');
             }
         });
 

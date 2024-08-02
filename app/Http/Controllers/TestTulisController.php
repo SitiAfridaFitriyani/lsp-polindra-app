@@ -156,8 +156,7 @@ class TestTulisController extends Controller
             ->where('uuid',$uuid)
             ->pluck('id');
         if(isset($kriteriaUnjukKerjaId)) {
-            $result = TestTulis::with('userTestTulis')
-            ->where('kriteria_unjuk_kerja_id', $kriteriaUnjukKerjaId)
+            $result = TestTulis::where('kriteria_unjuk_kerja_id', $kriteriaUnjukKerjaId)
             ->latest()
             ->get();
             return response()->json(['status' => 'success', 'data' => $result, 'totalRecord' => count($result)], 200);

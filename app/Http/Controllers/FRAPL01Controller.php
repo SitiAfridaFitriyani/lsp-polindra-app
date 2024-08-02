@@ -34,7 +34,7 @@ class FRAPL01Controller extends Controller
             // Existing
             'name' => 'required|string|max:255|exists:users,name',
             'email' => 'required|lowercase|email|exists:users,email|max:255',
-            'address'=> ['required','string','max:255','exists:users,address'],
+            'address'=> ['required','string','max:255'],
             'phone'=> ['required','regex:/(08)[0-9]{9}/','max:20','exists:users,phone'],
             'jenis_kelamin'=> ['required','in:Laki-laki,Perempuan','exists:users,jenis_kelamin'],
             // Non Existing

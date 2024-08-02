@@ -13,8 +13,8 @@
                         <table id="table-list-kriteriaUnjukKerja" class="table table-bordered mb-4">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Nama Kriteria Unjuk Kerja</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

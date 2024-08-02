@@ -1,5 +1,5 @@
 @extends('layouts.app.main')
-@section('title','Unit Kompetensi')
+@section('title','Kelompok Asesor')
 @section('content')
     <div class="row layout-top-spacing" id="cancel-row">
         <div id="breadcrumbDefault" class="col-xl-12 col-lg-12 layout-spacing">
@@ -13,6 +13,7 @@
                         <div class="dropdown-menu right" aria-labelledby="pendingTask" style="will-change: transform; position: absolute; transform: translate3d(105px, 0, 0px); top: 0px; left: 0px;">
                             <a class="dropdown-item" href="{{ route('event.index') }}">Event</a>
                             <a class="dropdown-item" href="{{ route('skema.index') }}">Skema</a>
+                            <a class="dropdown-item" href="{{ route('unitKompetensi.index') }}">Unit Kompetensi</a>
                             <a class="dropdown-item" href="{{ route('elemen.index') }}">Elemen</a>
                             <a class="dropdown-item" href="{{ route('kriteriaUnjukKerja.index') }}">Kriteria Unjuk Kerja</a>
                             <a class="dropdown-item" href="{{ route('berkasPemohon.index') }}">Berkas Permohonan</a>
@@ -20,13 +21,13 @@
                             <a class="dropdown-item" href="{{ route('ujianPraktek.index') }}">Ujian Praktek</a>
                         </div>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Unit Kompetensi</li>
+                    <li class="breadcrumb-item active" aria-current="page">Kelompok Asesor</li>
                 </ol>
             </nav>
         </div>
         <div class="col-lg-12">
             <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-unitKompetensi" onclick="modalFormCreate(this)">
+                <button type="button" class="btn btn-primary mb-2 mr-2" data-toggle="modal" data-target="#modal-kelompokAsesor" onclick="modalFormCreate(this)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 {{-- <button class="btn btn-transparent mb-2 mr-2 border dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -37,29 +38,27 @@
                     <a href="javascript:void(0);" class="dropdown-item">Export Excel</a>
                 </div> --}}
             </div>
-            @include('dashboard.unitKompetensi.create')
+            @include('dashboard.assignKelompokAsesor.create')
             <div class="statbox widget box box-shadow">
                 <div class="widget-content widget-content-area">
-                    <table id="table-unitKompetensi" class="table style-3 table-hover" data-route="{{ route('unitKompetensi.datatable') }}">
+                    <table id="table-kelompokAsesor" class="table style-3 table-hover" data-route="{{ route('kelompokAsesor.datatable') }}">
                         <thead>
                             <tr>
-                                <th>Kode Unit</th>
-                                <th>Judul Unit</th>
-                                <th>Jenis Standar</th>
+                                <th>Event</th>
                                 <th>Skema</th>
+                                <th>Kelas</th>
+                                <th>Asesor</th>
                                 <th class="text-center dt-no-sorting">Action</th>
                             </tr>
                         </thead>
                     </table>
-                    @include('dashboard.unitKompetensi.modalElemen')
                 </div>
             </div>
         </div>
     </div>
     @push('datatable')
-        @include('dashboard.unitKompetensi.component')
-        @include('dashboard.unitKompetensi.datatable')
-        @include('dashboard.unitKompetensi.listElemen')
-        @include('dashboard.unitKompetensi.edit')
+        @include('dashboard.assignKelompokAsesor.component')
+        @include('dashboard.assignKelompokAsesor.datatable')
+        @include('dashboard.assignKelompokAsesor.edit')
     @endpush
 @endsection

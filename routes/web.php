@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     JurusanController,
     GuestController,
     KelasController,
+    KelompokAsesorController,
     KriteriaUnjukKerjaController,
     ObservasiController,
     PengaturanConctroller,
@@ -44,6 +45,12 @@ Route::get('/captcha-refresh', function () {
 Route::middleware('auth')->group(function () {
     // Admin Middleware
     Route::middleware('can:admin')->group(function() {
+        // Kelompok Asesor
+        Route::resource('kelompok-asesor', KelompokAsesorController::class)->names('kelompokAsesor')->except(['create', 'show']);
+        Route::prefix('kelompok-asesor')->group(function () {
+            Route::get('datatable', [KelompokAsesorController::class, 'datatable'])->name('kelompokAsesor.datatable');
+            Route::get('list',[KelompokAsesorController::class,'list'])->name('kelompokAsesor.list');
+        });
         // Event
         Route::resource('event', EventController::class)->except(['create', 'show']);
         Route::prefix('event')->group(function () {

@@ -51,8 +51,7 @@ class KelasController extends Controller
     public function edit($uuid)
     {
         $kelas = Kelas::with(['kelompokAsesor','jurusan'])
-        ->where('uuid', $uuid)
-        ->first();
+        ->firstWhere('uuid', $uuid);
         if(!empty($kelas)) {
             return response()->json(['status' => 'success', 'data' => $kelas], 200);
         } else {
@@ -76,13 +75,12 @@ class KelasController extends Controller
         }
         $validated = $validator->validated();
 
-        $data = Kelas::where('uuid', $uuid)
-            ->first();
+        $data = Kelas::firstWhere('uuid', $uuid);
         if(empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data kelas tidak ditemukan'], 404);
         }
 
-        $jurusan = Jurusan::where('uuid', $validated['jurusan_id'])->first();
+        $jurusan = Jurusan::firstWhere('uuid', $validated['jurusan_id']);
         if(empty($jurusan)) {
             return response()->json(['status' => 'error', 'message' => 'Data jurusan tidak ditemukan'], 404);
         }

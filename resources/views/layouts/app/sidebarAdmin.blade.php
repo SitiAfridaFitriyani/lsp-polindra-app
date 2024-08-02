@@ -3,8 +3,8 @@
         <span>MASTER DATA</span>
     </div>
 </li>
-<li @class(['menu','active' => request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*')])>
-    <a href="#perangkat-assesmen" data-toggle="collapse" aria-expanded="{{ request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*') ? 'true' : 'false' }}" class="dropdown-toggle">
+<li @class(['menu','active' => request()->routeIs('kelompokAsesor.*') || request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*')])>
+    <a href="#perangkat-assesmen" data-toggle="collapse" aria-expanded="{{ request()->routeIs('kelompokAsesor.*') || request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*') ? 'true' : 'false' }}" class="dropdown-toggle">
         <div class="">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             <span>Perangkat Assesmen</span>
@@ -13,9 +13,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
     </a>
-    <ul @class(['collapse','submenu','list-unstyled','show' => request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*')]) id="perangkat-assesmen" data-parent="#accordionExample">
-        <li>
-            <a href="#"> Assign Kelompok Asesor </a>
+    <ul @class(['collapse','submenu','list-unstyled','show' => request()->routeIs('kelompokAsesor.*') || request()->routeIs('event.*') || request()->routeIs('skema.*') || request()->routeIs('unitKompetensi.*') || request()->routeIs('elemen.*') || request()->routeIs('kriteriaUnjukKerja.*') || request()->routeIs('berkasPemohon.*')]) id="perangkat-assesmen" data-parent="#accordionExample">
+        <li @class(['active' => request()->routeIs('kelompokAsesor.*')])>
+            <a href="{{ route('kelompokAsesor.index') }}"> Assign Asesor </a>
         </li>
         <li @class(['active' => request()->routeIs('event.*')])>
             <a href="{{ route('event.index') }}"> Event </a>
