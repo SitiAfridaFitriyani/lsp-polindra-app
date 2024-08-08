@@ -41,6 +41,9 @@
 <script src="{{ asset('admin/plugins/jquery-step/custom-jquery.steps.js') }}"></script>
 {{-- Upload File --}}
 <script src="{{ asset('admin/plugins/file-upload/file-upload-with-preview.min.js') }}"></script>
+<script src="{{ asset('admin/plugins/dropify/dropify.min.js') }}"></script>
+<script src="{{ asset('admin/plugins/blockui/jquery.blockUI.min.js') }}"></script>
+<script src="{{ asset('admin/assets/js/users/account-settings.js') }}"></script>
 <script>
     var secondUpload = new FileUploadWithPreview('mySecondImage')
 </script>
