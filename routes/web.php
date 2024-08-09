@@ -180,9 +180,10 @@ Route::middleware('auth')->group(function () {
     Route::view('/dashboard','dashboard.index')->name('dashboard');
 
     // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // Persetujuan Assesmen
     Route::resource('persetujuan-assesmen',PersetujuanKerahasiaanController::class)->names('persetujuanAssesmen')->except(['create', 'show']);
     Route::prefix('persetujuan-assesmen')->group(function () {

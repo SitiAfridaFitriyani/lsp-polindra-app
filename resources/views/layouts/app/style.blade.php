@@ -49,6 +49,11 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/theme-checkbox-radio.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/forms/switches.css') }}">
 @endif
+@if(request()->routeIs('profile.*'))
+    <link href="{{ asset('admin/assets/css/users/user-profile.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('admin/plugins/dropify/dropify.min.css') }}">
+    <link href="{{ asset('admin/assets/css/users/account-setting.css') }}" rel="stylesheet" type="text/css" />
+@endif
 <style>
     .ck-editor__editable[role="textbox"] {
         min-height: 200px;
