@@ -41,9 +41,9 @@ class PengaturanConctroller extends Controller
                 ],
             'application_icon' => [
                 'nullable',
-                File::types(['ico'])
+                File::types(['jpg', 'jpeg','png'])
                     ->min('1kb')
-                    ->max('1mb')
+                    ->max('100mb')
                 ]
         ], $this->messageValidation());
 

@@ -41,7 +41,7 @@
                                 </span>
                             </div>
                             <label for="application_icon">Favicon</label>
-                            <input type="file" class="form-control @error('application_icon') is-invalid @enderror" name="application_icon" id="application_icon" accept=".ico">
+                            <input type="file" class="form-control @error('application_icon') is-invalid @enderror" name="application_icon" id="application_icon" >
                             <small>Accepted .ico Max. total size 1 MB</small>
                         </div>
                     </div>

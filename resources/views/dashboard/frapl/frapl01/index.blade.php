@@ -52,7 +52,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="name" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Lengkap<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="name" name="name" readonly>
+                                        <input type="text" class="form-control" id="name" name="name">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
@@ -102,7 +102,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="address" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Rumah<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly></textarea>
+                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" ></textarea>
                                         <p class="badge bg-danger mt-2">Jika Alamat Rumah kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
@@ -115,7 +115,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="phone" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="phone" name="phone" readonly>
+                                        <input type="number" class="form-control" id="phone" name="phone" >
                                         <p class="badge bg-danger mt-2">Jika No. Telp Peserta kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.edit') }}">profile saya</a></p>
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                 <div class="form-group row mb-4">
                                     <label for="email" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="email" class="form-control" id="email" name="email" readonly>
+                                        <input type="email" class="form-control" id="email" name="email">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">

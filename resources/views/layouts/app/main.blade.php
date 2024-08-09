@@ -35,13 +35,11 @@
     @else
     <div class="form-container">
         <div class="form-form">
-            <div class="form-form-wrap">
-                <div class="form-container">
+            <div class="form-form-wrap p-5">
                     <div class="form-content">
                         @yield('authentication')
                         <p class="terms-conditions">© 2020 All Rights Reserved. <a href="javascript:void(0)">LSP Polindra</a> is a product of Designreset. <a href="javascript:void(0);">Cookie Preferences</a>, <a href="javascript:void(0);">Privacy</a>, and <a href="javascript:void(0);">Terms</a>.</p>
                     </div>
-                </div>
             </div>
         </div>
         <div class="form-image">
