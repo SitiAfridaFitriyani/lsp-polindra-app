@@ -48,14 +48,14 @@
                     <div class="form-row">
                         <div class="col-md-6 mb-4">
                             <label for="application_name">Nama Website <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('application_name') is-invalid @enderror" name="application_name" id="application_name" required value="{{ old('application_name', $pengaturan['application_name']) }}">
+                            <input type="text" class="form-control @error('application_name') is-invalid @enderror" name="application_name" id="application_name" value="{{ old('application_name', $pengaturan['application_name'] ?? '') }}" required>
                             <div class="invalid-feedback">
                                 Kolom nama website tidak boleh kosong
                             </div>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="application_short_name">Alias Web/ Short Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('application_short_name') is-invalid @enderror" name="application_short_name" id="application_short_name" required value="{{ old('application_short_name', $pengaturan['application_short_name']) }}">
+                            <input type="text" class="form-control @error('application_short_name') is-invalid @enderror" name="application_short_name" id="application_short_name" required value="{{ old('application_short_name', $pengaturan['application_short_name']  ?? '') }}">
                             <div class="invalid-feedback">
                                 Kolom nama alias website tidak boleh kosong
                             </div>
@@ -64,14 +64,14 @@
                     <div class="form-row">
                         <div class="col-md-6 mb-4">
                             <label for="application_email">Email<span class="text-danger">*</span></label>
-                            <input type="email" class="form-control @error('application_email') is-invalid @enderror" name="application_email" id="application_email" required value="{{ old('application_email', $pengaturan['application_email']) }}">
+                            <input type="email" class="form-control @error('application_email') is-invalid @enderror" name="application_email" id="application_email" required value="{{ old('application_email', $pengaturan['application_email'] ?? '') }}">
                             <div class="invalid-feedback">
                                 Kolom email website tidak boleh kosong
                             </div>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="application_contact">Kontak <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control @error('application_contact') is-invalid @enderror" name="application_contact" id="application_contact" required value="{{ old('application_contact', $pengaturan['application_contact']) }}">
+                            <input type="tel" class="form-control @error('application_contact') is-invalid @enderror" name="application_contact" id="application_contact" required value="{{ old('application_contact', $pengaturan['application_contact'] ?? '') }}">
                             <div class="invalid-feedback">
                                 Kolom kontak website tidak boleh kosong
                             </div>
@@ -86,7 +86,7 @@
                                         <img src="{{ asset('admin/assets/img/icon/instagram.svg') }}" width="30" height="30" alt="instagram">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="instagram_account" name="instagram_account" aria-describedby="basic-addon3" placeholder="Masukkan username" value="{{ old('instagram_account', $pengaturan['instagram_account']) }}">
+                                <input type="text" class="form-control" id="instagram_account" name="instagram_account" aria-describedby="basic-addon3" placeholder="Masukkan username" value="{{ old('instagram_account', $pengaturan['instagram_account'] ?? '') }}">
                             </div>
                         </div>
                         <div class="col-md-4 mb-4">
@@ -97,7 +97,7 @@
                                         <img src="{{ asset('admin/assets/img/icon/facebook.svg') }}" width="30" height="30" alt="facebook">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="facebook_account" name="facebook_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('facebook_account', $pengaturan['facebook_account']) }}">
+                                <input type="text" class="form-control" id="facebook_account" name="facebook_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('facebook_account', $pengaturan['facebook_account'] ?? '') }}">
                             </div>
                         </div>
                         <div class="col-md-4 mb-4">
@@ -108,7 +108,7 @@
                                         <img src="{{ asset('admin/assets/img/icon/whatsapp.svg') }}" width="30" height="30" alt="whatsapp">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="whatsapp_account" name="whatsapp_account" aria-describedby="basic-addon3" placeholder="Masukkan nomor" value="{{ old('whatsapp_account', $pengaturan['whatsapp_account']) }}">
+                                <input type="text" class="form-control" id="whatsapp_account" name="whatsapp_account" aria-describedby="basic-addon3" placeholder="Masukkan nomor" value="{{ old('whatsapp_account', $pengaturan['whatsapp_account'] ?? '') }}">
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                                         <img src="{{ asset('admin/assets/img/icon/twitterX.svg') }}" width="30" height="30" alt="twitter">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="twitter_account" name="twitter_account" aria-describedby="basic-addon3" placeholder="Masukkan username" value="{{ old('twitter_account', $pengaturan['twitter_account']) }}">
+                                <input type="text" class="form-control" id="twitter_account" name="twitter_account" aria-describedby="basic-addon3" placeholder="Masukkan username" value="{{ old('twitter_account', $pengaturan['twitter_account'] ?? '') }}">
                             </div>
                         </div>
                         <div class="col-md-4 mb-4">
@@ -132,7 +132,7 @@
                                         <img src="{{ asset('admin/assets/img/icon/youtube.svg') }}" width="30" height="30" alt="youtube">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="youtube_account" name="youtube_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('youtube_account', $pengaturan['youtube_account']) }}">
+                                <input type="text" class="form-control" id="youtube_account" name="youtube_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('youtube_account', $pengaturan['youtube_account'] ?? '') }}">
                             </div>
                         </div>
                         <div class="col-md-4 mb-4">
@@ -143,21 +143,21 @@
                                         <img src="{{ asset('admin/assets/img/icon/linkedin.svg') }}" width="30" height="30" alt="linkedin">
                                     </span>
                                 </div>
-                                <input type="text" class="form-control" id="linkedin_account" name="linkedin_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('linkedin', $pengaturan['linkedin']) }}">
+                                <input type="text" class="form-control" id="linkedin_account" name="linkedin_account" aria-describedby="basic-addon3" placeholder="Masukkan nama" value="{{ old('linkedin', $pengaturan['linkedin'] ?? '') }}">
                             </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="col-md-6 mb-4">
                             <label for="application_footer">Footer<span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('application_footer') is-invalid @enderror" name="application_footer" id="application_footer" required value="{{ old('application_footer', $pengaturan['application_footer']) }}">
+                            <input type="text" class="form-control @error('application_footer') is-invalid @enderror" name="application_footer" id="application_footer" required value="{{ old('application_footer', $pengaturan['application_footer'] ?? '') }}">
                             <div class="invalid-feedback">
                                 Kolom footer website tidak boleh kosong
                             </div>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="application_prefix_title">Prefix Title<span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('application_prefix_title') is-invalid @enderror" name="application_prefix_title" id="application_prefix_title" required value="{{ old('application_prefix_title', $pengaturan['application_prefix_title']) }}">
+                            <input type="text" class="form-control @error('application_prefix_title') is-invalid @enderror" name="application_prefix_title" id="application_prefix_title" required value="{{ old('application_prefix_title', $pengaturan['application_prefix_title'] ?? '') }}">
                             <div class="invalid-feedback">
                                 Kolom prefix title website tidak boleh kosong
                             </div>
@@ -166,7 +166,7 @@
                     <div class="form-row">
                         <div class="col-12 mb-4">
                             <label for="application_description">Deskripsi Website<span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('application_description') is-invalid @enderror" id="application_description" name="application_description" cols="30" rows="3" required>{!! old('application_description', $pengaturan['application_description']) !!}</textarea>
+                            <textarea class="form-control @error('application_description') is-invalid @enderror" id="application_description" name="application_description" cols="30" rows="3" required>{!! old('application_description', $pengaturan['application_description'] ?? '') !!}</textarea>
                             <div class="invalid-feedback">
                                 Kolom deskripsi website tidak boleh kosong
                             </div>

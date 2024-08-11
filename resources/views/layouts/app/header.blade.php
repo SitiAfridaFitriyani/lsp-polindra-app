@@ -7,18 +7,22 @@
                     $pengaturan = App\Models\Pengaturan::first();
                     $image = asset('admin/assets/img/nopict.png');
                     $shortName = 'LSP';
-
-                    if($pengaturan['application_logo'] != null) {
-                        $image = asset('storage/'.$pengaturan['application_logo']);
-                    }
-                    if($pengaturan['application_short_name'] != null) {
-                        $shortName = $pengaturan['application_short_name'];
+            
+                    if ($pengaturan !== null) {
+                        if (!empty($pengaturan['application_logo'])) {
+                            $image = asset('storage/'.$pengaturan['application_logo']);
+                        }
+            
+                        if (!empty($pengaturan['application_short_name'])) {
+                            $shortName = $pengaturan['application_short_name'];
+                        }
                     }
                 @endphp
+            
                 <a href="javascript:void(0);">
                     <img src="{{ $image }}" class="navbar-logo" alt="logo">
                 </a>
-            </li>
+            </li>            
             <li class="nav-item theme-text">
                 <a href="javascript:void(0);" class="nav-link"> {{ $shortName }} </a>
             </li>

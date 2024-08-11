@@ -11,11 +11,39 @@
                     <i class="fa fa-bars"></i>
                 </button>
                 <a class="navbar-brand" href="javascript:void(0);">
-                    <img class="mr-3" src="{{ asset('storage/'.$pengaturan['application_logo']) }}" class="logo default" alt="Logo" width="50">
-                    <img class="mr-3" src="{{ asset('guest/assets/img/logo/bnsp.svg') }}" class="logo default" alt="Logo" width="150">
-                    <img src="{{ asset('guest/assets/img/logo/ristekdikti.svg') }}" class="logo default" alt="Logo" width="63">
-                    <img src="{{ asset('storage/'.$pengaturan['application_logo']) }}" class="logo logo-responsive" alt="Logo">
+                    @if(isset($pengaturan['application_logo']) && $pengaturan['application_logo'])
+                        <img class="mr-3" 
+                             src="{{ asset('storage/'.$pengaturan['application_logo']) }}" 
+                             class="logo default" 
+                             alt="Logo" 
+                             width="50">
+                    @else
+                        <img class="mr-3" 
+                             src="{{ asset('admin/assets/img/300x300.jpg') }}" 
+                             class="logo default" 
+                             alt="Logo" 
+                             width="50">
+                    @endif
+                    <img class="mr-3" 
+                         src="{{ asset('guest/assets/img/logo/bnsp.svg') }}" 
+                         class="logo default" 
+                         alt="Logo" 
+                         width="150">
+                    <img src="{{ asset('guest/assets/img/logo/ristekdikti.svg') }}" 
+                         class="logo default" 
+                         alt="Logo" 
+                         width="63">
+                    @if(isset($pengaturan['application_logo']) && $pengaturan['application_logo'])
+                        <img src="{{ asset('storage/'.$pengaturan['application_logo']) }}" 
+                             class="logo logo-responsive" 
+                             alt="Logo">
+                    @else
+                        <img src="{{ asset('admin/assets/img/300x300.jpg') }}" 
+                             class="logo logo-responsive" 
+                             alt="Logo">
+                    @endif
                 </a>
+                          
             </div>
             <div class="collapse navbar-collapse" id="navbar-menu">
                 <ul class="nav navbar-nav navbar-right" data-in="fadeInDown" data-out="fadeOutUp">
