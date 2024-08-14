@@ -13,12 +13,12 @@
                 </div>
                 @php
                     $imageProfile = asset('admin/assets/img/nopict.png');
-                    if(!empty($user->photo) && Storage::exists($user->photo)) {
-                        $imageProfile = asset('storage/'.$user->photo);
+                    if(!empty($user->photo) && Storage::disk('public')->exists($user->photo)) {
+                        $imageProfile = asset('storage/' . $user->photo);
                     }
                 @endphp
                 <div class="text-center user-info">
-                    <img src="{{ $imageProfile }}" alt="avatar" width="90">
+                    <img src="{{ asset('storage/' . $user->photo) }}" alt="avatar" width="90">
                     <p class="">{{ $user->name }}</p>
                 </div>
                 <div class="user-info-list">

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('m_pengaturan', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->string('application_name');
             $table->string('application_short_name');
             $table->string('application_email');

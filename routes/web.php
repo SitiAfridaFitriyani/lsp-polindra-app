@@ -29,7 +29,8 @@ use App\Http\Controllers\{
     UnitKompetensiController,
     UserTestPraktekController,
     UserTestTulisController,
-    UserTestWawancaraController
+    UserTestWawancaraController,
+    DashboardController
 };
 use Illuminate\Support\Facades\Route;
 use Mews\Captcha\Facades\Captcha;
@@ -177,7 +178,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // All
-    Route::view('/dashboard','dashboard.index')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

@@ -20,10 +20,12 @@
                                             <div class="row">
                                                 @php
                                                     $imageProfile = asset('admin/assets/img/nopict.png');
-                                                    if(!empty($user->photo) && Storage::exists($user->photo)) {
-                                                        $imageProfile = asset('storage/'.$user->photo);
+                                                    if(!empty($user->photo) && Storage::disk('public')->exists($user->photo)) {
+                                                        $imageProfile = asset('storage/' . $user->photo);
                                                     }
+                                                    // dd($imageProfile);
                                                 @endphp
+
                                                 <div class="col-xl-2 col-lg-12 col-md-4">
                                                     <div class="upload mt-4 pr-md-4">
                                                         <input type="file" id="input-file-max-fs" name="photo" class="dropify" data-default-file="{{ $imageProfile }}" data-max-file-size="2M" />
@@ -113,4 +115,12 @@
             </div>
         </div>
     </div>
+
+    <script>
+       $(document).ready(function(){
+            $('.dropify').dropify();
+        });
+
+    
+    </script>
 @endsection

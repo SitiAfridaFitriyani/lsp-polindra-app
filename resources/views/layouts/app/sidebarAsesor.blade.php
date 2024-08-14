@@ -1,35 +1,41 @@
 @php
-    $asesor_id = Auth::user()->asesor['id'];
+    $asesor_id = Auth::user()->asesor['id'] ?? null;
     $current_time = Carbon\Carbon::now();
 
-    $kelompokAsesor = App\Models\KelompokAsesor::where('asesor_id', $asesor_id)
-        ->whereHas('event', function($query) use ($current_time) {
-            $query->where('event_mulai', '<=', $current_time)
-                ->where('event_selesai', '>=', $current_time);
-        })
-        ->with(['event' => function($query) use ($current_time) {
-            $query->where('event_mulai', '<=', $current_time)
-                ->where('event_selesai', '>=', $current_time);
-        }])
-        ->get();
-        $idUrl = request()->segment(2);
-        if(request()->routeIs('persetujuanAssesmen.*') ||
-            request()->routeIs('frapl.*') ||
-            request()->routeIs('testAssesmen.index') ||
-            request()->routeIs('checklistObservasi.*')
-        ) {
-            $idUrl = request('kelompok-asesor-id');
-        }
+    if ($asesor_id) {
+        $kelompokAsesor = App\Models\KelompokAsesor::where('asesor_id', $asesor_id)
+            ->whereHas('event', function($query) use ($current_time) {
+                $query->where('event_mulai', '<=', $current_time)
+                    ->where('event_selesai', '>=', $current_time);
+            })
+            ->with(['event' => function($query) use ($current_time) {
+                $query->where('event_mulai', '<=', $current_time)
+                    ->where('event_selesai', '>=', $current_time);
+            }])
+            ->get();
+    } else {
+        $kelompokAsesor = collect(); // Mengembalikan koleksi kosong jika tidak ada `asesor_id`
+    }
 
-        if(request()->routeIs('userTestTulis.*') ||
-            request()->routeIs('userTestPraktek.*') ||
-            request()->routeIs('userTestWawancara.*') ||
-            request()->routeIs('frapl01.*') ||
-            request()->routeIs('frapl02.*')
-        ) {
-            $idUrl = request()->query->keys()[0];
-        }
+    $idUrl = request()->segment(2);
+    if (request()->routeIs('persetujuanAssesmen.*') ||
+        request()->routeIs('frapl.*') ||
+        request()->routeIs('testAssesmen.index') ||
+        request()->routeIs('checklistObservasi.*')
+    ) {
+        $idUrl = request('kelompok-asesor-id');
+    }
+
+    if (request()->routeIs('userTestTulis.*') ||
+        request()->routeIs('userTestPraktek.*') ||
+        request()->routeIs('userTestWawancara.*') ||
+        request()->routeIs('frapl01.*') ||
+        request()->routeIs('frapl02.*')
+    ) {
+        $idUrl = request()->query->keys()[0];
+    }
 @endphp
+
 
 <li class="menu menu-heading">
     <div class="heading"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>

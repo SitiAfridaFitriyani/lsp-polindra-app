@@ -34,24 +34,32 @@ class ProfileController extends Controller
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $latestPhoto = Auth::user()->photo;
-        $request->user()->fill($request->validated());
-        $photo = $request->file('photo');
-        $user = User::firstWhere('email',$request->emai);
+{
 
-        if($photo && !empty($photo)) {
-            if(Storage::exists($latestPhoto)) {
-                Storage::delete($latestPhoto);
-            }
-            $request->user()->photo = $photo->store('profilePicture');
-        }
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    $latestPhoto = Auth::user()->photo;
+
+    $request->user()->fill($request->validated());
+
+    $photo = $request->file('photo');
+
+    if ($photo && !empty($photo)) {
+        if (!is_null($latestPhoto) && Storage::disk('public')->exists($latestPhoto)) {
+            Storage::disk('public')->delete($latestPhoto);
         }
 
-        $request->user()->save();
+        $path = $photo->store('profilePicture', 'public');
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $request->user()->photo = $path;
     }
+
+    if ($request->user()->isDirty('email')) {
+        $request->user()->email_verified_at = null;
+    }
+
+    
+    $request->user()->save();
+
+    return Redirect::route('profile.edit')->with('status', 'profile-updated');
+}
+
 }
