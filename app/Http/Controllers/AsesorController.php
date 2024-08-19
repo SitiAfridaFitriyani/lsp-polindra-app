@@ -34,10 +34,26 @@ class AsesorController extends Controller
             $gender = $request->input('jenis_kelamin');
 
             if($photo && !empty($photo)) {
-                $validated['photo'] = $photo->store('profilePicture');
+                // Membuat direktori jika belum ada
+                $photoDirectory = public_path('storage/profilePicture');
+                if (!is_dir($photoDirectory)) {
+                    mkdir($photoDirectory, 0755, true);
+                }
+
+                $photoName = time() . '_' . $photo->getClientOriginalName();
+                $photo->move($photoDirectory, $photoName);
+                $validated['photo'] = 'profilePicture/' . $photoName;
             }
+
             if($berkas && !empty($berkas)) {
-                $validated['surat_tugas'] = $berkas->store('suratTugas');
+                $berkasDirectory = public_path('storage/suratTugas');
+                if (!is_dir($berkasDirectory)) {
+                    mkdir($berkasDirectory, 0755, true);
+                }
+
+                $berkasName = time() . '_' . $berkas->getClientOriginalName();
+                $berkas->move($berkasDirectory, $berkasName);
+                $validated['surat_tugas'] = 'suratTugas/' . $berkasName;
             }
 
             $user = User::create([
@@ -51,12 +67,14 @@ class AsesorController extends Controller
                 'photo' => empty($photo) ? null : $validated['photo'],
                 'role' => 'Asesor'
             ]);
+
             if ($user) {
                 $asesor = Asesor::create([
                     'user_id' => (int) $user['id'],
                     'nip' => $validated['nip'],
-                    'surat_tugas' => empty($photo) ? null : $validated['surat_tugas']
+                    'surat_tugas' => empty($berkas) ? null : $validated['surat_tugas']
                 ]);
+
                 if($asesor) {
                     DB::commit();
                     return response()->json(['status' => 'success', 'message' => 'Data asesor berhasil ditambahkan'], 200);
@@ -73,6 +91,7 @@ class AsesorController extends Controller
             return response()->json(['status' => 'error', 'message' => $th->getMessage()], 500);
         }
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -94,8 +113,8 @@ class AsesorController extends Controller
     public function update(UpdateAsesorRequest $request, $uuid)
     {
         $validated = $request->validated();
-        $data = Asesor::with('user')->firstWhere('uuid',$uuid);
-        if(empty($data)) {
+        $data = Asesor::with('user')->firstWhere('uuid', $uuid);
+        if (empty($data)) {
             return response()->json(['status' => 'error', 'message' => 'Data asesor tidak ditemukan'], 404);
         }
 
@@ -106,21 +125,41 @@ class AsesorController extends Controller
             $password = $request->input('password');
             $gender = $request->input('jenis_kelamin');
 
-            if($photo && !empty($photo)) {
-                if($data->user['photo'] != null && Storage::exists($data->user['photo'])) {
-                    Storage::delete($data->user['photo']);
+            if ($photo && !empty($photo)) {
+                if ($data->user['photo'] != null && Storage::exists('public/' . $data->user['photo'])) {
+                    Storage::delete('public/' . $data->user['photo']);
                 }
-                $validated['photo'] = $photo->store('profilePicture');
+
+                // Membuat direktori jika belum ada
+                $photoDirectory = public_path('storage/profilePicture');
+                if (!is_dir($photoDirectory)) {
+                    mkdir($photoDirectory, 0755, true);
+                }
+
+                // Menyimpan foto baru
+                $photoName = time() . '_' . $photo->getClientOriginalName();
+                $photo->move($photoDirectory, $photoName);
+                $validated['photo'] = 'profilePicture/' . $photoName;
             }
 
-            if($berkas && !empty($berkas)) {
-                if($data['surat_tugas'] != null && Storage::exists($data['surat_tugas'])) {
-                    Storage::delete($data['surat_tugas']);
+            if ($berkas && !empty($berkas)) {
+                if ($data['surat_tugas'] != null && Storage::exists('public/' . $data['surat_tugas'])) {
+                    Storage::delete('public/' . $data['surat_tugas']);
                 }
-                $validated['surat_tugas'] = $berkas->store('suratTugas');
+
+                // Membuat direktori jika belum ada
+                $berkasDirectory = public_path('storage/suratTugas');
+                if (!is_dir($berkasDirectory)) {
+                    mkdir($berkasDirectory, 0755, true);
+                }
+
+                // Menyimpan berkas surat tugas baru
+                $berkasName = time() . '_' . $berkas->getClientOriginalName();
+                $berkas->move($berkasDirectory, $berkasName);
+                $validated['surat_tugas'] = 'suratTugas/' . $berkasName;
             }
 
-            if(!empty($password)) {
+            if (!empty($password)) {
                 $validated['password'] = bcrypt($password);
             }
 
@@ -130,6 +169,7 @@ class AsesorController extends Controller
                 'nip' => $validated['nip'],
                 'surat_tugas' => empty($berkas) ? $data['surat_tugas'] : $validated['surat_tugas']
             ]);
+
             $userUpdate = $user->update([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -141,6 +181,7 @@ class AsesorController extends Controller
                 'photo' => empty($photo) ? $data->user['photo'] : $validated['photo'],
                 'status' => $validated['status']
             ]);
+
             if ($asesorUpdate && $userUpdate) {
                 DB::commit();
                 return response()->json(['status' => 'success', 'message' => 'Data asesor berhasil diubah'], 200);
@@ -153,6 +194,7 @@ class AsesorController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Server Error 500'], 500);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

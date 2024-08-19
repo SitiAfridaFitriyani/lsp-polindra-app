@@ -22,7 +22,12 @@ class FRAPL01Controller extends Controller
         $query = KelompokAsesor::with(['skema.berkasPermohonan','event','kelas','asesor.user']);
         $kelompokAsesorNotIn = (clone $query)->where('uuid','!=',$uuid)->get();
         $kelompokAsesor = $query->firstWhere('uuid',$uuid);
-        return view('dashboard.frapl.frapl01.index',compact('kelompokAsesor','kelompokAsesorNotIn'));
+
+        // Get the current logged-in user
+        $user = Auth::user();
+        $isAsesi = $user->role === 'Asesi';  // Check if the user's role is 'asesi'
+
+        return view('dashboard.frapl.frapl01.index', compact('kelompokAsesor', 'kelompokAsesorNotIn', 'user', 'isAsesi'));
     }
 
     /**
@@ -89,19 +94,29 @@ class FRAPL01Controller extends Controller
 
             // TTD Asesi
             $signatureAsesi = $request->input('signatureAsesi');
-            if($signatureAsesi) {
-                if(!empty($existingData) && $existingData['ttd_asesi'] != null && Storage::exists($existingData['ttd_asesi'])) {
+            if ($signatureAsesi) {
+                if (!empty($existingData) && $existingData['ttd_asesi'] != null && Storage::exists($existingData['ttd_asesi'])) {
                     Storage::delete($existingData['ttd_asesi']);
                 }
+
                 $imageName = time() . '.png';
-                $path = public_path('storage/asesi_signatureFRAPL01/' . $imageName);
+                $directoryPath = public_path('storage/asesi_signatureFRAPL01');
+
+                if (!is_dir($directoryPath)) {
+                    mkdir($directoryPath, 0755, true);
+                }
+
+                $path = $directoryPath . '/' . $imageName;
+
                 $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
                 $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
                 file_put_contents($path, base64_decode($signatureAsesi));
-                $validated['ttd_asesi'] = 'asesi_signatureFRAPL01/'.$imageName;
+
+                $validated['ttd_asesi'] = 'asesi_signatureFRAPL01/' . $imageName;
             } else {
                 $validated['ttd_asesi'] = $existingData['ttd_asesi'];
             }
+
 
             if(isset($validated['berkasFilePemohon']) && !empty($existingData)) {
                 $jcdBerkas = json_decode($existingData['berkas_pemohon_asesi'],true);

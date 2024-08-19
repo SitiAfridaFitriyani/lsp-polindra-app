@@ -74,17 +74,33 @@ class UserTestWawancaraController extends Controller
 
             // TTD Asesor
             $signatureAsesor = $request->input('signatureAsesor');
-            if($signatureAsesor) {
-                if(!empty($existingData) && $existingData['ttd_asesor'] != null && Storage::exists($existingData['ttd_asesor'])) {
+            if ($signatureAsesor) {
+                // Periksa jika data sebelumnya ada dan hapus tanda tangan lama jika ada
+                if (!empty($existingData) && $existingData['ttd_asesor'] != null && Storage::exists($existingData['ttd_asesor'])) {
                     Storage::delete($existingData['ttd_asesor']);
                 }
+
+                // Tentukan nama dan path file
                 $imageName = time() . '.png';
-                $path = public_path('storage/asesor_signatureTestWawancara/' . $imageName);
+                $directoryPath = public_path('storage/asesor_signatureTestWawancara');
+
+                // Periksa jika direktori tidak ada, maka buat
+                if (!is_dir($directoryPath)) {
+                    mkdir($directoryPath, 0755, true); // Membuat direktori dengan izin 0755
+                }
+
+                // Tentukan path lengkap
+                $path = $directoryPath . '/' . $imageName;
+
+                // Proses dan simpan tanda tangan
                 $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
                 $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
                 file_put_contents($path, base64_decode($signatureAsesor));
-                $validated['ttd_asesor'] = 'asesor_signatureTestWawancara/'.$imageName;
+
+                // Simpan path ke dalam database
+                $validated['ttd_asesor'] = 'asesor_signatureTestWawancara/' . $imageName;
             } else {
+                // Jika tidak ada tanda tangan baru, gunakan yang lama
                 $validated['ttd_asesor'] = $existingData['ttd_asesor'];
             }
 

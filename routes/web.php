@@ -30,12 +30,19 @@ use App\Http\Controllers\{
     UserTestPraktekController,
     UserTestTulisController,
     UserTestWawancaraController,
-    DashboardController
+    DashboardController,
+    CertificateController,
 };
 use Illuminate\Support\Facades\Route;
 use Mews\Captcha\Facades\Captcha;
 
 // Root
+Route::get('/certificate-preview', function () {
+    return view('certificate.index'); // This will directly load the certificate preview view
+})->name('certificate.preview');
+
+Route::get('/generate-certificate', [CertificateController::class, 'generateCertificate']);
+
 Route::get('/', [GuestController::class,'index'])->name('guest.index');
 Route::get('/assesmen-register',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
 Route::get('kelas/list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
@@ -139,6 +146,7 @@ Route::middleware('auth')->group(function () {
             Route::get('datatable', [AsesiController::class, 'datatable'])->name('asesi.datatable');
             Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
         });
+        Route::get('sertifikasi', [SertifikasiController::class, 'index'])->name('sertifikasi.index');
         // Pengaturan
         Route::prefix('pengaturan')->group(function () {
             Route::get('',[PengaturanConctroller::class,'index'])->name('pengaturan');

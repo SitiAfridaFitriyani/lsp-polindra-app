@@ -49,12 +49,14 @@
                                     <h5 class="col-12 mb-3">a. Data Pribadi</h5>
                                     <p><span class="text-danger">*</span> Wajib diisi</p>
                                 </div>
-                                <div class="form-group row mb-4">
-                                    <label for="name" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Lengkap<span class="text-danger">*</span></label>
-                                    <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="text" class="form-control" id="name" name="name">
-                                    </div>
-                                </div>
+                                @if($isAsesi)
+                                    <div class="form-group row mb-4">
+                                        <label for="name" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Nama Lengkap<span class="text-danger">*</span></label>
+                                        <div class="col-xl-10 col-lg-9 col-sm-10">
+                                            <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}">
+                                        </div>
+                                    </div>   
+                                    @endif                             
                                 <div class="form-group row mb-4">
                                     <label for="no_ktp" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. KTP/NIK/Paspor<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
@@ -73,52 +75,66 @@
                                         <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" placeholder="Masukkan tanggal lahir peserta" required>
                                     </div>
                                 </div>
-                                <fieldset class="form-group mb-4">
-                                    <div class="row">
-                                        <label class="col-form-label col-xl-2 col-sm-3 col-sm-2 pt-0">Jenis Kelamin<span class="text-danger">*</span></label>
-                                        <div class="col-xl-10 col-lg-9 col-sm-10">
-                                            <div class="form-check mb-2">
-                                                <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jklakilaki" name="jenis_kelamin" value="Laki-laki" readonly class="custom-control-input">
-                                                    <label class="custom-control-label" for="jklakilaki">Laki-laki</label>
+                                @if($isAsesi)
+                                    <fieldset class="form-group mb-4">
+                                        <div class="row">
+                                            <label class="col-form-label col-xl-2 col-sm-3 col-sm-2 pt-0">Jenis Kelamin<span class="text-danger">*</span></label>
+                                            <div class="col-xl-10 col-lg-9 col-sm-10">
+                                                <div class="form-check mb-2">
+                                                    <div class="custom-control custom-radio classic-radio-info">
+                                                        <input type="radio" id="jklakilaki" name="jenis_kelamin" value="Laki-laki" readonly class="custom-control-input" 
+                                                        {{ $user->jenis_kelamin == 'Laki-laki' ? 'checked' : '' }}>
+                                                        <label class="custom-control-label" for="jklakilaki">Laki-laki</label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-check mb-2">
-                                                <div class="custom-control custom-radio classic-radio-info">
-                                                    <input type="radio" id="jkperempuan" name="jenis_kelamin" value="Perempuan" readonly class="custom-control-input">
-                                                    <label class="custom-control-label" for="jkperempuan">Perempuan</label>
+                                                <div class="form-check mb-2">
+                                                    <div class="custom-control custom-radio classic-radio-info">
+                                                        <input type="radio" id="jkperempuan" name="jenis_kelamin" value="Perempuan" readonly class="custom-control-input" 
+                                                        {{ $user->jenis_kelamin == 'Perempuan' ? 'checked' : '' }}>
+                                                        <label class="custom-control-label" for "jkperempuan">Perempuan</label>
+                                                    </div>
                                                 </div>
+                                                @if(empty($user->jenis_kelamin))
+                                                    <p class="badge bg-danger mt-2">Jenis Kelamin kosong. Harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
+                                                @endif
                                             </div>
-                                            <p class="badge bg-danger mt-2">Jika Jenis Kelamin kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
                                         </div>
-                                    </div>
-                                </fieldset>
+                                    </fieldset>
+                                @endif
                                 <div class="form-group row mb-4">
                                     <label for="kebangsaan" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Kebangsaan<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
                                         <input type="text" class="form-control" id="kebangsaan" name="kebangsaan" placeholder="Masukkan kebangsaan peserta" required>
                                     </div>
                                 </div>
-                                <div class="form-group row mb-4">
-                                    <label for="address" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Rumah<span class="text-danger">*</span></label>
-                                    <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly></textarea>
-                                        <p class="badge bg-danger mt-2">Jika Alamat Rumah kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
+                                @if($isAsesi)
+                                    <div class="form-group row mb-4">
+                                        <label for="address" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Alamat Rumah<span class="text-danger">*</span></label>
+                                        <div class="col-xl-10 col-lg-9 col-sm-10">
+                                            <textarea class="form-control" id="address" cols="20" rows="5" name="address" readonly>{{ $user->address }}</textarea>
+                                            @if(empty($user->address))
+                                                <p class="badge bg-danger mt-2">Alamat Rumah kosong. Harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                                 <div class="form-group row mb-4">
                                     <label for="kode_pos" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Kode Pos Rumah<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
                                         <input type="number" class="form-control" id="kode_pos" name="kode_pos" placeholder="Masukkan kode pos domisili peserta" required>
                                     </div>
                                 </div>
+                                @if($isAsesi)
                                 <div class="form-group row mb-4">
                                     <label for="phone" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Peserta<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="number" class="form-control" id="phone" name="phone" readonly>
-                                        <p class="badge bg-danger mt-2">Jika No. Telp Peserta kosong harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
+                                        <input type="number" class="form-control" id="phone" name="phone" value="{{ $user->phone }}" readonly>
+                                        @if(empty($user->phone))
+                                            <p class="badge bg-danger mt-2">No. Telp kosong. Harap lengkapi di menu <a class="text-white text-uppercase font-weight-bold" title="Profile Saya" href="{{ route('profile.index') }}">profile saya</a></p>
+                                        @endif
                                     </div>
                                 </div>
+                                @endif
                                 <div class="form-group row mb-4">
                                     <label for="tlp_rumah" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">No. Telp/HP/WA Rumah</label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">
@@ -131,12 +147,14 @@
                                         <input type="number" class="form-control" id="tlp_kantor" name="tlp_kantor" placeholder="Masukkan No. Telp/HP/WA kantor (pilih salah satu opsional)">
                                     </div>
                                 </div>
-                                <div class="form-group row mb-4">
-                                    <label for="email" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Peserta<span class="text-danger">*</span></label>
-                                    <div class="col-xl-10 col-lg-9 col-sm-10">
-                                        <input type="email" class="form-control" id="email" name="email">
+                                @if($isAsesi)
+                                    <div class="form-group row mb-4">
+                                        <label for="email" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Email Peserta<span class="text-danger">*</span></label>
+                                        <div class="col-xl-10 col-lg-9 col-sm-10">
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}">
+                                        </div>
                                     </div>
-                                </div>
+                                @endif                              
                                 <div class="form-group row mb-4">
                                     <label for="pendidikan" class="col-xl-2 col-sm-3 col-sm-2 col-form-label">Pendidikan Terakhir<span class="text-danger">*</span></label>
                                     <div class="col-xl-10 col-lg-9 col-sm-10">

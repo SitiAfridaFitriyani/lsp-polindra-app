@@ -33,6 +33,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
                 ->name('password.store');
+
+    Route::get('certificate-preview', function () {
+        return view('certificate.index'); // This will directly load the certificate preview view
+    })->name('certificate.preview');
 });
 
 Route::middleware('auth')->group(function () {
