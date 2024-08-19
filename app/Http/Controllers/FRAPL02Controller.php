@@ -64,19 +64,35 @@ class FRAPL02Controller extends Controller
         try {
             DB::beginTransaction();
 
-            // TTD Asesi
+                    // TTD Asesi
             $signatureAsesi = $request->input('signatureAsesi');
-            if($signatureAsesi) {
-                if(!empty($existingData) && $existingData['ttd_asesi'] != null && Storage::exists($existingData['ttd_asesi'])) {
+            if ($signatureAsesi) {
+                // Periksa jika data sebelumnya ada dan hapus tanda tangan lama jika ada
+                if (!empty($existingData) && $existingData['ttd_asesi'] != null && Storage::exists($existingData['ttd_asesi'])) {
                     Storage::delete($existingData['ttd_asesi']);
                 }
+
+                // Tentukan nama dan path file
                 $imageName = time() . '.png';
-                $path = public_path('storage/asesi_signatureFRAPL02/' . $imageName);
+                $directoryPath = public_path('storage/asesi_signatureFRAPL02');
+
+                // Periksa jika direktori tidak ada, maka buat
+                if (!is_dir($directoryPath)) {
+                    mkdir($directoryPath, 0755, true); // Membuat direktori dengan izin 0755
+                }
+
+                // Tentukan path lengkap
+                $path = $directoryPath . '/' . $imageName;
+
+                // Proses dan simpan tanda tangan
                 $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
                 $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
                 file_put_contents($path, base64_decode($signatureAsesi));
-                $validated['ttd_asesi'] = 'asesi_signatureFRAPL02/'.$imageName;
+
+                // Simpan path ke dalam database
+                $validated['ttd_asesi'] = 'asesi_signatureFRAPL02/' . $imageName;
             } else {
+                // Jika tidak ada tanda tangan baru, gunakan yang lama
                 $validated['ttd_asesi'] = $existingData['ttd_asesi'];
             }
 

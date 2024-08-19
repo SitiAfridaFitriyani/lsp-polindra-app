@@ -1,5 +1,5 @@
 @php
-    $kelas_id = Auth::user()->asesi['kelas_id'];
+    $kelas_id = optional(Auth::user()->asesi)->kelas_id;
     $current_time = Carbon\Carbon::now();
 
     $kelompokAsesor = App\Models\KelompokAsesor::where('kelas_id', $kelas_id)
@@ -12,20 +12,23 @@
                 ->where('event_selesai', '>=', $current_time);
         }])
         ->get();
-        $idUrl = request()->segment(2);
-        if(request()->routeIs('persetujuanAssesmen.*') ||
-        request()->routeIs('frapl.*') ||
-        request()->routeIs('frapl01.*') ||
-        request()->routeIs('frapl02.*') ||
-        request()->routeIs('userTestTulis.*') ||
-        request()->routeIs('userTestPraktek.*') ||
-        request()->routeIs('userTestWawancara.*') ||
-        request()->routeIs('checklistObservasi.*') ||
-        request()->routeIs('testAssesmen.index')
-        ) {
-            $idUrl = request()->query->keys()[0];
-        }
+
+    $idUrl = request()->segment(2);
+
+    if(request()->routeIs('persetujuanAssesmen.*') ||
+    request()->routeIs('frapl.*') ||
+    request()->routeIs('frapl01.*') ||
+    request()->routeIs('frapl02.*') ||
+    request()->routeIs('userTestTulis.*') ||
+    request()->routeIs('userTestPraktek.*') ||
+    request()->routeIs('userTestWawancara.*') ||
+    request()->routeIs('checklistObservasi.*') ||
+    request()->routeIs('testAssesmen.index')
+    ) {
+        $idUrl = request()->query->keys()[0];
+    }
 @endphp
+
 <li class="menu menu-heading">
     <div class="heading"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         <span>Perangkat Assesmen</span>

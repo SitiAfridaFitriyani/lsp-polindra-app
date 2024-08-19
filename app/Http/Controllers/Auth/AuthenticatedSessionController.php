@@ -33,8 +33,8 @@ class AuthenticatedSessionController extends Controller
         if (Captcha::check($request->captcha)) {
             if($user) {
                 $passwordCheck = Hash::check($password, $user['password']);
-                if($passwordCheck && $user->role == 'Asesi' && $user->asesi['status'] === 'nonactive') {
-                    return back()->with('status_account','Akun assesmen anda belum di aktifkan, silahkan hubungi admin');
+                if ($passwordCheck && $user->role == 'Asesi' && optional($user->asesi)->status === 'nonactive') {
+                    return back()->with('status_account', 'Akun assesmen anda belum di aktifkan, silahkan hubungi admin');
                 } elseif ($passwordCheck && $user['status'] === 'nonactive') {
                     return back()->with('status_account','Akun anda telah di nonaktifkan');
                 }
