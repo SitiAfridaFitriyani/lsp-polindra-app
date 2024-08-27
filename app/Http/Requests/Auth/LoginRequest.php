@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Auth;
 
-use Illuminate\Auth\Events\Lockout;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
+use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
@@ -27,9 +29,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'credential' => ['required', 'string'], // 'credential' bisa berupa email, NIM, NIP, atau username
             'password' => ['required', 'string'],
-            'captcha' => 'required|string'
+            'captcha' => ['required', 'string']
         ];
     }
 
@@ -37,9 +39,9 @@ class LoginRequest extends FormRequest
     {
         return [
             'required' => 'Data tidak boleh kosong',
-            'email' => 'Format email salah',
+            'credential.required' => 'Email/NIM/NIP/Username tidak boleh kosong',
             'captcha.required' => 'Captcha tidak boleh kosong',
-            'captcha.string' => 'Input harus string'
+            'captcha.string' => 'Input Captcha harus berupa string',
         ];
     }
 
@@ -52,16 +54,37 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $credentials = $this->only('credential', 'password');
 
-            // throw ValidationException::withMessages([
-            //     'email' => trans('auth.failed'),
-            // ]);
+        // Pertama, coba otentikasi menggunakan email atau username
+        if (Auth::attempt(['email' => $credentials['credential'], 'password' => $credentials['password']]) ||
+            Auth::attempt(['username' => $credentials['credential'], 'password' => $credentials['password']])) {
+            return; // Berhasil login
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // Jika tidak berhasil, coba cari user berdasarkan NIM atau NIP
+        $user = User::whereHas('asesi', function ($query) use ($credentials) {
+                        $query->where('nim', $credentials['credential']);
+                    })
+                    ->orWhereHas('asesor', function ($query) use ($credentials) {
+                        $query->where('nip', $credentials['credential']);
+                    })
+                    ->first();
+
+        // Jika user ditemukan dan password cocok, login menggunakan user id
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            Auth::loginUsingId($user->id);
+            return;
+        }
+
+        // Jika semua upaya otentikasi gagal
+        RateLimiter::hit($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'credential' => trans('auth.failed'),
+        ]);
     }
+
 
     /**
      * Ensure the login request is not rate limited.
@@ -79,7 +102,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'credential' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -91,6 +114,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('credential')).'|'.$this->ip());
     }
 }

@@ -28,31 +28,43 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $user = User::firstWhere('email', $request->email);
+        $credential = $request->input('credential'); // Input yang bisa berupa email, NIM, NIP, atau username
         $password = $request->password;
-        if (Captcha::check($request->captcha)) {
-            if($user) {
-                $passwordCheck = Hash::check($password, $user['password']);
-                if ($passwordCheck && $user->role == 'Asesi' && optional($user->asesi)->status === 'nonactive') {
-                    return back()->with('status_account', 'Akun assesmen anda belum di aktifkan, silahkan hubungi admin');
-                } elseif ($passwordCheck && $user['status'] === 'nonactive') {
-                    return back()->with('status_account','Akun anda telah di nonaktifkan');
-                }
-                if(!$passwordCheck) {
-                    return back()->with('status_account','Username/Password salah');
-                }
-            } else {
-                return back()->with('status_account','Username/Password salah');
-            }
-        } else {
-            return back()->with('failed-captcha','Kode Captcha tidak sesuai');
+        
+        if (!Captcha::check($request->captcha)) {
+            return back()->with('failed-captcha', 'Kode Captcha tidak sesuai');
         }
-        $request->authenticate();
 
+        // Cari user berdasarkan credential yang dimasukkan
+        $user = User::where('email', $credential)
+            ->orWhere('username', $credential)
+            ->orWhereHas('asesi', function ($query) use ($credential) {
+                $query->where('nim', $credential);
+            })
+            ->orWhereHas('asesor', function ($query) use ($credential) {
+                $query->where('nip', $credential);
+            })
+            ->first();
+
+        if (!$user || !Hash::check($password, $user->password)) {
+            return back()->with('status_account', 'Email/NIM/NIP/Username atau Password salah');
+        }
+
+        // Cek status akun
+        if ($user->role == 'Asesi' && optional($user)->status === 'nonactive') {
+            return back()->with('status_account', 'Akun asesmen anda belum diaktifkan, silahkan hubungi admin');
+        } elseif ($user->status === 'nonactive') {
+            return back()->with('status_account', 'Akun anda telah dinonaktifkan');
+        }
+
+        // Jika semua validasi berhasil, lakukan autentikasi dan regenerasi sesi
+        $request->authenticate();
         $request->session()->regenerate();
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
+
+
 
     /**
      * Destroy an authenticated session.
