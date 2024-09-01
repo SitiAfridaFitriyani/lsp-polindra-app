@@ -36,25 +36,35 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Cari user berdasarkan credential yang dimasukkan
-        $user = User::where('email', $credential)
-            ->orWhere('username', $credential)
+        $userQuery = User::query()
+            ->where('username', $credential)
             ->orWhereHas('asesi', function ($query) use ($credential) {
                 $query->where('nim', $credential);
             })
             ->orWhereHas('asesor', function ($query) use ($credential) {
                 $query->where('nip', $credential);
-            })
-            ->first();
+            });
+
+        // Tambahkan pengecekan email sebagai kondisi tersendiri
+        if (filter_var($credential, FILTER_VALIDATE_EMAIL)) {
+            $userQuery->orWhere('email', $credential);
+        }
+
+        $user = $userQuery->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
             return back()->with('status_account', 'Email/NIM/NIP/Username atau Password salah');
         }
 
-        // Cek status akun
-        if ($user->role == 'Asesi' && optional($user)->status === 'nonactive') {
-            return back()->with('status_account', 'Akun asesmen anda belum diaktifkan, silahkan hubungi admin');
-        } elseif ($user->status === 'nonactive') {
-            return back()->with('status_account', 'Akun anda telah dinonaktifkan');
+        // Cek status akun hanya jika login menggunakan email
+        if (filter_var($credential, FILTER_VALIDATE_EMAIL)) {
+            if ($user->status === 'nonactive') {
+                return back()->with('status_account', 'Akun anda belum terverifikasi');
+            }
+        } else {
+            if ($user->role == 'Asesi' && $user->status === 'nonactive') {
+                return back()->with('status_account', 'Akun asesmen anda belum diaktifkan, silahkan hubungi admin');
+            }
         }
 
         // Jika semua validasi berhasil, lakukan autentikasi dan regenerasi sesi
