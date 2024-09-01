@@ -130,15 +130,30 @@ class ObservasiController extends Controller
             // TTD Asesor
             $signatureAsesor = $request->input('signatureAsesor');
             if($signatureAsesor) {
-                if(!empty($existingData) && $existingData['ttd_asesor'] != null && Storage::exists($existingData['ttd_asesor'])) {
+                // Hapus tanda tangan asesor jika ada
+                if (!empty($existingData) && $existingData['ttd_asesor'] != null && Storage::exists($existingData['ttd_asesor'])) {
                     Storage::delete($existingData['ttd_asesor']);
                 }
-                $imageName = time() . '.png';
-                $path = public_path('storage/asesor_signatureChecklistObservasi/' . $imageName);
+
+                // Tentukan nama dan path file untuk tanda tangan asesor
+                $imageNameAsesor = time() . '.png';
+                $directoryPathAsesor = public_path('storage/asesor_signatureChecklistObservasi');
+
+                // Periksa jika direktori tidak ada, maka buat
+                if (!is_dir($directoryPathAsesor)) {
+                    mkdir($directoryPathAsesor, 0755, true); // Membuat direktori dengan izin 0755
+                }
+
+                // Tentukan path lengkap
+                $pathAsesor = $directoryPathAsesor . '/' . $imageNameAsesor;
+
+                // Proses dan simpan tanda tangan asesor
                 $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
                 $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
-                file_put_contents($path, base64_decode($signatureAsesor));
-                $validated['ttd_asesor'] = 'asesor_signatureChecklistObservasi/'.$imageName;
+                file_put_contents($pathAsesor, base64_decode($signatureAsesor));
+
+                // Simpan path ke dalam variabel untuk database
+                $validated['ttd_asesor'] = 'asesor_signatureChecklistObservasi/' . $imageNameAsesor;
             } else {
                 $validated['ttd_asesor'] = $existingData['ttd_asesor'];
             }
@@ -189,15 +204,30 @@ class ObservasiController extends Controller
         }
 
         if($signatureAsesi) {
-            if(!empty($observasi) && $observasi['ttd_asesi'] != null && Storage::exists($observasi['ttd_asesi'])) {
+            // Hapus tanda tangan asesi jika ada
+            if (!empty($observasi) && $observasi['ttd_asesi'] != null && Storage::exists($observasi['ttd_asesi'])) {
                 Storage::delete($observasi['ttd_asesi']);
             }
-            $imageName = time() . '.png';
-            $path = public_path('storage/asesi_signatureChecklistObservasi/' . $imageName);
+
+            // Tentukan nama dan path file untuk tanda tangan asesi
+            $imageNameAsesi = time() . '.png';
+            $directoryPathAsesi = public_path('storage/asesi_signatureChecklistObservasi');
+
+            // Periksa jika direktori tidak ada, maka buat
+            if (!is_dir($directoryPathAsesi)) {
+                mkdir($directoryPathAsesi, 0755, true); // Membuat direktori dengan izin 0755
+            }
+
+            // Tentukan path lengkap
+            $pathAsesi = $directoryPathAsesi . '/' . $imageNameAsesi;
+
+            // Proses dan simpan tanda tangan asesi
             $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
             $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
-            file_put_contents($path, base64_decode($signatureAsesi));
-            $resultTtdAsesi = 'asesi_signatureChecklistObservasi/'.$imageName;
+            file_put_contents($pathAsesi, base64_decode($signatureAsesi));
+
+            // Simpan path ke dalam variabel untuk database
+            $resultTtdAsesi = 'asesi_signatureChecklistObservasi/' . $imageNameAsesi;
         } else {
             $resultTtdAsesi = $observasi['ttd_asesi'];
         }

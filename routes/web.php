@@ -41,8 +41,6 @@ Route::get('/certificate-preview', function () {
     return view('certificate.index'); // This will directly load the certificate preview view
 })->name('certificate.preview');
 
-Route::get('/generate-certificate', [CertificateController::class, 'generateCertificate']);
-
 Route::get('/', [GuestController::class,'index'])->name('guest.index');
 Route::get('/assesmen-register',[GuestController::class,'registerAssesmen'])->name('guest.assesmen-register');
 Route::get('kelas/list/{uuid}', [KelasController::class, 'listByUUID'])->name('kelas.listByUuid');
@@ -146,7 +144,12 @@ Route::middleware('auth')->group(function () {
             Route::get('datatable', [AsesiController::class, 'datatable'])->name('asesi.datatable');
             Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
         });
-        Route::get('sertifikasi', [SertifikasiController::class, 'index'])->name('sertifikasi.index');
+        // Route::get('sertifikasi', [SertifikasiController::class, 'index'])->name('sertifikasi.index');
+        Route::prefix('sertifikasi')->group(function () {
+            Route::get('', [CertificateController::class, 'index'])->name('sertifikasi.index');
+            Route::get('generate-certificate', [CertificateController::class, 'generateCertificate'])->name('generateCertificate.datatable');
+            Route::get('datatable', [CertificateController::class, 'datatable'])->name('sertifikasi.datatable');
+        });
         // Pengaturan
         Route::prefix('pengaturan')->group(function () {
             Route::get('',[PengaturanConctroller::class,'index'])->name('pengaturan');

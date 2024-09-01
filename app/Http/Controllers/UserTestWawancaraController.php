@@ -177,15 +177,31 @@ class UserTestWawancaraController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Harap isi form sebelum melakukan tanda tangan'], 404);
         }
         if($signatureAsesi) {
-            if(!empty($testWawancara) && $testWawancara['ttd_asesi'] != null && Storage::exists($testWawancara['ttd_asesi'])) {
+            // Hapus tanda tangan asesi jika ada
+            if (!empty($testWawancara) && $testWawancara['ttd_asesi'] != null && Storage::exists($testWawancara['ttd_asesi'])) {
                 Storage::delete($testWawancara['ttd_asesi']);
             }
+
+            // Tentukan nama dan path file untuk tanda tangan asesi
             $imageName = time() . '.png';
-            $path = public_path('storage/asesi_signatureTestWawancara/' . $imageName);
+            $directoryPath = public_path('storage/asesi_signatureTestWawancara');
+
+            // Periksa jika direktori tidak ada, maka buat
+            if (!is_dir($directoryPath)) {
+                mkdir($directoryPath, 0755, true); // Membuat direktori dengan izin 0755
+            }
+
+            // Tentukan path lengkap
+            $path = $directoryPath . '/' . $imageName;
+
+            // Proses dan simpan tanda tangan asesi
             $signatureAsesi = str_replace('data:image/png;base64,', '', $signatureAsesi);
             $signatureAsesi = str_replace(' ', '+', $signatureAsesi);
             file_put_contents($path, base64_decode($signatureAsesi));
-            $resultTtdAsesi = 'asesi_signatureTestWawancara/'.$imageName;
+
+            // Simpan path ke dalam variabel untuk database
+            $resultTtdAsesi = 'asesi_signatureTestWawancara/' . $imageName;
+
         } else {
             $resultTtdAsesi = $testWawancara['ttd_asesi'];
         }

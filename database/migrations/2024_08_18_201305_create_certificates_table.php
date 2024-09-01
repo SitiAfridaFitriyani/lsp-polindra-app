@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->string('name');
-            $table->string('qualification');
-            $table->date('issue_date');
+            $table->enum('status_rekomendasi',['Kompeten','Belum Kompeten'])->default('Belum Kompeten');
+            $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
+            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->timestamps();
         });
     }

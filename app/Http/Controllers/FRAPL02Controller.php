@@ -162,29 +162,53 @@ class FRAPL02Controller extends Controller
         $signatureAsesor = $request->input('signature');
         $asesiUuid = $request->asesi_id;
         $kelompokAsesorUuid = $request->kelompok_asesor;
+
         DB::beginTransaction();
-        $asesi = Asesi::firstWhere('uuid',$asesiUuid);
-        $kelompokAsesor = KelompokAsesor::firstWhere('uuid',$kelompokAsesorUuid);
-        if(empty($asesi) || empty($kelompokAsesor)) {
+
+        $asesi = Asesi::firstWhere('uuid', $asesiUuid);
+        $kelompokAsesor = KelompokAsesor::firstWhere('uuid', $kelompokAsesorUuid);
+
+        if (empty($asesi) || empty($kelompokAsesor)) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
 
         $frapl02 = FRAPL02::firstWhere([
-            ['asesi_id',$asesi['id']],
-            ['kelompok_asesor_id',$kelompokAsesor['id']]
+            ['asesi_id', $asesi['id']],
+            ['kelompok_asesor_id', $kelompokAsesor['id']]
         ]);
 
-        if($signatureAsesor) {
-            if(!empty($frapl02) && $frapl02['ttd_asesor'] != null && Storage::exists($frapl02['ttd_asesor'])) {
+        if (empty($frapl02)) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Data FRAPL-02 tidak ditemukan'], 404);
+        }
+
+        if ($signatureAsesor) {
+            // Hapus tanda tangan asesor jika ada
+            if ($frapl02['ttd_asesor'] != null && Storage::exists($frapl02['ttd_asesor'])) {
                 Storage::delete($frapl02['ttd_asesor']);
             }
+
+            // Tentukan nama dan path file untuk tanda tangan asesor
             $imageName = time() . '.png';
-            $path = public_path('storage/asesor_signatureFRAPL02/' . $imageName);
+            $directoryPath = public_path('storage/asesor_signatureFRAPL02');
+
+            // Periksa jika direktori tidak ada, maka buat
+            if (!is_dir($directoryPath)) {
+                mkdir($directoryPath, 0755, true); // Membuat direktori dengan izin 0755
+            }
+
+            // Tentukan path lengkap
+            $path = $directoryPath . '/' . $imageName;
+
+            // Proses dan simpan tanda tangan asesor
             $signatureAsesor = str_replace('data:image/png;base64,', '', $signatureAsesor);
             $signatureAsesor = str_replace(' ', '+', $signatureAsesor);
             file_put_contents($path, base64_decode($signatureAsesor));
-            $resultTtdAsesor = 'asesor_signatureFRAPL02/'.$imageName;
+
+            // Simpan path ke dalam variabel untuk database
+            $resultTtdAsesor = 'asesor_signatureFRAPL02/' . $imageName;
+
         } else {
             $resultTtdAsesor = $frapl02['ttd_asesor'];
         }
@@ -193,6 +217,7 @@ class FRAPL02Controller extends Controller
             'tgl_ttd_asesor' => now(),
             'ttd_asesor' => $resultTtdAsesor
         ]);
+
         if ($result) {
             DB::commit();
             return response()->json(['status' => 'success', 'code' => '200', 'message' => 'Data FRAPL-02 berhasil ditandatangani'], 200);
@@ -201,6 +226,7 @@ class FRAPL02Controller extends Controller
             return response()->json(['status' => 'error' ,'code' => '500', 'message' => 'Server Error 500'], 500);
         }
     }
+
 
     public function showByKelompokAsesor()
     {

@@ -35,7 +35,7 @@
             $queryFRAPL01Asesi = $kelompokAsesor->frapl01
                 ->where('asesi_id', $asesiId)
                 ->where('kelompok_asesor_id',$kelompokAsesor['id']);
-            $is_frapl01TtdAsesor = (clone $queryFRAPL01Asesi)->where('ttd_asesor','!=', null)->first();
+            $is_frapl01TtdAdminLsp = (clone $queryFRAPL01Asesi)->where('ttd_admin_lsp','!=', null)->first();
             $is_frapl01TtdAsesi = $queryFRAPL01Asesi->where('ttd_asesi','!=', null)->first();
 
             // TTD Asesi Check FRAPL02
@@ -77,10 +77,11 @@
                                     </span>
                                 </div>
                                 <div>
+                                    {{-- @dd($is_frapl01TtdAsesi) --}}
                                     <span @class(['text-wrap','badge','p1',
-                                        'bg-success' => $is_frapl01TtdAsesor,
-                                        'bg-danger' => !$is_frapl01TtdAsesor,
-                                        ])> {{ $is_frapl01TtdAsesor ? 'Ditandatangani oleh Asesor' : 'Belum Ditandatangani Admin LSP' }}
+                                        'bg-success' => $is_frapl01TtdAdminLsp,
+                                        'bg-danger' => !$is_frapl01TtdAdminLsp,
+                                        ])> {{ $is_frapl01TtdAdminLsp ? 'Ditandatangani oleh Admin LSP' : 'Belum Ditandatangani Admin LSP' }}
                                     </span>
                                 </div>
                             </div>

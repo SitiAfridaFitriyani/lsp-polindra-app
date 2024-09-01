@@ -214,15 +214,31 @@ class FRAPL01Controller extends Controller
         ]);
 
         if($signatureAdminLSP) {
-            if(!empty($frapl01) && $frapl01['ttd_admin_lsp'] != null && Storage::exists($frapl01['ttd_admin_lsp'])) {
+            // Hapus tanda tangan admin LSP jika ada
+            if (!empty($frapl01) && $frapl01['ttd_admin_lsp'] != null && Storage::exists($frapl01['ttd_admin_lsp'])) {
                 Storage::delete($frapl01['ttd_admin_lsp']);
             }
+
+            // Tentukan nama dan path file untuk tanda tangan admin LSP
             $imageName = time() . '.png';
-            $path = public_path('storage/adminLSP_signatureFRAPL01/' . $imageName);
+            $directoryPath = public_path('storage/adminLSP_signatureFRAPL01');
+
+            // Periksa jika direktori tidak ada, maka buat
+            if (!is_dir($directoryPath)) {
+                mkdir($directoryPath, 0755, true); // Membuat direktori dengan izin 0755
+            }
+
+            // Tentukan path lengkap
+            $path = $directoryPath . '/' . $imageName;
+
+            // Proses dan simpan tanda tangan admin LSP
             $signatureAdminLSP = str_replace('data:image/png;base64,', '', $signatureAdminLSP);
             $signatureAdminLSP = str_replace(' ', '+', $signatureAdminLSP);
             file_put_contents($path, base64_decode($signatureAdminLSP));
-            $resultTtdAdminLSP = 'adminLSP_signatureFRAPL01/'.$imageName;
+
+            // Simpan path ke dalam variabel untuk database
+            $resultTtdAdminLSP = 'adminLSP_signatureFRAPL01/' . $imageName;
+
         } else {
             $resultTtdAdminLSP = $frapl01['ttd_admin_lsp'];
         }
