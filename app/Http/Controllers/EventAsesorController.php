@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Asesi;
 use App\Models\KelompokAsesor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class EventAsesorController extends Controller
 {
@@ -34,7 +36,34 @@ class EventAsesorController extends Controller
             ['uuid',$uuid],
             ['asesor_id', $asesor_id]
         ]);
-        $data = $kelompokAsesor->kelas->asesi;
+        $data = $kelompokAsesor;
+        // $data = $kelompokAsesor->kelas->asesi;
+
+        // dd($data);
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
+
+    public function updateQualificationStatus(Request $request, $uuid)
+    {
+        // Debug untuk melihat isi request
+        dd($request->all());
+
+        // Validasi input
+        $request->validate([
+            'kelompok_asesor_id' => 'required|exists:t_kelompok_asesor,id',
+            'new_status' => 'required|in:Kompeten,Belum Kompeten',
+        ]);
+
+        // Temukan kelompok asesor berdasarkan ID
+        $kelompokAsesor = Asesi::findOrFail($request->input('kelompok_asesor_id'));
+
+        // Update status
+        $kelompokAsesor->is_qualification = $request->input('new_status');
+        $kelompokAsesor->save();
+
+        // Kembalikan respons sukses
+        return response()->json(['status' => 'success', 'message' => 'Status berhasil diperbarui'], 200);
+    }
+
+
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\{DB,Storage};
 use App\Http\Requests\{StoreAsesiRequest, UpdateAsesiRequest};
 
 class AsesiController extends Controller
-{
+{   
     /**
      * Display a listing of the resource.
      */

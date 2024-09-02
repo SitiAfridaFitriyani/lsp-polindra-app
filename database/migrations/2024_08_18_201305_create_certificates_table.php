@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('uuid')->unique();
             $table->enum('status_rekomendasi',['Kompeten','Belum Kompeten'])->default('Belum Kompeten');
             $table->foreignId('asesi_id')->constrained('m_asesi')->cascadeOnDelete();
-            $table->foreignId('kelompok_asesor_id')->constrained('t_kelompok_asesor')->cascadeOnDelete();
             $table->timestamps();
         });
     }

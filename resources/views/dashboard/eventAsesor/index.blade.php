@@ -35,6 +35,7 @@
                                 <th>Phone</th>
                                 <th>Gender</th>
                                 <th>Alamat</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                     </table>

@@ -7,21 +7,25 @@
             type: 'GET',
             dataType: 'json',
             success: function(response) {
-                const data = response.data;
+                const datas = response.data;
+                const data = datas.kelas.asesi;
+                console.log("ini data", data);
+                
                 const kelompokAsesorId = @json(request()->segment(2));
-
+                
                 const checklistObservasiRouteBaseURL = '{{ route("checklistObservasi.index", ":uuid") }}';
                 const checklistObservasiRouteURL = `${checklistObservasiRouteBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
-
+                
                 const fraplRouteBaseURL = '{{ route("frapl.index", ":uuid") }}';
                 const fraplRouteURL = `${fraplRouteBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
-
+                
                 const persetujuanAssesmenBaseURL = '{{ route("persetujuanAssesmen.index", ":uuid") }}';
                 const persetujuanAssesmenURL = `${persetujuanAssesmenBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
-
+                
                 const testAssesmenBaseURL = '{{ route("testAssesmen.index", ":uuid") }}';
                 const testAssesmenURL = `${testAssesmenBaseURL}&kelompok-asesor-id=${kelompokAsesorId}`;
-
+                
+                // console.log("testing", datas);
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
                         "<'table-responsive'tr>" +
@@ -105,6 +109,19 @@
                                 return data ? data.address : 'N/A';
                             }
                         },
+                        {
+                            data: 'is_qualification',
+                                render: function(data, type, row) {
+                                    // Jika syarat belum terpenuhi, dropdown tidak bisa dipilih
+                                    const statusOptions = `
+                                        <select class="form-control status-dropdown" data-id="${row.uuid}" ${!data ? 'disabled' : ''}>
+                                            <option value="Kompeten" ${data === 'Kompeten' ? 'selected' : ''}>Kompeten</option>
+                                            <option value="Belum Kompeten" ${data === 'Belum Kompeten' ? 'selected' : ''}>Belum Kompeten</option>
+                                        </select>
+                                    `;
+                                    return statusOptions;
+                            }
+                        },
                     ]
                 });
             },
@@ -114,6 +131,39 @@
         });
 
     }
+
+    $(document).on('change', '.status-dropdown', function() {
+    const kelompokAsesorId = $(this).data('id');  // ID dari t_kelompok_asesor
+    const newValue = $(this).val();  // Nilai baru dari dropdown
+    const uuid = @json(request()->segment(2));  // UUID dari URL yang ada di function show
+
+    console.log(kelompokAsesorId, uuid);
+
+    // AJAX request untuk update status
+    $.ajax({
+        url: '/event-asesor/' + uuid + '/update-qualification-status',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',  // Sertakan CSRF token untuk keamanan
+            kelompok_asesor_id: kelompokAsesorId,  // ID dari t_kelompok_asesor
+            new_status: newValue  // Nilai yang dipilih dari dropdown (Kompeten/Belum Kompeten)
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                alert('Status berhasil diperbarui');
+            } else {
+                alert('Gagal memperbarui status');
+            }
+        },
+        error: function(xhr) {
+            alert('Terjadi kesalahan saat memperbarui status');
+        }
+    });
+});
+
+
+
+
 </script>
 {{-- <a class="dropdown-item" href="${persetujuanAssesmenRendered}" title="Daftar Lembar Persetujuan">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>

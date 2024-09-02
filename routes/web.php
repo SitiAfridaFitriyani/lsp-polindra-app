@@ -177,8 +177,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:asesor')->group(function() {
         Route::prefix('event-asesor')->group(function () {
             Route::get('{uuid}/datatable', [EventAsesorController::class, 'datatable'])->name('event-asesor.datatable');
-            Route::get('{uuid}/show',[EventAsesorController::class,'show'])->name('event-asesor.show');
-        });
+            Route::get('{uuid}/show', [EventAsesorController::class, 'show'])->name('event-asesor.show');
+            Route::post('{uuid}/update-qualification-status', [EventAsesorController::class, 'updateQualificationStatus']);
+        });        
         // TTD Test Tulis & Praktek
         Route::post('test-tulis-assesmen/asesor-signature',[UserTestTulisController::class,'asesorSignature'])->name('userTestTulis.asesor-signature');
         Route::post('test-praktek-assesmen/asesor-signature',[UserTestPraktekController::class,'asesorSignature'])->name('userTestPraktek.asesor-signature');

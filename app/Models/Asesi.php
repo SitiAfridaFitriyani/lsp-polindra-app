@@ -63,4 +63,9 @@ class Asesi extends Model
     {
         return $this->hasMany(FRAPL02::class,'asesor_id');
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'asesi_id');
+    }
 }
