@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Log;
+use Carbon\Carbon;
+use App\Models\Certificate;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
@@ -18,47 +22,62 @@ class CertificateController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function datatable($uuid)
+    public function datatable()
     {
-        $asesi = Asesi::firstWhere('uuid',$uuid);
-        $data = KelompokAsesor::with(['skema','event','kelas','asesor.user'])
-        ->where('kelas_id', $asesi['kelas_id'])
-        ->latest()
-        ->get();
+        $data = Certificate::with([
+            'asesi',
+            'asesi.user', 
+            'kelompokAsesor',
+            'kelompokAsesor.asesor',
+            'kelompokAsesor.asesor.user'
+            ])->latest()->get();
+
+        // dd($data);
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
-    public function generateCertificate()
-    {
-        // Pastikan direktori 'certificates' ada
-        $certificateDir = public_path('certificates');
-        if (!File::exists($certificateDir)) {
-            File::makeDirectory($certificateDir, 0755, true);
-        }
+    public function generateCertificate($certificateId)
+{
+    Log::info('Certificate ID yang dikirim: ' . $certificateId);
 
-        // Data untuk diisi pada view
-        $data = [
-            'name' => 'Moh. Ali Fikri',
-            'noreg' => 'No. Reg. TIK 1565 04115 2024',
-            'skill' => 'Pemasaran Digital',
-            'skill2' => 'Social Media Marketing',
-            'location' => 'Yogyakarta, 22 Februari 2024',
-        ];
+    $certificate = Certificate::with('asesi.user', 'kelompokAsesor.event', 'kelompokAsesor.skema')
+                                ->where('uuid', $certificateId)
+                                ->firstOrFail();
 
-        // Temukan nomor urut yang belum ada
-        $i = 1;
-        do {
-            $pdfFileName = sprintf('NAMADOKUMEN-%02d.pdf', $i);
-            $pdfPath = $certificateDir . '/' . $pdfFileName;
-            $i++;
-        } while (File::exists($pdfPath));
+    $oldFile = $certificate->file_certificate;
 
-        // Render tampilan HTML menjadi PDF
-        $pdf = Pdf::loadView('certificate.index', $data)->setPaper('A4', 'portrait');
-
-        // Simpan PDF ke dalam folder public/certificates
-        $pdf->save($pdfPath);
-
-        return response()->json(['message' => 'PDF has been generated successfully!', 'pdf_path' => $pdfPath]);
+    if ($oldFile && Storage::exists('public/' . $oldFile)) {
+        Storage::delete('public/' . $oldFile);
     }
+
+
+    $skill = $certificate->kelompokAsesor->event->nama_event; 
+    $skillEng = $skill;
+    
+    $data = [
+        'name' => $certificate->asesi->user->name,
+        'noreg' => 'No. Reg. TIK 1565 04115 2024',
+        'skill' => $skill, 
+        'skillEng' => $skillEng, 
+        'skill2' => $certificate->kelompokAsesor->skema->judul_skema,
+        'date' => $certificate->asesi->valid_date ? Carbon::parse($certificate->asesi->valid_date)->translatedFormat('d F Y') : 'Tanggal tidak tersedia',
+    ];
+
+    // Generate nama file baru untuk sertifikat
+    $pdfFileName = 'sertifikat-' . Str::slug($certificate->asesi->user->name) . '.pdf';
+
+    // Render PDF menggunakan data yang sudah diambil
+    $pdf = Pdf::loadView('certificate.index', $data)->setPaper('A4', 'portrait');
+
+    // Simpan PDF ke dalam folder public/storage/certificate
+    $pdfContent = $pdf->output();
+    Storage::put('public/certificate/' . $pdfFileName, $pdfContent);
+
+    // Simpan path file PDF ke dalam kolom file_certificate di database
+    $certificate->update([
+        'file_certificate' => 'certificate/' . $pdfFileName,  // Path disimpan di database dengan format 'certificate/{nama file}'
+    ]);
+
+    return response()->json(['message' => 'PDF has been generated and saved successfully!', 'pdf_path' => asset('storage/certificate/' . $pdfFileName)]);
+}
 }

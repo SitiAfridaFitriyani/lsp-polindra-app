@@ -145,9 +145,11 @@ Route::middleware('auth')->group(function () {
             Route::get('list',[AsesiController::class,'list'])->name('asesi.list');
         });
         // Route::get('sertifikasi', [SertifikasiController::class, 'index'])->name('sertifikasi.index');
+        Route::resource('sertifikasi',CertificateController::class)->except(['index', 'create', 'show']);
         Route::prefix('sertifikasi')->group(function () {
             Route::get('', [CertificateController::class, 'index'])->name('sertifikasi.index');
-            Route::get('generate-certificate', [CertificateController::class, 'generateCertificate'])->name('generateCertificate.datatable');
+            // Menggunakan metode POST dan melewatkan uuid sebagai parameter
+            Route::post('sertifikasi/generate-certificate/{uuid}', [CertificateController::class, 'generateCertificate'])->name('sertifikasi.upload');
             Route::get('datatable', [CertificateController::class, 'datatable'])->name('sertifikasi.datatable');
         });
         // Pengaturan

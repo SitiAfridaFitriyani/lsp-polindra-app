@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Asesi;
+use App\Models\Certificate;
+use Illuminate\Http\Request;
 use App\Models\KelompokAsesor;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class EventAsesorController extends Controller
 {
@@ -46,24 +47,45 @@ class EventAsesorController extends Controller
     public function updateQualificationStatus(Request $request, $uuid)
     {
         // Debug untuk melihat isi request
-        dd($request->all());
+        // dd($request->all());
 
         // Validasi input
         $request->validate([
+            'asesi_id' => 'required|exists:m_asesi,id',
             'kelompok_asesor_id' => 'required|exists:t_kelompok_asesor,id',
-            'new_status' => 'required|in:Kompeten,Belum Kompeten',
+            'is_qualification' => 'required|in:Kompeten,Belum Kompeten',
         ]);
+        
 
         // Temukan kelompok asesor berdasarkan ID
-        $kelompokAsesor = Asesi::findOrFail($request->input('kelompok_asesor_id'));
+        // Ubah pencarian menjadi berdasarkan uuid, bukan id
+        $kelompokAsesor = Asesi::where('id', $request->input('asesi_id'))->firstOrFail();
 
-        // Update status
-        $kelompokAsesor->is_qualification = $request->input('new_status');
+        // Update status dan valid_date dengan tanggal sekarang
+        $kelompokAsesor->is_qualification = $request->input('is_qualification');
+        $kelompokAsesor->valid_date = now(); // Mengisi valid_date dengan tanggal sekarang
         $kelompokAsesor->save();
 
+        // Cek apakah sudah ada sertifikat untuk asesi dan kelompok_asesor ini
+        $existingCertificate = Certificate::where('asesi_id', $kelompokAsesor->id)
+                                        ->where('kelompok_asesor_id', $request->input('kelompok_asesor_id'))
+                                        ->first();
+
+                                        // dd($kelompokAsesor->uuid);
+        if (!$existingCertificate) {
+            // Jika belum ada, buat sertifikat baru
+            Certificate::create([
+                'asesi_id' => $kelompokAsesor->id,
+                'kelompok_asesor_id' => $request->input('kelompok_asesor_id'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
         // Kembalikan respons sukses
-        return response()->json(['status' => 'success', 'message' => 'Status berhasil diperbarui'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Status, valid date, dan sertifikat berhasil diperbarui'], 200);
     }
+
 
 
 }

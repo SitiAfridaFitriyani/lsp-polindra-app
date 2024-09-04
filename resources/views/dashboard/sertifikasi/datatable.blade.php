@@ -1,19 +1,20 @@
 <script>
     function getData() {
-        const table = $('#table-event-saya');
+        const table = $('#table-sertifikasi');
+        
         const dataRoute = table.data('route');
+        console.log(dataRoute);
+
         $.ajax({
             url: dataRoute,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
                 const data = response.data;
-                const listAsesorRoute = '{{ route("asesor.listByUuid", [":uuid"]) }}';
-                const fraplRoute = '{{ route("frapl.index", [":uuid"]) }}';
-                const persetujuanAssesmen = '{{ route("persetujuanAssesmen.index", [":uuid"]) }}';
-                const testAssesmen = '{{ route("testAssesmen.index", [":uuid"]) }}';
-                const checklistObservasi = '{{ route("checklistObservasi.index", [":uuid"]) }}';
-
+                const deleteRoute = '{{ route("sertifikasi.destroy", [":uuid"]) }}';
+                const uploadRoute = '{{ route("sertifikasi.upload", [":uuid"]) }}'; // route untuk upload sertifikat
+                console.log(data);
+                
                 table.DataTable({
                     "dom": "<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>" +
                         "<'table-responsive'tr>" +
@@ -37,68 +38,44 @@
                         {
                             data: 'uuid',
                             render: function(data) {
-                                const listAsesorRouteRendered = listAsesorRoute.replace(':uuid', data);
-                                const fraplRouteRendered = fraplRoute.replace(':uuid', '{{ request()->query->keys()[0] }}');
-                                const persetujuanAssesmenRendered = persetujuanAssesmen.replace(':uuid', data);
-                                const daftarTestAssesmenRendered = testAssesmen.replace(':uuid', '{{ request()->query->keys()[0] }}');
-                                const checklistObservasiAssesmenRendered = checklistObservasi.replace(':uuid', '{{ request()->query->keys()[0] }}');
+                                const deleteRouteRendered = deleteRoute.replace(':uuid', data);
+                                // const editRouteRendered = editRoute.replace(':uuid', data);
 
                                 return `
-                                    <div class="dropdown">
+                                    <div class="">
                                         <a class="dropdown-toggle" href="javascript:void(0);" role="button" id="dropdownMenuLink10" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="More menu">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                         </a>
                                         <div class="dropdown-menu left" aria-labelledby="dropdownMenuLink10" style="will-change: transform; position: absolute; transform: translate3d(-141px, 19px, 0px); top: 0px; left: 0px;" x-placement="bottom-end">
-                                            <a class="dropdown-item" href="${daftarTestAssesmenRendered}&kelompok-asesor-id=${data}" title="Test Wawancara">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                                Test Wawancara
-                                            </a>
-                                            <a class="dropdown-item" href="${checklistObservasiAssesmenRendered}&kelompok-asesor-id=${data}" title="Daftar Checklist Observasi">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                                                Daftar Checklist Observasi
-                                            </a>
-                                            <a class="dropdown-item" href="${fraplRouteRendered}&kelompok-asesor-id=${data}" title="Daftar FRAPL">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                                                Daftar FRAPL
+                                            <a class="dropdown-item" href="javascript:void(0);" onclick="handleDelete(this)" data-route="${deleteRouteRendered}" title="Delete Asesor">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+                                                Delete Asesor
                                             </a>
                                         </div>
                                     </div>`;
                             }
                         },
                         {
-                            data: 'asesor',
+                            data: 'asesi.user',
                             render: function(data) {
-                                return data ? data.user.name : 'N/A';
+                                return data ? data.name : 'N/A';
                             }
                         },
                         {
-                            data: 'skema',
+                            data: 'asesi',
                             render: function(data) {
-                                return data ? data.judul_skema : 'N/A';
+                                if (data && data.is_qualification) {
+                                    return `<span class="badge badge-success">Kompeten</span>`;
+                                } else {
+                                    return `<span class="badge badge-danger">Belum Kompeten</span>`;
+                                }
                             }
                         },
                         {
-                            data: 'kelas',
+                            data: 'uuid',
                             render: function(data) {
-                                return data ? data.nama_kelas : 'N/A';
-                            }
-                        },
-                        {
-                            data: 'event',
-                            render: function(data) {
-                                return data ? data.tuk : 'N/A';
-                            }
-                        },
-                        {
-                            data: 'event',
-                            render: function(data) {
-                                return data ? moment(data.event_mulai).format('DD MMMM Y H:mm') +' WIB' : 'N/A';
-                            }
-                        },
-                        {
-                            data: 'event',
-                            render: function(data) {
-                                return data ? moment(data.event_selesai).format('DD MMMM Y H:mm') +' WIB' : 'N/A';
+                                const uploadRouteRendered = '{{ route("sertifikasi.upload", ":uuid") }}'.replace(':uuid', data);
+                                return `<button class="btn btn-primary" onclick="submitCertificate('${uploadRouteRendered}')">Upload Sertifikat</button>`;
                             }
                         }
                     ]
@@ -108,17 +85,35 @@
                 snackBarAlert('Data gagal termuat', '#e7515a');
             }
         });
+
     }
+
+    function submitCertificate(url) {
+    $.ajax({
+        url: url,
+        type: 'POST',  // Pastikan menggunakan POST
+        success: function(response) {
+            snackBarAlert(response.message, '#1abc9c');
+            getData();  // Panggil fungsi untuk memperbarui data
+            clearCanvasAsesi();  // Bersihkan canvas tanda tangan
+        },
+        error: function(xhr, status, error) {
+            // Tampilkan pesan error spesifik dari response
+            let errorMessage = '';
+
+            // Jika ada response JSON, ambil pesan kesalahannya
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            } else {
+                // Jika tidak, tampilkan pesan status dan error yang diambil dari server
+                errorMessage = `Error ${xhr.status}: ${status} - ${error}`;
+            }
+
+            // Gunakan snackBarAlert atau alert untuk menampilkan error
+            snackBarAlert('Certificated error generate: ' + errorMessage, '#e7515a');
+            clearCanvasAsesi();  // Bersihkan canvas tanda tangan
+        }
+    });
+}
+
 </script>
-{{-- <a class="dropdown-item" href="${persetujuanAssesmenRendered}" title="Daftar Lembar Persetujuan">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-    Daftar Lembar Persetujuan
-</a>
-<a class="dropdown-item" href="javascript:void(0);" title="Daftar Rekaman Assesmen">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-server"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
-    Daftar Rekaman Assesmen
-</a>
-<a class="dropdown-item" href="javascript:void(0);" title="Umpan Balik">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-    Umpan Balik
-</a> --}}

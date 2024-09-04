@@ -8,8 +8,12 @@
             dataType: 'json',
             success: function(response) {
                 const datas = response.data;
-                const data = datas.kelas.asesi;
-                console.log("ini data", data);
+                const data = datas.kelas.asesi; // Tetap menggunakan datas sebagai referensi utama
+                
+                const mergedData = {
+                    ...data,       // Spread semua properti dari data
+                    ...datas       // Spread semua properti dari datas
+                };
                 
                 const kelompokAsesorId = @json(request()->segment(2));
                 
@@ -44,15 +48,17 @@
                     "lengthMenu": [5, 10, 20, 50],
                     "pageLength": 5,
                     "destroy": true,
-                    "data": data,
+                    "data": [mergedData],
                     "columns": [
                         {
-                            data: 'uuid',
+                            data: [0],
                             render: function(data) {
-                                const checklistObservasiRouteRendered = checklistObservasiRouteURL.replace(':uuid', data);
-                                const fraplRouteRendered = fraplRouteURL.replace(':uuid', data);
-                                const persetujuanAssesmenRendered = persetujuanAssesmenURL.replace(':uuid', data);
-                                const daftarTestAssesmenRendered = testAssesmenURL.replace(':uuid', data);
+                                // console.log("INI DATA", data);
+                                
+                                const checklistObservasiRouteRendered = checklistObservasiRouteURL.replace(':uuid', data.uuid);
+                                const fraplRouteRendered = fraplRouteURL.replace(':uuid', data.uuid);
+                                const persetujuanAssesmenRendered = persetujuanAssesmenURL.replace(':uuid', data.uuid);
+                                const daftarTestAssesmenRendered = testAssesmenURL.replace(':uuid', data.uuid);
 
                                 return `
                                     <div class="dropdown">
@@ -77,49 +83,65 @@
                             }
                         },
                         {
-                            data: 'user',
+                            data: [0],
                             render: function(data) {
-                                return data ? data.name : 'N/A';
+                                // console.log(data);
+                                return data ? data.user.name : 'N/A';
                             }
                         },
                         {
-                            data: 'user',
+                            data: [0],
                             render: function(data) {
-                                return data ? data.email : 'N/A';
+                                return data ? data.user.email : 'N/A';
                             }
                         },
                         {
-                            data: 'nim'
-                        },
-                        {
-                            data: 'user',
+                            data: [0],
                             render: function(data) {
-                                return data ? data.phone : 'N/A';
+                                return data ? data.nim : 'N/A';
                             }
                         },
                         {
-                            data: 'user',
+                            data: [0],
                             render: function(data) {
-                                return data ? data.jenis_kelamin : 'N/A';
+                                return data ? data.user.phone : 'N/A';
                             }
                         },
                         {
-                            data: 'user',
+                            data: [0],
                             render: function(data) {
-                                return data ? data.address : 'N/A';
+                                return data ? data.user.jenis_kelamin : 'N/A';
                             }
                         },
                         {
-                            data: 'is_qualification',
-                                render: function(data, type, row) {
-                                    // Jika syarat belum terpenuhi, dropdown tidak bisa dipilih
+                            data: [0],
+                            render: function(data) {
+                                return data ? data.user.address : 'N/A';
+                            }
+                        },
+                        {
+                            data: [0],
+                            render: function(data, type, row) {
+                                // Pastikan row[0] ada dan memiliki uuid
+                                if (row[0] && row[0].id) {
+                                    const asesiUuid = row[0].id; // Mengambil UUID dari asesi (row[0])
+                                    const kelompokAsesorUuid = row.id; // Mengambil UUID dari kelompok_asesor (row.uuid)
+
+                                    console.log("CEK ID KELOMPOK ASESOR", kelompokAsesorUuid); // Debugging
+                                    console.log("CEK ID ASESI", asesiUuid); // Debugging UUID asesi
+
+                                    // Dropdown untuk memilih status kompetensi dengan data-attributes
                                     const statusOptions = `
-                                        <select class="form-control status-dropdown" data-id="${row.uuid}" ${!data ? 'disabled' : ''}>
-                                            <option value="Kompeten" ${data === 'Kompeten' ? 'selected' : ''}>Kompeten</option>
-                                            <option value="Belum Kompeten" ${data === 'Belum Kompeten' ? 'selected' : ''}>Belum Kompeten</option>
+                                        <select class="form-control status-dropdown" data-asesi-id="${asesiUuid}" data-kelompok-asesor-id="${kelompokAsesorUuid}" ${!row[0].is_qualification ? 'disabled' : ''}>
+                                            <option value="Kompeten" ${row[0].is_qualification === 'Kompeten' ? 'selected' : ''}>Kompeten</option>
+                                            <option value="Belum Kompeten" ${row[0].is_qualification === 'Belum Kompeten' ? 'selected' : ''}>Belum Kompeten</option>
                                         </select>
                                     `;
                                     return statusOptions;
+                                }
+
+                                // Jika row[0] atau uuid tidak ditemukan
+                                return 'N/A';
                             }
                         },
                     ]
@@ -133,33 +155,37 @@
     }
 
     $(document).on('change', '.status-dropdown', function() {
-    const kelompokAsesorId = $(this).data('id');  // ID dari t_kelompok_asesor
-    const newValue = $(this).val();  // Nilai baru dari dropdown
-    const uuid = @json(request()->segment(2));  // UUID dari URL yang ada di function show
+        const asesi_id = $(this).data('asesi-id');  // ID dari asesi
+        const kelompok_asesor_id = $(this).data('kelompok-asesor-id');  // ID dari kelompok_asesor
+        const newValue = $(this).val();  // Nilai baru dari dropdown
+        const uuid = @json(request()->segment(2));  // UUID dari URL yang ada di function show
 
-    console.log(kelompokAsesorId, uuid);
+        console.log("ASESI_ID:", asesi_id);  // Debugging asesi_id
+        console.log("KELOMPOK_ASESOR_ID:", kelompok_asesor_id);  // Debugging kelompok_asesor_id
 
-    // AJAX request untuk update status
-    $.ajax({
-        url: '/event-asesor/' + uuid + '/update-qualification-status',
-        type: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',  // Sertakan CSRF token untuk keamanan
-            kelompok_asesor_id: kelompokAsesorId,  // ID dari t_kelompok_asesor
-            new_status: newValue  // Nilai yang dipilih dari dropdown (Kompeten/Belum Kompeten)
-        },
-        success: function(response) {
-            if (response.status === 'success') {
-                alert('Status berhasil diperbarui');
-            } else {
-                alert('Gagal memperbarui status');
+        // AJAX request untuk update status
+        $.ajax({
+            url: '/event-asesor/' + uuid + '/update-qualification-status',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',  // Sertakan CSRF token untuk keamanan
+                asesi_id: asesi_id,  // ID dari asesi
+                kelompok_asesor_id: kelompok_asesor_id,  // ID dari kelompok_asesor
+                is_qualification: newValue  // Nilai yang dipilih dari dropdown (Kompeten/Belum Kompeten)
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert('Status berhasil diperbarui');
+                } else {
+                    alert('Gagal memperbarui status');
+                }
+            },
+            error: function(xhr) {
+                alert('Terjadi kesalahan saat memperbarui status');
             }
-        },
-        error: function(xhr) {
-            alert('Terjadi kesalahan saat memperbarui status');
-        }
+        });
     });
-});
+
 
 
 

@@ -25,4 +25,9 @@ class Certificate extends Model
     {
         return $this->belongsTo(Asesi::class, 'asesi_id');
     }
+
+    public function kelompokAsesor()
+    {
+        return $this->belongsTo(KelompokAsesor::class,'kelompok_asesor_id');
+    }
 }

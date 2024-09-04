@@ -217,13 +217,13 @@
         <p class="competence-indo">Telah kompeten pada bidang:</p>
         <p class="competence-eng">has been competence in the area of:</p>
         <p class="skill-indo">{{ $skill }}</p>
-        <p class="skill-eng">Digital Marketing</p>
+        <p class="skill-eng">{{ $skillEng }}</p>
         <p class="qualification-indo">Dengan Kualifikasi / Kompetensi:</p>
         <p class="qualification-eng">With Qualification / Competency:</p>
         <p class="skill2">{{ $skill2 }}</p>
         <p class="validity-indo">sertifikat ini berlaku untuk: 3 (tiga) tahun</p>
         <p class="validity-eng">this certificate is valid for: 3 (three) years</p>
-        <p class="location">{{ $location }}</p>
+        <p class="location">Indramayu, {{ $date }}</p>
         <p class="authority-indo">Atas Nama Badan Nasional Sertifikasi Profesi</p>
         <p class="authority-eng">On Behalf Of Indonesian Professional Certification Authority</p>
         <p class="organization-indo">Lembaga Sertifikasi Profesi Teknologi Digital</p>

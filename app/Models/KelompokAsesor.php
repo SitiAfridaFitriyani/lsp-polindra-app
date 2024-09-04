@@ -64,4 +64,9 @@ class KelompokAsesor extends Model
     {
         return $this->hasMany(UserTestWawancara::class,'kelompok_asesor_id');
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'kelompok_asesor_id');
+    }
 }
