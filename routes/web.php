@@ -150,6 +150,7 @@ Route::middleware('auth')->group(function () {
             Route::get('', [CertificateController::class, 'index'])->name('sertifikasi.index');
             // Menggunakan metode POST dan melewatkan uuid sebagai parameter
             Route::post('sertifikasi/generate-certificate/{uuid}', [CertificateController::class, 'generateCertificate'])->name('sertifikasi.upload');
+            Route::get('export-pdf', [CertificateController::class, 'exportPdf'])->name('export.pdf');
             Route::get('datatable', [CertificateController::class, 'datatable'])->name('sertifikasi.datatable');
         });
         // Pengaturan
