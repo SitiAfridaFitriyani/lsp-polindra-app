@@ -175,16 +175,17 @@
             },
             success: function(response) {
                 if (response.status === 'success') {
-                    alert('Status berhasil diperbarui');
+                    snackBarAlert('Status berhasil diperbarui', '#1abc9c');  // Gunakan snackBarAlert untuk sukses
                 } else {
-                    alert('Gagal memperbarui status');
+                    snackBarAlert('Gagal memperbarui status', '#e7515a');  // Gunakan snackBarAlert untuk error
                 }
             },
             error: function(xhr) {
-                alert('Terjadi kesalahan saat memperbarui status');
+                snackBarAlert('Terjadi kesalahan saat memperbarui status', '#e7515a');  // Gunakan snackBarAlert untuk error
             }
         });
     });
+
 
 
 

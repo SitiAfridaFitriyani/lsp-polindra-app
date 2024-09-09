@@ -169,6 +169,8 @@ Route::middleware('auth')->group(function () {
         Route::prefix('event-asesi')->group(function () {
             Route::get('{uuid}/datatable', [EventAsesiController::class, 'datatable'])->name('event-asesi.datatable');
             Route::get('{uuid}/show',[EventAsesiController::class,'show'])->name('event-asesi.show');
+            // Route untuk download sertifikat
+            Route::get('{uuid}/certificates/download/{id}', [EventAsesiController::class, 'downloadCertificate'])->name('certificates.download');
         });
         // TTD Test Wawancara
         Route::post('test-wawancara-assesmen/asesi-signature',[UserTestWawancaraController::class,'asesiSignature'])->name('userTestWawancara.asesi-signature');

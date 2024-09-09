@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Certificate;
 use Illuminate\Http\Request;
 use App\Models\KelompokAsesor;
 use Illuminate\Support\Facades\Auth;
@@ -29,12 +30,66 @@ class EventAsesiController extends Controller
     }
 
     public function datatable($uuid)
+{
+    $kelas_id = Auth::user()->asesi['kelas_id'];
+
+    // Ambil data Kelompok Asesor beserta relasi
+    $data = KelompokAsesor::with([
+        'skema', 
+        'event', 
+        'kelas', 
+        'asesor.user', 
+        'certificates'
+    ])->where([
+        ['uuid', $uuid],
+        ['kelas_id', $kelas_id]
+    ])->get();
+
+    // Map data dan tambahkan 'uuid' serta 'certificates' jika ada
+    $responseData = $data->map(function ($kelompok) {
+        return [
+            'uuid' => $kelompok->uuid,
+            'skema' => $kelompok->skema,
+            'event' => $kelompok->event,
+            'kelas' => $kelompok->kelas,
+            'asesor' => $kelompok->asesor->user,
+            'certificates' => $kelompok->certificates->map(function ($certificate) {
+                return [
+                    'id' => $certificate->id,
+                    'file_certificate' => $certificate->file_certificate, // Path sertifikat
+                    // 'name' => $certificate->name // Nama sertifikat
+                ];
+            }),
+        ];
+    });
+
+    return response()->json(['status' => 'success', 'data' => $responseData], 200);
+}
+    
+    public function downloadCertificate($uuid, $id)
     {
-        $kelas_id = Auth::user()->asesi['kelas_id'];
-        $data = KelompokAsesor::with(['skema','event','kelas','asesor.user'])->where([
-            ['uuid',$uuid],
-            ['kelas_id', $kelas_id]
-        ])->get();
-        return response()->json(['status' => 'success', 'data' => $data], 200);
+        // Cari sertifikat berdasarkan ID
+        $certificate = Certificate::find($id);
+
+        // Jika sertifikat tidak ditemukan atau file_certificate null
+        if (is_null($certificate) || is_null($certificate->file_certificate)) {
+            return response()->json(['status' => 'error', 'message' => 'Sertifikat belum dibagikan'], 400);
+        }
+
+        // Path ke file sertifikat di storage
+        $pathToFile = storage_path('app/public/' . $certificate->file_certificate);
+
+        // Cek apakah file ada di server
+        if (!file_exists($pathToFile)) {
+            return response()->json(['status' => 'error', 'message' => 'File sertifikat tidak ditemukan'], 404);
+        }
+
+        // Jika file ditemukan, berikan status sukses
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sertifikat berhasil didownload',
+            'download_url' => url('storage/' . $certificate->file_certificate) // URL untuk mengunduh file
+        ]);
     }
+
 }
